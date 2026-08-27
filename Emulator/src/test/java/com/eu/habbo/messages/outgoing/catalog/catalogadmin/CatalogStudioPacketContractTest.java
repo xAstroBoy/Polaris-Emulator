@@ -4,24 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.eu.habbo.habbohotel.catalog.versioning.CatalogDraftPreview;
-import com.eu.habbo.habbohotel.catalog.versioning.CatalogOfferSnapshot;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogChangeEntry;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogChangeGroup;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogChangeOperation;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogChangeSource;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogEntityType;
 import com.eu.habbo.habbohotel.catalog.versioning.CatalogPageSnapshot;
-import com.eu.habbo.habbohotel.catalog.versioning.CatalogPreviewProduct;
-import com.eu.habbo.habbohotel.catalog.CatalogPageType;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogSmartSaveResult;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogStudioDocumentWireCodec;
 import com.eu.habbo.messages.outgoing.Outgoing;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioActor;
-import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioChangedEntity;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioDocumentResultComposer;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioHistoryComposer;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioHistoryEntry;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioHistoryGroup;
-import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioLockComposer;
-import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioOperationComposer;
-import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioPreviewComposer;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioPublishedVersion;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioSessionComposer;
-import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioSessionOffer;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioValidationComposer;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioValidationIssue;
 import com.google.gson.Gson;
@@ -78,7 +76,7 @@ class CatalogStudioPacketContractTest {
     }
 
     @Test
-    void sessionPayloadKeepsEveryCompressedSnapshotChunkReadableByRenderer() throws IOException {
+    void sessionPayloadKeepsEveryCompressedPageChunkReadableByRenderer() throws IOException {
         List<CatalogPageSnapshot> pages = new ArrayList<>();
         Random random = new Random(42);
         String lastText = "";
@@ -100,11 +98,7 @@ class CatalogStudioPacketContractTest {
                         true,
                         0,
                         List.of(),
-                        pages,
-                        List.of(new CatalogStudioSessionOffer(
-                                offer(42, 700),
-                                List.of(new CatalogPreviewProduct("s", 456, "", 1, false, 0, 0)),
-                                true)))
+                        pages)
                 .compose()
                 .get();
 
@@ -126,77 +120,9 @@ class CatalogStudioPacketContractTest {
         try (GZIPInputStream input = new GZIPInputStream(new ByteArrayInputStream(compressed))) {
             json = new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
-        var decoded = new Gson().fromJson(json, com.google.gson.JsonObject.class);
-        assertEquals(700, decoded.getAsJsonArray("pages").size());
-        assertEquals(lastText, decoded.getAsJsonArray("pages").get(699).getAsJsonObject().get("pageTextDetails").getAsString());
-        var decodedOffer = decoded.getAsJsonArray("offers").get(0).getAsJsonObject();
-        assertEquals(42, decodedOffer.getAsJsonObject("offer").get("offerId").getAsInt());
-        assertEquals(456, decodedOffer.getAsJsonArray("products").get(0).getAsJsonObject().get("productClassId").getAsInt());
-        assertTrue(decodedOffer.get("giftable").getAsBoolean());
-        assertFalse(payload.isReadable());
-    }
-
-    @Test
-    void lockPayloadIncludesOwnerTokenAndExpiryForAcquireAndRenew() {
-        ByteBuf payload = new CatalogStudioLockComposer(
-                        Outgoing.CatalogStudioAcquireLockComposer,
-                        "op-lock",
-                        true,
-                        "LOCK_ACQUIRED",
-                        "Lock acquired",
-                        12,
-                        "PAGE",
-                        "BUILDER",
-                        44,
-                        9,
-                        "Alice",
-                        "token-123",
-                        Instant.parse("2026-08-02T10:06:30Z"))
-                .compose()
-                .get();
-
-        assertHeader(payload, Outgoing.CatalogStudioAcquireLockComposer);
-        assertEquals("op-lock", readString(payload));
-        assertTrue(payload.readBoolean());
-        assertEquals("LOCK_ACQUIRED", readString(payload));
-        assertEquals("Lock acquired", readString(payload));
-        assertEquals(12, payload.readInt());
-        assertEquals("PAGE", readString(payload));
-        assertEquals("BUILDER", readString(payload));
-        assertEquals(44, payload.readInt());
-        assertEquals(9, payload.readInt());
-        assertEquals("Alice", readString(payload));
-        assertEquals("token-123", readString(payload));
-        assertEquals("2026-08-02T10:06:30Z", readString(payload));
-        assertFalse(payload.isReadable());
-    }
-
-    @Test
-    void operationPayloadKeepsRevisionAndChangedEntityIdsInOrder() {
-        ByteBuf payload = new CatalogStudioOperationComposer(
-                        Outgoing.CatalogStudioPublishComposer,
-                        "op-publish",
-                        true,
-                        "PUBLISHED",
-                        "Catalog published",
-                        8,
-                        List.of(
-                                new CatalogStudioChangedEntity("PAGE", 44),
-                                new CatalogStudioChangedEntity("OFFER", 77)))
-                .compose()
-                .get();
-
-        assertHeader(payload, Outgoing.CatalogStudioPublishComposer);
-        assertEquals("op-publish", readString(payload));
-        assertTrue(payload.readBoolean());
-        assertEquals("PUBLISHED", readString(payload));
-        assertEquals("Catalog published", readString(payload));
-        assertEquals(8, payload.readInt());
-        assertEquals(2, payload.readInt());
-        assertEquals("PAGE", readString(payload));
-        assertEquals(44, payload.readInt());
-        assertEquals("OFFER", readString(payload));
-        assertEquals(77, payload.readInt());
+        CatalogPageSnapshot[] decoded = new Gson().fromJson(json, CatalogPageSnapshot[].class);
+        assertEquals(700, decoded.length);
+        assertEquals(lastText, decoded[699].pageTextDetails());
         assertFalse(payload.isReadable());
     }
 
@@ -268,24 +194,10 @@ class CatalogStudioPacketContractTest {
     }
 
     @Test
-    void previewPayloadCarriesTypedSnapshotJson() {
-        ByteBuf payload = new CatalogStudioPreviewComposer(
-                        "op-preview", new CatalogDraftPreview(12, 7, List.of(), List.of()))
-                .compose()
-                .get();
-
-        assertHeader(payload, Outgoing.CatalogStudioPreviewComposer);
-        assertEquals("op-preview", readString(payload));
-        assertEquals(7, payload.readInt());
-        assertEquals("[]", readString(payload));
-        assertEquals("[]", readString(payload));
-        assertFalse(payload.isReadable());
-    }
-
-    @Test
     void documentResultPayloadKeepsFingerprintAndDiffCount() {
+        String document = "UPDATE catalog_pages SET caption = 'Shop' WHERE id = 1;";
         ByteBuf payload = new CatalogStudioDocumentResultComposer(
-                        "op-dry", true, "DRY_RUN_READY", "Dry-run ready", 7, "JSONC", "{}", "fingerprint", 3)
+                        "op-dry", true, "DRY_RUN_READY", "Dry-run ready", 7, "SQL", document, "fingerprint", 3)
                 .compose()
                 .get();
 
@@ -295,11 +207,105 @@ class CatalogStudioPacketContractTest {
         assertEquals("DRY_RUN_READY", readString(payload));
         assertEquals("Dry-run ready", readString(payload));
         assertEquals(7, payload.readInt());
-        assertEquals("JSONC", readString(payload));
-        assertEquals("{}", readString(payload));
+        assertEquals("SQL", readString(payload));
+        String encoding = readString(payload);
+        int chunkCount = payload.readInt();
+        java.util.List<String> chunks = new java.util.ArrayList<>(chunkCount);
+        for (int index = 0; index < chunkCount; index++) chunks.add(readString(payload));
+        assertEquals(document, CatalogStudioDocumentWireCodec.decode(encoding, chunks));
         assertEquals("fingerprint", readString(payload));
         assertEquals(3, payload.readInt());
+        assertEquals(0, payload.readInt());
         assertFalse(payload.isReadable());
+    }
+
+    @Test
+    void catalogAdminResultKeepsLegacyFieldsAndAppendsTheVersionedSmartSavePayload() {
+        CatalogAdminSmartSavePayload smartSave = new CatalogAdminSmartSavePayload(
+                "save-page-1",
+                "savePage",
+                "SAVED",
+                12,
+                8,
+                "PAGE",
+                "NORMAL",
+                44,
+                "{\"pageId\":44}",
+                "{\"id\":91}",
+                "{}",
+                13);
+        ByteBuf payload = new CatalogAdminResultComposer(true, "Page saved", smartSave)
+                .compose()
+                .get();
+
+        assertHeader(payload, Outgoing.CatalogAdminResultComposer);
+        assertTrue(payload.readBoolean());
+        assertEquals("Page saved", readString(payload));
+        assertEquals(1, payload.readInt());
+        assertEquals("save-page-1", readString(payload));
+        assertEquals("savePage", readString(payload));
+        assertEquals("SAVED", readString(payload));
+        assertEquals(12, payload.readInt());
+        assertEquals(8, payload.readInt());
+        assertEquals("PAGE", readString(payload));
+        assertEquals("NORMAL", readString(payload));
+        assertEquals(44, payload.readInt());
+        assertEquals("{\"pageId\":44}", readString(payload));
+        assertEquals("{\"id\":91}", readString(payload));
+        assertEquals("{}", readString(payload));
+        assertEquals(13, payload.readInt());
+        assertFalse(payload.isReadable());
+    }
+
+    @Test
+    void smartSavePayloadFactoryUsesStableHistoryJsonAndAllowsCreateFailures() {
+        CatalogChangeEntry entry = new CatalogChangeEntry(
+                1,
+                CatalogEntityType.PAGE,
+                com.eu.habbo.habbohotel.catalog.CatalogPageType.NORMAL,
+                44,
+                CatalogChangeOperation.UPDATE,
+                "{}",
+                "{\"pageId\":44}");
+        CatalogChangeGroup group = new CatalogChangeGroup(
+                91,
+                12,
+                8,
+                9,
+                "Edit page",
+                CatalogChangeSource.UI,
+                Instant.parse("2026-08-02T10:05:30Z"),
+                List.of(entry));
+        CatalogSmartSaveResult result = new CatalogSmartSaveResult(
+                false,
+                "save-page-1",
+                12,
+                8,
+                CatalogEntityType.PAGE,
+                com.eu.habbo.habbohotel.catalog.CatalogPageType.NORMAL,
+                44,
+                CatalogChangeOperation.UPDATE,
+                group,
+                "{\"pageId\":44}",
+                13);
+
+        CatalogAdminSmartSavePayload success =
+                CatalogAdminSmartSavePayload.success("savePage", "SAVED", result, "Alice", new Gson());
+        CatalogAdminSmartSavePayload failure = CatalogAdminSmartSavePayload.failure(
+                "create-page-1",
+                "createPage",
+                "VALIDATION_FAILED",
+                12,
+                7,
+                "PAGE",
+                "NORMAL",
+                0,
+                "{\"caption\":\"Page caption is required\"}");
+
+        assertTrue(success.historyGroupJson().contains("\"actorName\":\"Alice\""));
+        assertTrue(success.historyGroupJson().contains("\"createdAt\":\"2026-08-02T10:05:30Z\""));
+        assertEquals(0, failure.entityId());
+        assertEquals("{\"caption\":\"Page caption is required\"}", failure.fieldErrorsJson());
     }
 
     private static void assertHeader(ByteBuf payload, int expectedHeader) {
@@ -356,25 +362,5 @@ class CatalogStudioPacketContractTest {
                 "",
                 0,
                 "");
-    }
-
-    private static CatalogOfferSnapshot offer(int offerId, int pageId) {
-        return new CatalogOfferSnapshot(
-                CatalogPageType.NORMAL,
-                offerId,
-                "123",
-                pageId,
-                "chair",
-                5,
-                0,
-                0,
-                1,
-                0,
-                0,
-                9001,
-                0,
-                "",
-                true,
-                false);
     }
 }

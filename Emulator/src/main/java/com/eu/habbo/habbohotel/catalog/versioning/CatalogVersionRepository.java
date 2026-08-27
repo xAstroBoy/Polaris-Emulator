@@ -3,13 +3,26 @@ package com.eu.habbo.habbohotel.catalog.versioning;
 import com.eu.habbo.habbohotel.catalog.CatalogPageType;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public interface CatalogVersionRepository {
     CatalogRuntimeState lockRuntimeState(Connection connection) throws SQLException;
 
     CatalogVersionSnapshot loadSnapshot(Connection connection, long versionId) throws SQLException;
 
-    long cloneAsDraft(Connection connection, long sourceVersionId, int actorId, String label) throws SQLException;
+    default CatalogVersion loadVersion(Connection connection, long versionId) throws SQLException {
+        return loadSnapshot(connection, versionId).version();
+    }
+
+    default Optional<CatalogPageSnapshot> loadPage(
+            Connection connection, long versionId, CatalogPageType catalogType, int pageId) throws SQLException {
+        return loadSnapshot(connection, versionId).page(catalogType, pageId);
+    }
+
+    default Optional<CatalogOfferSnapshot> loadOffer(
+            Connection connection, long versionId, CatalogPageType catalogType, int offerId) throws SQLException {
+        return loadSnapshot(connection, versionId).offer(catalogType, offerId);
+    }
 
     long nextPageId(Connection connection) throws SQLException;
 
@@ -30,10 +43,4 @@ public interface CatalogVersionRepository {
     }
 
     long incrementRevision(Connection connection, long versionId, long expectedRevision) throws SQLException;
-
-    void archiveVersion(Connection connection, long versionId) throws SQLException;
-
-    void markPublished(Connection connection, long versionId, int actorId) throws SQLException;
-
-    void updateRuntimePointers(Connection connection, long activeVersionId, long draftVersionId) throws SQLException;
 }

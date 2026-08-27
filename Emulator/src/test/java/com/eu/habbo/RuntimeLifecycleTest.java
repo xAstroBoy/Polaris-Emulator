@@ -2,6 +2,7 @@ package com.eu.habbo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -12,7 +13,6 @@ import com.eu.habbo.core.ConfigurationManager;
 import com.eu.habbo.database.Database;
 import com.eu.habbo.database.PersistenceExecutor;
 import com.eu.habbo.habbohotel.GameEnvironment;
-import com.eu.habbo.habbohotel.gameclients.GameClientManager;
 import com.eu.habbo.networking.gameserver.GameServer;
 import com.eu.habbo.networking.rconserver.RCONServer;
 import com.eu.habbo.plugin.PluginManager;
@@ -35,7 +35,6 @@ class RuntimeLifecycleTest {
         Database database = mock(Database.class);
         HikariDataSource dataSource = mock(HikariDataSource.class);
         GameServer gameServer = mock(GameServer.class);
-        GameClientManager gameClientManager = mock(GameClientManager.class);
         RCONServer rconServer = mock(RCONServer.class);
         ThreadPooling threading = mock(ThreadPooling.class);
         PersistenceExecutor persistence = mock(PersistenceExecutor.class);
@@ -44,13 +43,16 @@ class RuntimeLifecycleTest {
 
         when(database.getDataSource()).thenReturn(dataSource);
         when(dataSource.isClosed()).thenReturn(false);
-        when(gameServer.getGameClientManager()).thenReturn(gameClientManager);
         doAnswer(invocation -> {
                     calls.add("threading.reject-new-work");
                     return null;
                 })
                 .when(threading)
                 .setCanAdd(false);
+        when(persistence.awaitIdle(anyLong(), any())).thenAnswer(invocation -> {
+            calls.add("persistence.await-idle");
+            return true;
+        });
         doAnswer(invocation -> {
                     Object event = invocation.getArgument(0);
                     if (event instanceof EmulatorStartShutdownEvent) {
@@ -68,12 +70,6 @@ class RuntimeLifecycleTest {
                 })
                 .when(rconServer)
                 .stop();
-        doAnswer(invocation -> {
-                    calls.add("clients.force-dispose");
-                    return null;
-                })
-                .when(gameClientManager)
-                .forceDisposeAllClients();
         doAnswer(invocation -> {
                     calls.add("game.stop");
                     return null;
@@ -131,10 +127,10 @@ class RuntimeLifecycleTest {
 
         assertEquals(
                 List.of(
-                        "threading.reject-new-work",
                         "plugins.before-shutdown",
+                        "threading.reject-new-work",
                         "rcon.stop",
-                        "clients.force-dispose",
+                        "persistence.await-idle",
                         "game.stop",
                         "sessions.dispose",
                         "hotel.dispose",

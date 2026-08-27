@@ -4,6 +4,7 @@ import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.gameclients.GameClient;
 import com.eu.habbo.messages.incoming.Incoming;
 import com.eu.habbo.messages.incoming.MessageHandler;
+import com.eu.habbo.messages.incoming.UnsupportedIncoming;
 import com.eu.habbo.messages.incoming.achievements.RequestAchievementConfigurationEvent;
 import com.eu.habbo.messages.incoming.achievements.RequestAchievementsEvent;
 import com.eu.habbo.messages.incoming.ambassadors.AmbassadorAlertCommandEvent;
@@ -19,7 +20,9 @@ import com.eu.habbo.messages.incoming.catalog.BuildersClubQueryFurniCountEvent;
 import com.eu.habbo.messages.incoming.catalog.CatalogBuyClubDiscountEvent;
 import com.eu.habbo.messages.incoming.catalog.CatalogBuyItemAsGiftEvent;
 import com.eu.habbo.messages.incoming.catalog.CatalogBuyItemEvent;
+import com.eu.habbo.messages.incoming.catalog.CatalogProductMetadataEvent;
 import com.eu.habbo.messages.incoming.catalog.CatalogRequestClubDiscountEvent;
+import com.eu.habbo.messages.incoming.catalog.CatalogRuntimeConfigurationEvent;
 import com.eu.habbo.messages.incoming.catalog.CatalogSearchedItemEvent;
 import com.eu.habbo.messages.incoming.catalog.CatalogSelectClubGiftEvent;
 import com.eu.habbo.messages.incoming.catalog.CheckPetNameEvent;
@@ -52,18 +55,11 @@ import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminSavePageI
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminSavePageImagesEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminSetPageEnabledEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminSetPageVisibleEvent;
-import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioAcquireLockEvent;
-import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioDiscardEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioDocumentApplyEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioDocumentDryRunEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioExportEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioLoadHistoryEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioOpenSessionEvent;
-import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioPreviewEvent;
-import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioPublishEvent;
-import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioReleaseLockEvent;
-import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioRenewLockEvent;
-import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioRestoreEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioUndoEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioValidateEvent;
 import com.eu.habbo.messages.incoming.catalog.marketplace.BuyItemEvent;
@@ -684,6 +680,8 @@ public class PacketManager {
         this.registerHandler(Incoming.BuildersClubPlaceRoomItemEvent, BuildersClubPlaceRoomItemEvent.class);
         this.registerHandler(Incoming.BuildersClubPlaceWallItemEvent, BuildersClubPlaceWallItemEvent.class);
         this.registerHandler(Incoming.RequestCatalogPageEvent, RequestCatalogPageEvent.class);
+        this.registerHandler(Incoming.CatalogProductMetadataEvent, CatalogProductMetadataEvent.class);
+        this.registerHandler(Incoming.CatalogRuntimeConfigurationEvent, CatalogRuntimeConfigurationEvent.class);
         this.registerHandler(Incoming.CatalogBuyItemAsGiftEvent, CatalogBuyItemAsGiftEvent.class);
         this.registerHandler(Incoming.CatalogBuyItemEvent, CatalogBuyItemEvent.class);
         this.registerHandler(Incoming.RedeemVoucherEvent, RedeemVoucherEvent.class);
@@ -739,16 +737,9 @@ public class PacketManager {
         this.registerHandler(Incoming.CatalogAdminSetPageVisibleEvent, CatalogAdminSetPageVisibleEvent.class);
         this.registerHandler(Incoming.CatalogAdminReorderOffersEvent, CatalogAdminReorderOffersEvent.class);
         this.registerHandler(Incoming.CatalogStudioOpenSessionEvent, CatalogStudioOpenSessionEvent.class);
-        this.registerHandler(Incoming.CatalogStudioAcquireLockEvent, CatalogStudioAcquireLockEvent.class);
-        this.registerHandler(Incoming.CatalogStudioRenewLockEvent, CatalogStudioRenewLockEvent.class);
-        this.registerHandler(Incoming.CatalogStudioReleaseLockEvent, CatalogStudioReleaseLockEvent.class);
         this.registerHandler(Incoming.CatalogStudioLoadHistoryEvent, CatalogStudioLoadHistoryEvent.class);
         this.registerHandler(Incoming.CatalogStudioUndoEvent, CatalogStudioUndoEvent.class);
         this.registerHandler(Incoming.CatalogStudioValidateEvent, CatalogStudioValidateEvent.class);
-        this.registerHandler(Incoming.CatalogStudioPublishEvent, CatalogStudioPublishEvent.class);
-        this.registerHandler(Incoming.CatalogStudioDiscardEvent, CatalogStudioDiscardEvent.class);
-        this.registerHandler(Incoming.CatalogStudioRestoreEvent, CatalogStudioRestoreEvent.class);
-        this.registerHandler(Incoming.CatalogStudioPreviewEvent, CatalogStudioPreviewEvent.class);
         this.registerHandler(Incoming.CatalogStudioExportEvent, CatalogStudioExportEvent.class);
         this.registerHandler(Incoming.CatalogStudioDocumentDryRunEvent, CatalogStudioDocumentDryRunEvent.class);
         this.registerHandler(Incoming.CatalogStudioDocumentApplyEvent, CatalogStudioDocumentApplyEvent.class);
@@ -835,7 +826,7 @@ public class PacketManager {
         this.registerHandler(Incoming.RequestPromotedRoomsEvent, RequestPromotedRoomsEvent.class);
         this.registerHandler(Incoming.RequestCreateRoomEvent, RequestCreateRoomEvent.class);
         this.registerHandler(Incoming.RequestTagsEvent, RequestTagsEvent.class);
-        this.registerHandler(Incoming.SearchRoomsByTagEvent, SearchRoomsByTagEvent.class);
+        this.registerHandler(UnsupportedIncoming.SearchRoomsByTagEvent, SearchRoomsByTagEvent.class);
         this.registerHandler(Incoming.SearchRoomsEvent, SearchRoomsEvent.class);
         this.registerHandler(Incoming.SearchRoomsFriendsNowEvent, SearchRoomsFriendsNowEvent.class);
         this.registerHandler(Incoming.SearchRoomsFriendsOwnEvent, SearchRoomsFriendsOwnEvent.class);
@@ -863,7 +854,7 @@ public class PacketManager {
         this.registerHandler(Incoming.RequestNewsListEvent, RequestNewsListEvent.class);
         this.registerHandler(Incoming.HotelViewDataEvent, HotelViewDataEvent.class);
         this.registerHandler(Incoming.HotelViewRequestBadgeRewardEvent, HotelViewRequestBadgeRewardEvent.class);
-        this.registerHandler(Incoming.HotelViewClaimBadgeRewardEvent, HotelViewClaimBadgeRewardEvent.class);
+        this.registerHandler(UnsupportedIncoming.HotelViewClaimBadgeRewardEvent, HotelViewClaimBadgeRewardEvent.class);
         this.registerHandler(Incoming.HotelViewRequestLTDAvailabilityEvent, HotelViewRequestLTDAvailabilityEvent.class);
         this.registerHandler(Incoming.HotelViewRequestSecondsUntilEvent, HotelViewRequestSecondsUntilEvent.class);
         this.registerHandler(Incoming.HotelViewLandingRequestEvent, HotelViewLandingRequestEvent.class);
@@ -1028,13 +1019,14 @@ public class PacketManager {
         this.registerHandler(Incoming.ModToolCloseTicketEvent, ModToolCloseTicketEvent.class);
         this.registerHandler(Incoming.ModToolReleaseTicketEvent, ModToolReleaseTicketEvent.class);
         this.registerHandler(Incoming.ModToolAlertEvent, ModToolAlertEvent.class);
-        this.registerHandler(Incoming.ModToolWarnEvent, ModToolWarnEvent.class);
+        this.registerHandler(UnsupportedIncoming.ModToolWarnEvent, ModToolWarnEvent.class);
         this.registerHandler(Incoming.ModToolKickEvent, ModToolKickEvent.class);
         this.registerHandler(Incoming.ModToolRoomAlertEvent, ModToolRoomAlertEvent.class);
         this.registerHandler(Incoming.ModToolChangeRoomSettingsEvent, ModToolChangeRoomSettingsEvent.class);
         this.registerHandler(Incoming.ModToolRequestRoomVisitsEvent, ModToolRequestRoomVisitsEvent.class);
         this.registerHandler(Incoming.ModToolRequestIssueChatlogEvent, ModToolRequestIssueChatlogEvent.class);
-        this.registerHandler(Incoming.ModToolRequestRoomUserChatlogEvent, ModToolRequestRoomUserChatlogEvent.class);
+        this.registerHandler(
+                UnsupportedIncoming.ModToolRequestRoomUserChatlogEvent, ModToolRequestRoomUserChatlogEvent.class);
         this.registerHandler(Incoming.ModToolRequestUserChatlogEvent, ModToolRequestUserChatlogEvent.class);
         this.registerHandler(Incoming.ModToolSanctionAlertEvent, ModToolSanctionAlertEvent.class);
         this.registerHandler(Incoming.ModToolSanctionMuteEvent, ModToolSanctionMuteEvent.class);
@@ -1164,7 +1156,8 @@ public class PacketManager {
 
     void registerAchievements() throws Exception {
         this.registerHandler(Incoming.RequestAchievementsEvent, RequestAchievementsEvent.class);
-        this.registerHandler(Incoming.RequestAchievementConfigurationEvent, RequestAchievementConfigurationEvent.class);
+        this.registerHandler(
+                UnsupportedIncoming.RequestAchievementConfigurationEvent, RequestAchievementConfigurationEvent.class);
     }
 
     void registerGuides() throws Exception {

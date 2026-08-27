@@ -2,8 +2,8 @@ package com.eu.habbo.habbohotel.catalog.versioning;
 
 public enum CatalogChangeSource {
     UI,
-    JSONC,
     SQL,
+    LIVE_SYNC,
     RESTORE,
     UNDO
 }

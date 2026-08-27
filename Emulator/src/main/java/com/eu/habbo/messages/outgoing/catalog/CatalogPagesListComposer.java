@@ -8,14 +8,17 @@ import com.eu.habbo.habbohotel.users.Habbo;
 import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.messages.outgoing.MessageComposer;
 import com.eu.habbo.messages.outgoing.Outgoing;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 public class CatalogPagesListComposer extends MessageComposer {
     private static final Logger LOGGER = LoggerFactory.getLogger(CatalogPagesListComposer.class);
 
+    private static final int MAX_OFFERS = 4000;
     private static final int MAX_CHILDREN = 500;
     private static final int MAX_DEPTH = 20;
 
@@ -33,7 +36,8 @@ public class CatalogPagesListComposer extends MessageComposer {
     protected ServerMessage composeInternal() {
         try {
             CatalogPageType requestedType = CatalogPageType.fromString(this.mode);
-            List<CatalogPage> pages = Emulator.getGameEnvironment().getCatalogManager().getCatalogPages(-1, this.habbo, requestedType);
+            List<CatalogPage> pages =
+                    Emulator.getGameEnvironment().getCatalogManager().getCatalogPages(-1, this.habbo, requestedType);
 
             this.response.init(Outgoing.CatalogPagesListComposer);
 
@@ -64,7 +68,9 @@ public class CatalogPagesListComposer extends MessageComposer {
     }
 
     private void append(CatalogPage category, int depth, CatalogPageType requestedType) {
-        List<CatalogPage> pagesList = Emulator.getGameEnvironment().getCatalogManager().getCatalogPages(category.getId(), this.habbo, requestedType);
+        List<CatalogPage> pagesList = Emulator.getGameEnvironment()
+                .getCatalogManager()
+                .getCatalogPages(category.getId(), this.habbo, requestedType);
 
         this.response.appendBoolean(category.isVisible());
         this.response.appendInt(category.getIconImage());
@@ -73,13 +79,26 @@ public class CatalogPagesListComposer extends MessageComposer {
         this.response.appendString(category.getPageName());
         this.response.appendString(category.getCaption() + (this.hasPermission ? " (" + category.getId() + ")" : ""));
 
-        // Nitro uses this index to resolve an offer back to its exact catalog
-        // page. A count-only sentinel breaks catalog/open/offerId because the
-        // client can no longer expand the correct tab and sub-page.
-        int[] offerIds = navigationOfferIds(category);
-        this.response.appendInt(offerIds.length);
-        for (int offerId : offerIds) {
-            this.response.appendInt(offerId);
+        IntList pageOfferIds = category.getOfferIds();
+        IntList offerIds = new IntArrayList(pageOfferIds.size());
+        IntOpenHashSet seenOfferIds = new IntOpenHashSet();
+        for (int idx = 0; idx < pageOfferIds.size(); idx++) {
+            int offerId = pageOfferIds.getInt(idx);
+            if (offerId > 0 && seenOfferIds.add(offerId)) offerIds.add(offerId);
+        }
+
+        int offerCount = Math.min(offerIds.size(), MAX_OFFERS);
+        if (offerIds.size() > MAX_OFFERS) {
+            LOGGER.warn(
+                    "Catalog page {} has {} offers; limiting the index packet to {}",
+                    category.getId(),
+                    offerIds.size(),
+                    MAX_OFFERS);
+        }
+
+        this.response.appendInt(offerCount);
+        for (int idx = 0; idx < offerCount; idx++) {
+            this.response.appendInt(offerIds.getInt(idx));
         }
 
         if (depth >= MAX_DEPTH) {
@@ -94,11 +113,6 @@ public class CatalogPagesListComposer extends MessageComposer {
             this.append(pagesList.get(idx), depth + 1, requestedType);
         }
     }
-
-    static int[] navigationOfferIds(CatalogPage category) {
-        return category.getOfferIds().toIntArray();
-    }
-
 
     public Habbo getHabbo() {
         return habbo;
