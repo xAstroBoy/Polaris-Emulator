@@ -789,7 +789,6 @@ public class HabboInfo implements Runnable {
 
     @Override
     public void run() {
-        this.saveCurrencies();
 
         // Read credits under the lock so the persisted value is consistent with
         // concurrent addCredits/setCredits.
