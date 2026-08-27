@@ -218,6 +218,7 @@ import com.eu.habbo.messages.incoming.inventory.prefixes.SetDisplayOrderEvent;
 import com.eu.habbo.messages.incoming.mentions.DeleteMentionEvent;
 import com.eu.habbo.messages.incoming.mentions.MarkMentionsReadEvent;
 import com.eu.habbo.messages.incoming.mentions.RequestMentionsEvent;
+import com.eu.habbo.messages.incoming.commands.RequestAvailableCommandsEvent;
 import com.eu.habbo.messages.incoming.modtool.ModToolAlertEvent;
 import com.eu.habbo.messages.incoming.modtool.ModToolChangeRoomSettingsEvent;
 import com.eu.habbo.messages.incoming.modtool.ModToolCloseTicketEvent;
@@ -897,6 +898,7 @@ public class PacketManager {
     }
 
     void registerRooms() throws Exception {
+        this.registerHandler(Incoming.RequestAvailableCommandsEvent, RequestAvailableCommandsEvent.class);
         this.registerHandler(Incoming.RequestMentionsEvent, RequestMentionsEvent.class);
         this.registerHandler(Incoming.MarkMentionsReadEvent, MarkMentionsReadEvent.class);
         this.registerHandler(Incoming.DeleteMentionEvent, DeleteMentionEvent.class);

@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.eu.habbo.habbohotel.catalog.versioning.CatalogDraftPreview;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogOfferSnapshot;
 import com.eu.habbo.habbohotel.catalog.versioning.CatalogPageSnapshot;
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogPreviewProduct;
+import com.eu.habbo.habbohotel.catalog.CatalogPageType;
 import com.eu.habbo.messages.outgoing.Outgoing;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioActor;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioChangedEntity;
@@ -18,6 +21,7 @@ import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioO
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioPreviewComposer;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioPublishedVersion;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioSessionComposer;
+import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioSessionOffer;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioValidationComposer;
 import com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio.CatalogStudioValidationIssue;
 import com.google.gson.Gson;
@@ -74,7 +78,7 @@ class CatalogStudioPacketContractTest {
     }
 
     @Test
-    void sessionPayloadKeepsEveryCompressedPageChunkReadableByRenderer() throws IOException {
+    void sessionPayloadKeepsEveryCompressedSnapshotChunkReadableByRenderer() throws IOException {
         List<CatalogPageSnapshot> pages = new ArrayList<>();
         Random random = new Random(42);
         String lastText = "";
@@ -96,7 +100,11 @@ class CatalogStudioPacketContractTest {
                         true,
                         0,
                         List.of(),
-                        pages)
+                        pages,
+                        List.of(new CatalogStudioSessionOffer(
+                                offer(42, 700),
+                                List.of(new CatalogPreviewProduct("s", 456, "", 1, false, 0, 0)),
+                                true)))
                 .compose()
                 .get();
 
@@ -118,9 +126,13 @@ class CatalogStudioPacketContractTest {
         try (GZIPInputStream input = new GZIPInputStream(new ByteArrayInputStream(compressed))) {
             json = new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
-        CatalogPageSnapshot[] decoded = new Gson().fromJson(json, CatalogPageSnapshot[].class);
-        assertEquals(700, decoded.length);
-        assertEquals(lastText, decoded[699].pageTextDetails());
+        var decoded = new Gson().fromJson(json, com.google.gson.JsonObject.class);
+        assertEquals(700, decoded.getAsJsonArray("pages").size());
+        assertEquals(lastText, decoded.getAsJsonArray("pages").get(699).getAsJsonObject().get("pageTextDetails").getAsString());
+        var decodedOffer = decoded.getAsJsonArray("offers").get(0).getAsJsonObject();
+        assertEquals(42, decodedOffer.getAsJsonObject("offer").get("offerId").getAsInt());
+        assertEquals(456, decodedOffer.getAsJsonArray("products").get(0).getAsJsonObject().get("productClassId").getAsInt());
+        assertTrue(decodedOffer.get("giftable").getAsBoolean());
         assertFalse(payload.isReadable());
     }
 
@@ -344,5 +356,25 @@ class CatalogStudioPacketContractTest {
                 "",
                 0,
                 "");
+    }
+
+    private static CatalogOfferSnapshot offer(int offerId, int pageId) {
+        return new CatalogOfferSnapshot(
+                CatalogPageType.NORMAL,
+                offerId,
+                "123",
+                pageId,
+                "chair",
+                5,
+                0,
+                0,
+                1,
+                0,
+                0,
+                9001,
+                0,
+                "",
+                true,
+                false);
     }
 }

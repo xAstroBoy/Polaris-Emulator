@@ -31,12 +31,12 @@ class HousekeepingTargetRankGuardContractTest {
                 "rank comparison should be reusable for online and offline housekeeping targets");
         assertTrue(guard.contains("static boolean canAssignRank(Habbo operator, int rankId)"),
                 "rank assignment should use the same peer/core ceiling as target moderation");
-        assertTrue(guard.contains("targetRankId < operatorRankId"),
-                "non-core housekeeping operators must only target lower-ranked users");
-        assertTrue(guard.contains("isCoreRank(operatorRankId) && targetRankId <= operatorRankId"),
-                "the highest/core rank should be allowed to target peer ranks");
-        assertTrue(guard.contains("private static boolean isCoreRank(int rankId)"),
-                "core-rank detection should be centralized in the target-rank guard");
+        assertTrue(guard.contains("HousekeepingRankPolicy.evaluate"),
+                "rank decisions should use the tested central policy");
+        assertTrue(guard.contains("highestConfiguredRankId()"),
+                "the policy must use the actual highest configured rank");
+        assertTrue(guard.contains("Housekeeping rank rejected"),
+                "rejected rank operations should be auditable");
     }
 
     @Test

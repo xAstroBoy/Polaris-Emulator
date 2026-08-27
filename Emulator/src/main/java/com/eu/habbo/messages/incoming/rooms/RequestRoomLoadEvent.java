@@ -4,6 +4,7 @@ import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomTile;
 import com.eu.habbo.messages.incoming.MessageHandler;
+import com.eu.habbo.messages.outgoing.commands.AvailableCommandsComposer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,6 +96,18 @@ public class RequestRoomLoadEvent extends MessageHandler {
                     spawnTile != null ? "(" + spawnTile.x + "," + spawnTile.y + ")" : "door",
                     isReconnect);
             Emulator.getGameEnvironment().getRoomManager().enterRoom(this.client.getHabbo(), roomId, password, false, spawnTile, isReconnect);
+
+            // The initial login command packet can arrive before React mounts
+            // the room chat autocomplete listener. Refresh it once the room UI
+            // exists; getCommandsForRank keeps the result server-authoritative.
+            var commandClient = this.client;
+            Emulator.getThreading().run(() -> {
+                if (commandClient.getHabbo() == null) return;
+
+                commandClient.sendResponse(new AvailableCommandsComposer(
+                        Emulator.getGameEnvironment().getCommandHandler().getCommandsForRank(
+                                commandClient.getHabbo().getHabboInfo().getRank().getId())));
+            }, 750);
         }
     }
 }

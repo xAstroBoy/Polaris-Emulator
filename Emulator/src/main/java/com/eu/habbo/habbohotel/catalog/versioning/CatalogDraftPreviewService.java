@@ -41,11 +41,20 @@ public final class CatalogDraftPreviewService {
             if (offer.costPoints() > persona.currencies().getOrDefault(offer.pointsType(), 0)) {
                 reasons.add("INSUFFICIENT_CURRENCY_" + offer.pointsType());
             }
-            CatalogPreviewPresentation presentation = presentationResolver.resolve(offer);
+            CatalogPreviewPresentation presentation = presentation(offer);
             offers.add(new CatalogPreviewOffer(
                     offer, reasons.isEmpty(), reasons, presentation.products(), presentation.giftable()));
         }
         return new CatalogDraftPreview(draft.version().id(), draft.version().revision(), pages, offers);
+    }
+
+    /**
+     * Resolves the product data used by Catalog Studio's editor independently of preview
+     * visibility and persona filters. The editor must be able to inspect every draft offer,
+     * including hidden and currently ineligible offers.
+     */
+    public CatalogPreviewPresentation presentation(CatalogOfferSnapshot offer) {
+        return presentationResolver.resolve(Objects.requireNonNull(offer, "offer"));
     }
 
     private static boolean visible(

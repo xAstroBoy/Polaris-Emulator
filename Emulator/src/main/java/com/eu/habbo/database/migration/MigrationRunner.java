@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationInfo;
 import org.flywaydb.core.api.MigrationInfoService;
+import org.flywaydb.core.api.MigrationState;
 import org.flywaydb.core.api.output.MigrateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,14 @@ public final class MigrationRunner {
 
         LOGGER.info("[migrate] Detected schema state: {}", state);
         try {
+            boolean hasFailedMigration = state == SchemaPreflight.State.MANAGED
+                    && java.util.Arrays.stream(flyway.info().all())
+                            .anyMatch(migration -> migration.getState() == MigrationState.FAILED);
+            if (hasFailedMigration) {
+                LOGGER.warn(
+                        "[migrate] Failed migration history detected. Clearing only failed Flyway entries before retrying startup migrations.");
+                flyway.repair();
+            }
             if (state != SchemaPreflight.State.EMPTY && state != SchemaPreflight.State.UNKNOWN) {
                 java.util.List<String> pending = java.util.Arrays.stream(
                                 flyway.info().pending())

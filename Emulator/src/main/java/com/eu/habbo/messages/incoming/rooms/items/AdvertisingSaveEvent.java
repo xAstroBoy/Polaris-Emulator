@@ -45,10 +45,6 @@ public class AdvertisingSaveEvent extends MessageHandler {
                 if (key.isEmpty())
                     continue;
 
-                if (!Emulator.getConfig().getBoolean("camera.use.https")) {
-                    value = value.replace("https://", "http://");
-                }
-
                 ((InteractionCustomValues) item).values.put(key, value);
             }
 

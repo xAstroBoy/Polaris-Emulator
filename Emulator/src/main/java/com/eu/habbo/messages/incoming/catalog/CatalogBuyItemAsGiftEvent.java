@@ -10,6 +10,7 @@ import com.eu.habbo.habbohotel.catalog.CatalogPageAccessPolicy;
 import com.eu.habbo.habbohotel.catalog.CatalogPaymentService;
 import com.eu.habbo.habbohotel.catalog.CatalogPurchaseMath;
 import com.eu.habbo.habbohotel.catalog.ClubOffer;
+import com.eu.habbo.habbohotel.commands.BssCommandPreferences;
 import com.eu.habbo.habbohotel.catalog.layouts.BuildersClubAddonsLayout;
 import com.eu.habbo.habbohotel.catalog.layouts.BuildersClubFrontPageLayout;
 import com.eu.habbo.habbohotel.catalog.layouts.BuildersClubLoyaltyLayout;
@@ -222,6 +223,12 @@ public class CatalogBuyItemAsGiftEvent extends MessageHandler {
 
                     if (userId == 0) {
                         LOGGER.debug("receiver not found -> {}", username);
+                        this.client.sendResponse(new GiftReceiverNotFoundComposer());
+                        return;
+                    }
+
+                    if (BssCommandPreferences.isEnabled(
+                            userId, BssCommandPreferences.Flag.BLOCK_GIFTS)) {
                         this.client.sendResponse(new GiftReceiverNotFoundComposer());
                         return;
                     }

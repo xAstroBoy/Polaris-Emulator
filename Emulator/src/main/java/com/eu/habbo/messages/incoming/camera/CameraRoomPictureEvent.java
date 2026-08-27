@@ -144,7 +144,7 @@ public class CameraRoomPictureEvent extends MessageHandler {
         String fileName = habboInfo.getId() + "_" + timestamp;
         String URL = fileName + ".png";
         String URLsmall = fileName + "_small.png";
-        String base = Emulator.getConfig().getValue("camera.url");
+        String base = normalizeCameraBaseUrl(Emulator.getConfig().getValue("camera.url"));
         String json = Emulator.getConfig().getValue("camera.extradata")
                 .replace("%timestamp%", Integer.toString(timestamp))
                 .replace("%room_id%", Integer.toString(room.getId()))
@@ -173,6 +173,14 @@ public class CameraRoomPictureEvent extends MessageHandler {
         }
 
         this.client.sendResponse(new CameraURLComposer(URL));
+    }
+
+    static String normalizeCameraBaseUrl(String configured) {
+        if (configured == null || configured.isBlank()) return "/camera/";
+        String value = configured.trim();
+        String lower = value.toLowerCase(java.util.Locale.ROOT);
+        if (lower.contains("127.0.0.1") || lower.contains("localhost") || lower.contains("photo.bsshotel.it")) return "/camera/";
+        return value.endsWith("/") ? value : value + "/";
     }
 
     private boolean isPNG(byte[] bytes) {

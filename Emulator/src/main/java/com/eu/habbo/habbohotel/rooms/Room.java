@@ -183,6 +183,8 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
     private int banOption;
     private int pollId;
     private int tradeMode;
+    private boolean pullEnabled;
+    private boolean pushEnabled;
     private boolean moveDiagonally;
     private boolean allowUnderpass;
     private boolean muteAllPets;
@@ -337,6 +339,8 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
 
         RoomSnapshot snapshot = RoomSnapshot.complete(initial, set);
         this.tradeMode = snapshot.postBanLoad().tradeMode();
+        this.pullEnabled = snapshot.postBanLoad().pullEnabled();
+        this.pushEnabled = snapshot.postBanLoad().pushEnabled();
         this.moveDiagonally = snapshot.postBanLoad().moveDiagonally();
         this.allowUnderpass = snapshot.postBanLoad().allowUnderpass();
         this.muteAllPets = snapshot.postBanLoad().muteAllPets();
@@ -761,6 +765,11 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
                 } catch (Exception e) {
                     LOGGER.error("Caught exception", e);
                 }
+
+                // Persist dirty furniture continuously instead of waiting for room
+                // disposal. A forced emulator restart cannot execute disposal and
+                // previously lost every state that was still only held in memory.
+                this.itemManager.saveAllPendingItems();
             }
 
             this.save();
@@ -1021,6 +1030,24 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
 
     public void setTradeMode(int tradeMode) {
         this.tradeMode = tradeMode;
+    }
+
+    public boolean isPullEnabled() {
+        return this.pullEnabled;
+    }
+
+    public void setPullEnabled(boolean pullEnabled) {
+        this.pullEnabled = pullEnabled;
+        this.needsUpdate = true;
+    }
+
+    public boolean isPushEnabled() {
+        return this.pushEnabled;
+    }
+
+    public void setPushEnabled(boolean pushEnabled) {
+        this.pushEnabled = pushEnabled;
+        this.needsUpdate = true;
     }
 
     public boolean moveDiagonally() {

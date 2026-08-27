@@ -11,6 +11,7 @@ import com.eu.habbo.habbohotel.pets.PetVocalsType;
 import com.eu.habbo.habbohotel.pets.RideablePet;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomRightLevels;
+import com.eu.habbo.habbohotel.rooms.RoomState;
 import com.eu.habbo.messages.outgoing.rooms.users.RoomUserTypingComposer;
 import com.eu.habbo.plugin.events.users.UserCommandEvent;
 import com.eu.habbo.plugin.events.users.UserExecuteCommandEvent;
@@ -43,7 +44,9 @@ public class CommandHandler {
     public static void addCommand(Command command) {
         if (command == null) return;
 
-        commands.put(command.getClass().getName(), command);
+        String firstKey = command.keys.length == 0 || command.keys[0] == null ? "" : command.keys[0];
+        String registrationKey = command.getClass().getName() + "#" + command.permission + "#" + firstKey;
+        commands.put(registrationKey, command);
     }
 
     public static void addCommand(Class<? extends Command> command) {
@@ -261,6 +264,10 @@ public class CommandHandler {
         addCommand(new FurniDataCommand());
         addCommand(new GiftCommand());
         addCommand(new GiveRankCommand());
+        addCommand(new GiveRespectPointsCommand(
+                Emulator.getTexts(),
+                Emulator.getConfig(),
+                Emulator.getGameEnvironment().getHabboManager()));
         addCommand(new HabnamCommand());
         addCommand(new HandItemCommand());
         addCommand(new HappyHourCommand());
@@ -268,6 +275,7 @@ public class CommandHandler {
         addCommand(new HotelAlertCommand());
         addCommand(new HotelAlertLinkCommand());
         addCommand(new InvisibleCommand());
+        addCommand(new ClickInvisibleTilesCommand());
         addCommand(new IPBanCommand());
         addCommand(new LayCommand());
         addCommand(new MachineBanCommand());
@@ -283,15 +291,55 @@ public class CommandHandler {
         addCommand(new MuteBotsCommand());
         addCommand(new MuteCommand());
         addCommand(new MutePetsCommand());
+        addCommand(new OnlineCommand());
         addCommand(new PetInfoCommand());
         addCommand(new PickallCommand());
         addCommand(new PingCommand());
         addCommand(new PixelCommand());
         addCommand(new PluginsCommand());
         addCommand(new PointsCommand());
+        addCommand(new KissCommand());
+        addCommand(new PunchCommand());
+        addCommand(new BssPreferenceCommand("cmd_bss_dnd", BssCommandPreferences.Flag.DO_NOT_DISTURB));
+        addCommand(new BssPreferenceCommand("cmd_bss_block_gifts", BssCommandPreferences.Flag.BLOCK_GIFTS));
+        addCommand(new BssPreferenceCommand("cmd_bss_block_whispers", BssCommandPreferences.Flag.BLOCK_WHISPERS));
+        addCommand(new BssPreferenceCommand("cmd_bss_block_mimic", BssCommandPreferences.Flag.BLOCK_MIMIC));
+        addCommand(new BssPreferenceCommand("cmd_bss_block_kisses", BssCommandPreferences.Flag.BLOCK_KISSES));
+        addCommand(new BssPreferenceCommand("cmd_bss_group_chat", BssCommandPreferences.Flag.GROUP_CHAT_ENABLED));
+        addCommand(new BssPreferenceCommand("cmd_bss_user_click", BssCommandPreferences.Flag.USER_CLICK_ENABLED));
+        addCommand(new BssPreferenceCommand("cmd_bss_random_walk", BssCommandPreferences.Flag.RANDOM_WALK_PRIORITY));
+        addCommand(new BssKickPetsCommand());
+        addCommand(new BssKickBotsCommand());
+        addCommand(new BssRegenerateMapsCommand());
+        addCommand(new BssCloseDiceCommand());
+        addCommand(new BssRoomStateCommand("cmd_bss_open_room", RoomState.OPEN));
+        addCommand(new BssRoomStateCommand("cmd_bss_close_room", RoomState.LOCKED));
+        addCommand(new BssDisableEffectCommand());
+        addCommand(new BssReloadCreditsCommand());
+        addCommand(new BssRoomBanCommand());
+        addCommand(new BssTogglePyramidsCommand());
+        addCommand(new BssTagCommand("cmd_bss_add_tag", BssTagCommand.Operation.ADD));
+        addCommand(new BssTagCommand("cmd_bss_remove_tag", BssTagCommand.Operation.REMOVE));
+        addCommand(new BssTagCommand("cmd_bss_clear_tags", BssTagCommand.Operation.CLEAR));
+        addCommand(new BssPersonalTradeCommand());
+        addCommand(new BssResetPrefixCommand());
+        addCommand(new BssReportCommand());
+        addCommand(new BssClearGroupChatCommand());
+        addCommand(new BssRedeemCurrencyCommand("cmd_bss_convert_credits", BssRedeemCurrencyCommand.Mode.CREDITS));
+        addCommand(new BssRedeemCurrencyCommand("cmd_bss_convert_diamonds", BssRedeemCurrencyCommand.Mode.DIAMONDS));
+        addCommand(new BssRareValueCommand("cmd_bss_rare_value", BssRareValueCommand.Scope.ITEM));
+        addCommand(new BssRareValueCommand("cmd_bss_inventory_value", BssRareValueCommand.Scope.INVENTORY));
+        addCommand(new BssRareValueCommand("cmd_bss_room_value", BssRareValueCommand.Scope.ROOM));
+        addCommand(new BssGivePrizeCommand());
+        addCommand(new BssPlacementCommand("cmd_bss_placex", BssPlacementCommand.Mode.BATCH));
+        addCommand(new BssPlacementCommand("cmd_bss_force_height", BssPlacementCommand.Mode.FORCE_HEIGHT));
+        addCommand(new BssPlacementCommand("cmd_bss_force_rotation", BssPlacementCommand.Mode.FORCE_ROTATION));
         addCommand(new PromoteTargetOfferCommand());
         addCommand(new PullCommand());
         addCommand(new PushCommand());
+        addCommand(new TogglePullPushCommand(true));
+        addCommand(new TogglePullPushCommand(false));
+        addCommand(new ToggleTradeCommand());
         addCommand(new RedeemCommand());
         addCommand(new ReloadRoomCommand());
         addCommand(new RoomAlertCommand());
@@ -307,6 +355,7 @@ public class CommandHandler {
         addCommand(new SayAllCommand());
         addCommand(new SayCommand());
         addCommand(new SetMaxCommand());
+        addCommand(new SetHomeCommand());
         addCommand(new SetPollCommand());
         addCommand(new SetRoomTemplateCommand());
         addCommand(new SetSpeedCommand());
@@ -328,6 +377,7 @@ public class CommandHandler {
         addCommand(new TeleportCommand());
         addCommand(new TransformCommand());
         addCommand(new TrashCommand());
+        addCommand(new FunRoomCommand());
         addCommand(new UnbanCommand());
         addCommand(new UnloadRoomCommand());
         addCommand(new UnmuteCommand());

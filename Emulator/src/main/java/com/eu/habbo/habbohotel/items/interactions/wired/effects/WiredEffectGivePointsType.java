@@ -37,7 +37,7 @@ public class WiredEffectGivePointsType extends InteractionWiredEffect {
     public static final WiredEffectType type = WiredEffectType.GIVE_POINTS_TYPE;
 
     private static final int MIN_POINTS_TYPE = 0;
-    private static final int MAX_POINTS_TYPE = 100;
+    private static final int MAX_POINTS_TYPE = 255;
     private static final int DEFAULT_POINTS_TYPE = 0;
 
     private int pointsType = DEFAULT_POINTS_TYPE;

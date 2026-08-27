@@ -2,6 +2,7 @@ package com.eu.habbo.messages.incoming.camera;
 
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.achievements.AchievementManager;
+import com.eu.habbo.habbohotel.items.FurnitureType;
 import com.eu.habbo.habbohotel.items.Item;
 import com.eu.habbo.habbohotel.users.Habbo;
 import com.eu.habbo.habbohotel.users.HabboInfo;
@@ -15,16 +16,20 @@ import com.eu.habbo.plugin.events.users.UserPurchasePictureEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+
 public class CameraPurchaseEvent extends MessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CameraPurchaseEvent.class);
 
     public static int CAMERA_PURCHASE_CREDITS = 2;
     public static int CAMERA_PURCHASE_POINTS = 0;
     public static int CAMERA_PURCHASE_POINTS_TYPE = 5;
+    private static final String PHOTO_SIZE_SMALL = "small";
+    private static final String PHOTO_SIZE_LARGE = "large";
 
     @Override
     public void handle() {
-        this.packet.readString();
+        String requestedPhotoSize = this.packet.readString().trim().toLowerCase(Locale.ROOT);
 
         Habbo habbo = this.client.getHabbo();
         HabboInfo habboInfo = habbo.getHabboInfo();
@@ -68,12 +73,15 @@ public class CameraPurchaseEvent extends MessageHandler {
                         habboInfo.getPhotoTimestamp()))
                 .isCancelled()) return;
 
-        int cameraItemId = Emulator.getConfig().getInt("camera.item_id");
+        int cameraItemId = getCameraItemId(requestedPhotoSize);
         Item item = Emulator.getGameEnvironment().getItemManager().getItem(cameraItemId);
-        if (item == null || !item.getInteractionType().getName().equals("external_image")) {
+        if (item == null
+                || item.getType() != FurnitureType.WALL
+                || !item.getInteractionType().getName().equals("external_image")) {
             LOGGER.warn(
-                    "Camera purchase for {} aborted: camera.item_id={} is {} (need a catalog item with interaction type 'external_image').",
+                    "Camera purchase for {} aborted: requested size '{}' resolved to item {} which is {} (need a wall item with interaction type 'external_image').",
                     habboInfo.getUsername(),
+                    requestedPhotoSize,
                     cameraItemId,
                     item == null
                             ? "not found"
@@ -107,5 +115,17 @@ public class CameraPurchaseEvent extends MessageHandler {
 
         AchievementManager.progressAchievement(
                 habbo, Emulator.getGameEnvironment().getAchievementManager().getAchievement("CameraPhotoCount"));
+    }
+
+    static int getCameraItemId(String requestedPhotoSize) {
+        if (PHOTO_SIZE_SMALL.equals(requestedPhotoSize)) {
+            return Emulator.getConfig().getInt("camera.item_id.small");
+        }
+
+        if (PHOTO_SIZE_LARGE.equals(requestedPhotoSize)) {
+            return Emulator.getConfig().getInt("camera.item_id.large");
+        }
+
+        return Emulator.getConfig().getInt("camera.item_id");
     }
 }

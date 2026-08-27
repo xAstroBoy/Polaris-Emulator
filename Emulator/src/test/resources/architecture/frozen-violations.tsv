@@ -168,8 +168,10 @@ U|com/eu/habbo/habbohotel/commands/CalendarCommand.java|CALL|getTexts|1
 U|com/eu/habbo/habbohotel/commands/ChatTypeCommand.java|CALL|getConfig|1
 U|com/eu/habbo/habbohotel/commands/ChatTypeCommand.java|CALL|getTexts|6
 U|com/eu/habbo/habbohotel/commands/CommandHandler.java|CALL|getDatabaseLogger|1
-U|com/eu/habbo/habbohotel/commands/CommandHandler.java|CALL|getGameEnvironment|2
+U|com/eu/habbo/habbohotel/commands/CommandHandler.java|CALL|getConfig|1
+U|com/eu/habbo/habbohotel/commands/CommandHandler.java|CALL|getGameEnvironment|3
 U|com/eu/habbo/habbohotel/commands/CommandHandler.java|CALL|getPluginManager|2
+U|com/eu/habbo/habbohotel/commands/CommandHandler.java|CALL|getTexts|1
 U|com/eu/habbo/habbohotel/commands/CommandTargetGuard.java|CALL|getGameEnvironment|1
 U|com/eu/habbo/habbohotel/commands/CommandsCommand.java|CALL|getGameEnvironment|1
 U|com/eu/habbo/habbohotel/commands/CommandsCommand.java|CALL|getTexts|3

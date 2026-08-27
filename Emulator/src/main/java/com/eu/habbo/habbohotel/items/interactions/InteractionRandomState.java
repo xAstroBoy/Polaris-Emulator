@@ -36,6 +36,7 @@ public class InteractionRandomState extends InteractionDefault {
 
         Emulator.getThreading().run(() -> {
             this.setExtradata(randomState + "");
+            this.needsUpdate(true);
             room.updateItemState(this);
         }, params.getDelay());
     }

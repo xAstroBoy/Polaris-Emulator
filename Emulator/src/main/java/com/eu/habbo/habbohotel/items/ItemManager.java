@@ -37,6 +37,7 @@ import com.eu.habbo.habbohotel.items.interactions.InteractionHabboClubGate;
 import com.eu.habbo.habbohotel.items.interactions.InteractionHabboClubHopper;
 import com.eu.habbo.habbohotel.items.interactions.InteractionHabboClubTeleportTile;
 import com.eu.habbo.habbohotel.items.interactions.InteractionHanditem;
+import com.eu.habbo.habbohotel.items.interactions.InteractionHanditemTester;
 import com.eu.habbo.habbohotel.items.interactions.InteractionHanditemBlockControl;
 import com.eu.habbo.habbohotel.items.interactions.InteractionHanditemTile;
 import com.eu.habbo.habbohotel.items.interactions.InteractionHideWiredControl;
@@ -237,6 +238,7 @@ import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveC
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveCurrencyFromChest;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveDiamonds;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveDuckets;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveBssPoints;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveEffect;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveExperience;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveFurniFromChest;
@@ -393,6 +395,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import org.slf4j.Logger;
@@ -401,6 +404,21 @@ import org.slf4j.LoggerFactory;
 public class ItemManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ItemManager.class);
+    private static final Map<String, String> LEGACY_INTERACTION_ALIASES = Map.ofEntries(
+            Map.entry("teletile", "teleporttile"),
+            Map.entry("tele_tile", "teleporttile"),
+            Map.entry("tile_walk_magic", "tile_walkmagic"),
+            Map.entry("vending", "vendingmachine"),
+            Map.entry("wateritem", "water_item"),
+            Map.entry("puzzlebox", "puzzle_box"),
+            Map.entry("pressure_plate", "pressureplate"),
+            Map.entry("costume_hoppper", "costume_hopper"),
+            Map.entry("crackables", "crackable"),
+            Map.entry("conf_handitem_block", "wf_conf_handitem_block"),
+            Map.entry("yt_tv", "youtube"),
+            Map.entry("yt_jukebox", "youtube"),
+            Map.entry("multieheight", "multiheight"),
+            Map.entry("defult", "default"));
     private static final String BASE_ITEMS_SQL = """
             SELECT id, sprite_id, public_name, item_name, type, width, length,
                    stack_height, allow_stack, allow_sit, allow_lay, allow_walk,
@@ -459,6 +477,7 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("badge_display", InteractionBadgeDisplay.class));
         this.interactionsList.add(new ItemInteraction("mannequin", InteractionMannequin.class));
         this.interactionsList.add(new ItemInteraction("ads_bg", InteractionRoomAds.class));
+        this.interactionsList.add(new ItemInteraction("ads_yt", InteractionRoomAds.class));
         this.interactionsList.add(new ItemInteraction("trophy", InteractionTrophy.class));
         this.interactionsList.add(new ItemInteraction("vendingmachine", InteractionVendingMachine.class));
         this.interactionsList.add(new ItemInteraction("pressureplate", InteractionPressurePlate.class));
@@ -538,6 +557,7 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("tent", InteractionTent.class));
         this.interactionsList.add(new ItemInteraction("gym_equipment", InteractionGymEquipment.class));
         this.interactionsList.add(new ItemInteraction("handitem", InteractionHanditem.class));
+        this.interactionsList.add(new ItemInteraction("handitem_tester", InteractionHanditemTester.class));
         this.interactionsList.add(new ItemInteraction("handitem_tile", InteractionHanditemTile.class));
         this.interactionsList.add(new ItemInteraction("effect_giver", InteractionEffectGiver.class));
         this.interactionsList.add(new ItemInteraction("effect_vendingmachine", InteractionEffectVendingMachine.class));
@@ -596,6 +616,7 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("wf_act_give_credits", WiredEffectGiveCredits.class));
         this.interactionsList.add(new ItemInteraction("wf_act_give_duckets", WiredEffectGiveDuckets.class));
         this.interactionsList.add(new ItemInteraction("wf_act_give_diamonds", WiredEffectGiveDiamonds.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_give_bss_points", WiredEffectGiveBssPoints.class));
         // Phase-C effects (badges / achievements / posture / movement / misc)
         this.interactionsList.add(new ItemInteraction("wf_act_give_badge", WiredEffectGiveBadge.class));
         this.interactionsList.add(new ItemInteraction("wf_act_give_userbadge", WiredEffectGiveBadge.class));
@@ -1055,6 +1076,46 @@ public class ItemManager {
         }
 
         return this.getItemInteraction(InteractionDefault.class);
+    }
+
+    /**
+     * Resolves a base item's runtime interaction while preserving explicitly configured behavior.
+     *
+     * <p>Furni Editor and BSS furnidata imports store the asset classname in {@code item_name} and
+     * the human-readable label in {@code public_name}. Older recovery logic checked only the label,
+     * leaving supported {@code wf_*} furniture loaded as inert {@code default} items.</p>
+     */
+    public ItemInteraction resolveItemInteraction(
+            String configuredType, String itemName, String publicName) {
+        String normalizedType = configuredType == null ? "" : configuredType.toLowerCase(Locale.ROOT);
+        String resolvedType = LEGACY_INTERACTION_ALIASES.getOrDefault(normalizedType, configuredType);
+        ItemInteraction configured = this.interactionsList.find(resolvedType);
+        if (configured != null && !"default".equalsIgnoreCase(configured.getName())) {
+            return configured;
+        }
+
+        ItemInteraction byClassname = resolveWiredClassname(itemName);
+        if (byClassname != null) {
+            return byClassname;
+        }
+
+        ItemInteraction byLegacyPublicName = resolveWiredClassname(publicName);
+        if (byLegacyPublicName != null) {
+            return byLegacyPublicName;
+        }
+
+        return configured != null ? configured : this.getItemInteraction(InteractionDefault.class);
+    }
+
+    private ItemInteraction resolveWiredClassname(String value) {
+        if (value == null || !value.regionMatches(true, 0, "wf_", 0, 3)) {
+            return null;
+        }
+
+        ItemInteraction interaction = this.interactionsList.find(value);
+        return interaction != null && !"default".equalsIgnoreCase(interaction.getName())
+                ? interaction
+                : null;
     }
 
     public void loadItems() {

@@ -1,5 +1,6 @@
 package com.eu.habbo.messages.incoming.rooms.items;
 
+import com.eu.habbo.habbohotel.commands.BssPlacementPreferences;
 import com.eu.habbo.habbohotel.items.FurnitureType;
 import com.eu.habbo.habbohotel.items.interactions.*;
 import com.eu.habbo.habbohotel.modtool.ScripterManager;
@@ -68,6 +69,9 @@ public class RoomPlaceItemEvent extends MessageHandler {
 
             if (x == null || y == null || rotation == null)
                 return;
+
+            rotation = BssPlacementPreferences.resolveRotation(
+                    this.client.getHabbo().getHabboInfo().getId(), rotation);
 
             RoomTile tile = room.getLayout().getTile(x, y);
 

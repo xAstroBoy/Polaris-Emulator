@@ -6,6 +6,7 @@ import com.eu.habbo.habbohotel.users.HabboItem;
 import com.eu.habbo.messages.outgoing.rooms.items.FloorItemUpdateComposer;
 import com.eu.habbo.messages.outgoing.rooms.items.ItemStateComposer;
 import com.eu.habbo.messages.outgoing.rooms.items.WallItemUpdateComposer;
+import java.util.List;
 
 final class RoomItemOperations {
 
@@ -40,6 +41,8 @@ final class RoomItemOperations {
         } else if (item.getBaseItem().getType() == FurnitureType.WALL) {
             this.room.sendComposer(new WallItemUpdateComposer(item).compose());
         }
+
+        this.persistDirtyItem(item);
     }
 
     void updateItemState(HabboItem item) {
@@ -60,6 +63,7 @@ final class RoomItemOperations {
 
         if (item.getBaseItem().getType() == FurnitureType.FLOOR) {
             if (this.room.currentLayout() == null) {
+                this.persistDirtyItem(item);
                 return;
             }
 
@@ -87,6 +91,14 @@ final class RoomItemOperations {
 
         if (item.getBaseItem().getType() == FurnitureType.FLOOR) {
             this.room.onFurnitureTopologyChanged();
+        }
+
+        this.persistDirtyItem(item);
+    }
+
+    private void persistDirtyItem(HabboItem item) {
+        if (item.needsUpdate()) {
+            this.room.savePendingItems(List.of(item));
         }
     }
 }

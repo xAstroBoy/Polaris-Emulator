@@ -33,14 +33,14 @@ public class InteractionCrackable extends HabboItem {
 
     @Override
     public void serializeExtradata(ServerMessage serverMessage) {
-        if (this.getExtradata().length() == 0)
-            this.setExtradata("0");
+        int progress = this.readProgress();
+        int target = Emulator.getGameEnvironment().getItemManager().getCrackableCount(this.getBaseItem().getId());
 
         serverMessage.appendInt(7 + (this.isLimited() ? 256 : 0));
 
-        serverMessage.appendString(Emulator.getGameEnvironment().getItemManager().calculateCrackState(Integer.parseInt(this.getExtradata()), Emulator.getGameEnvironment().getItemManager().getCrackableCount(this.getBaseItem().getId()), this.getBaseItem()) + "");
-        serverMessage.appendInt(Integer.valueOf(this.getExtradata()));
-        serverMessage.appendInt(Emulator.getGameEnvironment().getItemManager().getCrackableCount(this.getBaseItem().getId()));
+        serverMessage.appendString(Emulator.getGameEnvironment().getItemManager().calculateCrackState(progress, target, this.getBaseItem()) + "");
+        serverMessage.appendInt(progress);
+        serverMessage.appendInt(target);
 
         super.serializeExtradata(serverMessage);
     }
@@ -74,8 +74,7 @@ public class InteractionCrackable extends HabboItem {
                 return;
             }
 
-            if (this.getExtradata().length() == 0)
-                this.setExtradata("0");
+            this.readProgress();
 
             if (this.getBaseItem().getEffectF() > 0)
                 if (client.getHabbo().getHabboInfo().getGender().equals(HabboGender.F) && this.getBaseItem().getEffectF() == client.getHabbo().getRoomUnit().getEffectId())
@@ -96,13 +95,16 @@ public class InteractionCrackable extends HabboItem {
             CrackableReward rewardData = Emulator.getGameEnvironment().getItemManager().getCrackableData(this.getBaseItem().getId());
 
             if (rewardData != null) {
+                if (rewardData.count <= 0)
+                    return;
+
                 if (rewardData.requiredEffect > 0 && habbo.getRoomUnit().getEffectId() != rewardData.requiredEffect)
                     return;
 
                 if(this.ticks < 1)
                 {
                     // If there are no ticks (for example because the room has been reloaded), check the current extradata of the item and update the ticks.
-                    this.ticks = Integer.parseInt(this.getExtradata());
+                    this.ticks = Math.min(this.readProgress(), Math.max(0, rewardData.count - 1));
                 }
                 this.ticks++;
                 this.setExtradata("" + (this.ticks));
@@ -112,7 +114,7 @@ public class InteractionCrackable extends HabboItem {
                 if (!rewardData.achievementTick.isEmpty()) {
                     AchievementManager.progressAchievement(habbo, Emulator.getGameEnvironment().getAchievementManager().getAchievement(rewardData.achievementTick));
                 }
-                if (!this.cracked && this.ticks == Emulator.getGameEnvironment().getItemManager().getCrackableCount(this.getBaseItem().getId())) {
+                if (!this.cracked && this.ticks >= rewardData.count) {
                     this.cracked = true;
                     Emulator.getThreading().run(new CrackableExplode(room, this, habbo, !this.placeInRoom(), this.getX(), this.getY()), 1500);
 
@@ -172,6 +174,23 @@ public class InteractionCrackable extends HabboItem {
         this.ticks = 0;
         this.setExtradata("0");
         room.updateItem(this);
+    }
+
+    private int readProgress() {
+        int progress = 0;
+        try {
+            progress = Math.max(0, Integer.parseInt(this.getExtradata()));
+        } catch (NumberFormatException ignored) {
+            // Old imports sometimes left non-numeric extra data on crackables.
+        }
+
+        String normalized = Integer.toString(progress);
+        if (!normalized.equals(this.getExtradata())) {
+            this.setExtradata(normalized);
+            this.needsUpdate(true);
+        }
+
+        return progress;
     }
 
     @Override

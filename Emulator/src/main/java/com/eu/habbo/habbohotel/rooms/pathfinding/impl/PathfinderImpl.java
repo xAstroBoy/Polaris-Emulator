@@ -5,6 +5,7 @@ import static com.eu.habbo.habbohotel.rooms.pathfinding.impl.PathfinderConstants
 import static com.eu.habbo.habbohotel.rooms.pathfinding.impl.PathfinderConstants.TIMEOUT_CHECK_INTERVAL;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.commands.BssCommandPreferences;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomLayout;
 import com.eu.habbo.habbohotel.rooms.RoomTile;
@@ -19,6 +20,7 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class PathfinderImpl implements Pathfinder {
 
@@ -114,8 +116,15 @@ public class PathfinderImpl implements Pathfinder {
     long startTime = CACHED_TIMEOUT_ENABLED ? System.nanoTime() : 0;
     int iterationCount = 0;
 
-    PriorityQueue<RoomTile> openList = new PriorityQueue<>(
-        Comparator.comparingInt(RoomTile::getfCosts));
+    Comparator<RoomTile> tileComparator = Comparator.comparingInt(RoomTile::getfCosts);
+    com.eu.habbo.habbohotel.users.Habbo walkingHabbo = this.room.getHabbo(roomUnit);
+    if (walkingHabbo != null && BssCommandPreferences.isCachedEnabled(
+        walkingHabbo.getHabboInfo().getId(), BssCommandPreferences.Flag.RANDOM_WALK_PRIORITY)) {
+      int seed = ThreadLocalRandom.current().nextInt();
+      tileComparator = tileComparator.thenComparingInt(tile ->
+          Integer.rotateLeft(tile.getX() * 73856093 ^ tile.getY() * 19349663, seed & 31));
+    }
+    PriorityQueue<RoomTile> openList = new PriorityQueue<>(tileComparator);
     HashSet<RoomTile> closedList = new HashSet<>();
 
     openList.add(oldTile.copy());

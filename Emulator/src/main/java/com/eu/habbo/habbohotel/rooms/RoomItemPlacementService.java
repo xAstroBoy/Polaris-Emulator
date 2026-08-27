@@ -1,5 +1,6 @@
 package com.eu.habbo.habbohotel.rooms;
 
+import com.eu.habbo.habbohotel.commands.BssPlacementPreferences;
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.items.interactions.InteractionBuildArea;
 import com.eu.habbo.habbohotel.items.interactions.InteractionStackHelper;
@@ -175,6 +176,9 @@ final class RoomItemPlacementService {
                 height = layout.getHeightAtSquare(tile.x, tile.y) + event.getUpdatedHeight();
             }
         }
+
+        Double forcedHeight = BssPlacementPreferences.consumeHeight(owner.getHabboInfo().getId());
+        if (forcedHeight != null) height = Math.max(layout.getHeightAtSquare(tile.x, tile.y), forcedHeight);
 
         item.setZ(height);
         item.setX(tile.x);

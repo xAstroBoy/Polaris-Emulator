@@ -42,13 +42,13 @@ public class ChestDepositEvent extends MessageHandler {
 
         if (!contents.isAccessDonate() && !room.hasRights(habbo)) return;
 
-        int balance = (currencyType < 0)
-                ? habbo.getHabboInfo().getCredits()
+        long balance = (currencyType < 0)
+                ? habbo.getHabboInfo().getCreditsLong()
                 : habbo.getHabboInfo().getCurrencyAmount(currencyType);
         if (balance <= 0) return;
 
         // Never debit more than the user owns; the chest decides atomically how much fits.
-        int desired = Math.min(amount, balance);
+        int desired = (int) Math.min((long) amount, balance);
         int accepted = contents.depositCurrency(currencyType, desired);
         if (accepted <= 0) return;
 

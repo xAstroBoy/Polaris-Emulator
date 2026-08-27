@@ -1014,10 +1014,11 @@ public class RoomUnitManager {
     }
 
     public void giveHandItem(RoomUnit roomUnit, int handItem) {
-        roomUnit.setHandItem(handItem);
+        int supportedHandItem = AvatarHandItemSupport.normalize(handItem);
+        roomUnit.setHandItem(supportedHandItem);
         this.room.sendComposer(new RoomUserHandItemComposer(roomUnit).compose());
 
-        if (handItem > 0) {
+        if (supportedHandItem > 0) {
             com.eu.habbo.habbohotel.wired.core.WiredManager.triggerUserGetsHandItem(this.room, roomUnit);
         }
     }

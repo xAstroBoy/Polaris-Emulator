@@ -52,6 +52,9 @@ final class RuntimeLifecycle {
             run("stop RCON server", () -> services.rconServer().stop());
         }
         if (services.gameServer() != null) {
+            run(
+                    "disconnect active game clients",
+                    () -> services.gameServer().getGameClientManager().forceDisposeAllClients());
             run("stop game server", () -> services.gameServer().stop());
         }
         run("dispose resumed sessions", sessionCleanup);

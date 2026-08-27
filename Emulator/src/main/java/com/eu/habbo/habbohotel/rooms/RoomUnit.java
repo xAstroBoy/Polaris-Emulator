@@ -680,7 +680,7 @@ public class RoomUnit {
   }
 
   public void setHandItem(int handItem) {
-    this.handItem = handItem;
+    this.handItem = AvatarHandItemSupport.normalize(handItem);
     this.handItemTimestamp = System.currentTimeMillis();
   }
 
@@ -693,8 +693,8 @@ public class RoomUnit {
   }
 
   public void setEffectId(int effectId, int endTimestamp) {
-    this.effectId = effectId;
-    this.effectEndTimestamp = endTimestamp;
+    this.effectId = AvatarEffectSupport.normalize(effectId);
+    this.effectEndTimestamp = this.effectId == 0 ? 0 : endTimestamp;
   }
 
   public int getEffectEndTimestamp() {

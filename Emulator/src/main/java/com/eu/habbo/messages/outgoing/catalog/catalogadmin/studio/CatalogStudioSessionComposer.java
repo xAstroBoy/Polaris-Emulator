@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.zip.GZIPOutputStream;
 
 public final class CatalogStudioSessionComposer extends MessageComposer {
-    private static final String SNAPSHOT_ENCODING = "GZIP_BASE64_JSON";
+    private static final String SNAPSHOT_ENCODING = "GZIP_BASE64_JSON_COUNTS_V2";
     private static final int MAX_STRING_CHUNK_LENGTH = Short.MAX_VALUE;
 
     private final long activeVersionId;
@@ -30,6 +30,7 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
     private final int validationIssueCount;
     private final List<CatalogStudioPublishedVersion> publishedVersions;
     private final List<CatalogPageSnapshot> pages;
+    private final List<CatalogStudioSessionOffer> offers;
 
     public CatalogStudioSessionComposer(
             long activeVersionId,
@@ -53,6 +54,7 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
                 validationCurrent,
                 validationIssueCount,
                 publishedVersions,
+                List.of(),
                 List.of());
     }
 
@@ -68,6 +70,34 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
             int validationIssueCount,
             List<CatalogStudioPublishedVersion> publishedVersions,
             List<CatalogPageSnapshot> pages) {
+        this(
+                activeVersionId,
+                draftVersionId,
+                revision,
+                activeUpdatedAt,
+                draftCreatedAt,
+                pendingCount,
+                actors,
+                validationCurrent,
+                validationIssueCount,
+                publishedVersions,
+                pages,
+                List.of());
+    }
+
+    public CatalogStudioSessionComposer(
+            long activeVersionId,
+            long draftVersionId,
+            long revision,
+            Instant activeUpdatedAt,
+            Instant draftCreatedAt,
+            int pendingCount,
+            List<CatalogStudioActor> actors,
+            boolean validationCurrent,
+            int validationIssueCount,
+            List<CatalogStudioPublishedVersion> publishedVersions,
+            List<CatalogPageSnapshot> pages,
+            List<CatalogStudioSessionOffer> offers) {
         this.activeVersionId = activeVersionId;
         this.draftVersionId = draftVersionId;
         this.revision = revision;
@@ -79,6 +109,7 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
         this.validationIssueCount = validationIssueCount;
         this.publishedVersions = List.copyOf(publishedVersions);
         this.pages = List.copyOf(pages);
+        this.offers = List.copyOf(offers);
     }
 
     @Override
@@ -103,18 +134,21 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
             this.response.appendString(version.label());
             this.response.appendString(version.publishedAt().toString());
         }
-        String pageJson = new Gson().toJson(pages);
-        List<String> pageChunks = encodePageChunks(pages, pageJson);
+        CatalogStudioSnapshotPayload payload = new CatalogStudioSnapshotPayload(pages, offers);
+        String snapshotJson = new Gson().toJson(payload);
+        List<String> pageChunks = encodeSnapshotChunks(payload, snapshotJson);
         this.response.appendString(SNAPSHOT_ENCODING);
+        this.response.appendInt(pages.size());
+        this.response.appendInt(offers.size());
         this.response.appendInt(pageChunks.size());
         pageChunks.forEach(this.response::appendString);
         return this.response;
     }
 
-    private static List<String> encodePageChunks(List<CatalogPageSnapshot> pages, String pageJson) {
-        if (pages.isEmpty()) return List.of();
+    private static List<String> encodeSnapshotChunks(CatalogStudioSnapshotPayload payload, String snapshotJson) {
+        if (payload.pages().isEmpty() && payload.offers().isEmpty()) return List.of();
 
-        byte[] json = pageJson.getBytes(StandardCharsets.UTF_8);
+        byte[] json = snapshotJson.getBytes(StandardCharsets.UTF_8);
         ByteArrayOutputStream compressed = new ByteArrayOutputStream();
         try (GZIPOutputStream gzip = new GZIPOutputStream(compressed)) {
             gzip.write(json);
@@ -129,4 +163,7 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
         }
         return List.copyOf(chunks);
     }
+
+    private record CatalogStudioSnapshotPayload(
+            List<CatalogPageSnapshot> pages, List<CatalogStudioSessionOffer> offers) {}
 }

@@ -442,7 +442,7 @@ public final class Emulator {
 
     private static void registerStartupConfigDefaults() {
         ConfigurationManager configuration = Emulator.config;
-        configuration.register("camera.url", "http://localhost/camera/");
+        configuration.register("camera.url", "/camera/");
         Emulator.config.register("imager.location.output.camera", "/public/camera/");
         Emulator.config.register("imager.location.output.thumbnail", "/public/camera/thumbnails/");
         Emulator.config.register("camera.price.points.publish", "1");

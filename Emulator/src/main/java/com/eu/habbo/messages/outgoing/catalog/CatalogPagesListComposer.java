@@ -73,9 +73,14 @@ public class CatalogPagesListComposer extends MessageComposer {
         this.response.appendString(category.getPageName());
         this.response.appendString(category.getCaption() + (this.hasPermission ? " (" + category.getId() + ")" : ""));
 
-        // Offer IDs are resolved when a page is opened (GetCatalogPage). Embedding ~80k
-        // ids in the index bloats the first catalog open by seconds on large catalogs.
-        this.response.appendInt(0);
+        // Nitro uses this index to resolve an offer back to its exact catalog
+        // page. A count-only sentinel breaks catalog/open/offerId because the
+        // client can no longer expand the correct tab and sub-page.
+        int[] offerIds = navigationOfferIds(category);
+        this.response.appendInt(offerIds.length);
+        for (int offerId : offerIds) {
+            this.response.appendInt(offerId);
+        }
 
         if (depth >= MAX_DEPTH) {
             this.response.appendInt(0);
@@ -88,6 +93,10 @@ public class CatalogPagesListComposer extends MessageComposer {
         for (int idx = 0; idx < childCount; idx++) {
             this.append(pagesList.get(idx), depth + 1, requestedType);
         }
+    }
+
+    static int[] navigationOfferIds(CatalogPage category) {
+        return category.getOfferIds().toIntArray();
     }
 
 

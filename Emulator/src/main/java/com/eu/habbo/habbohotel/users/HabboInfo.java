@@ -42,7 +42,7 @@ public class HabboInfo implements Runnable {
     private int id;
     private int accountCreated;
     private Rank rank;
-    private int credits;
+    private long credits;
     private int lastOnline;
     private int homeRoom;
     private boolean online;
@@ -98,7 +98,7 @@ public class HabboInfo implements Runnable {
             }
 
             this.accountCreated = set.getInt("account_created");
-            this.credits = Math.max(0, set.getInt("credits"));
+            this.credits = Math.max(0L, set.getLong("credits"));
             this.homeRoom = set.getInt("home_room");
             this.lastOnline = set.getInt("last_online");
             this.machineID = set.getString("machine_id");
@@ -122,7 +122,7 @@ public class HabboInfo implements Runnable {
         this.loadMessengerCategories();
     }
 
-    HabboInfo(int id, int credits) {
+    HabboInfo(int id, long credits) {
         this.id = id;
         this.credits = WalletBalanceMath.requireValidBalance(credits);
         this.gender = HabboGender.M;
@@ -531,17 +531,25 @@ public class HabboInfo implements Runnable {
     }
 
     public boolean canBuy(CatalogItem item) {
-        return this.getCredits() >= item.getCredits()
+        return this.getCreditsLong() >= item.getCredits()
                 && this.getCurrencyAmount(item.getPointsType()) >= item.getPoints();
     }
 
     public int getCredits() {
+        return (int) Math.min(Integer.MAX_VALUE, getCreditsLong());
+    }
+
+    public long getCreditsLong() {
         synchronized (this.currencyLock) {
             return this.credits;
         }
     }
 
     public void setCredits(int credits) {
+        setCredits((long) credits);
+    }
+
+    public void setCredits(long credits) {
         synchronized (this.currencyLock) {
             this.credits = WalletBalanceMath.requireValidBalance(credits);
         }
@@ -549,12 +557,22 @@ public class HabboInfo implements Runnable {
     }
 
     public void addCredits(int credits) {
+        addCredits((long) credits);
+    }
+
+    public void addCredits(long credits) {
         // Legacy check-then-act entry point: never throw here (see
         // addCurrencyAmount). Clamp into range and log an out-of-range delta.
         // Paths that must reject an out-of-range update use tryAddCredits.
         synchronized (this.currencyLock) {
-            int updated = WalletBalanceMath.clampedBalance(this.credits, credits);
-            if ((long) Math.max(0, this.credits) + credits != updated) {
+            long updated = WalletBalanceMath.clampedBalance(this.credits, credits);
+            boolean exact;
+            try {
+                exact = Math.addExact(Math.max(0L, this.credits), credits) == updated;
+            } catch (ArithmeticException exception) {
+                exact = false;
+            }
+            if (!exact) {
                 LOGGER.warn(
                         "Clamped out-of-range credit balance for user {}: {} + {} -> {}",
                         this.id,
@@ -567,7 +585,7 @@ public class HabboInfo implements Runnable {
         this.run();
     }
 
-    void applyPersistedCredits(int credits) {
+    void applyPersistedCredits(long credits) {
         synchronized (this.currencyLock) {
             this.credits = WalletBalanceMath.requireValidBalance(credits);
         }
@@ -584,6 +602,10 @@ public class HabboInfo implements Runnable {
     }
 
     public boolean tryAddCredits(int credits) {
+        return tryAddCredits((long) credits);
+    }
+
+    public boolean tryAddCredits(long credits) {
         synchronized (this.currencyLock) {
             try {
                 this.credits = WalletBalanceMath.checkedBalance(this.credits, credits);
@@ -800,7 +822,7 @@ public class HabboInfo implements Runnable {
 
         // Read credits under the lock so the persisted value is consistent with
         // concurrent addCredits/setCredits (matches the currencyLock invariant).
-        final int creditsForSave;
+        final long creditsForSave;
         synchronized (this.currencyLock) {
             creditsForSave = this.credits;
         }

@@ -12,7 +12,8 @@ import com.eu.habbo.plugin.events.users.UserSignEvent;
 
 public class RoomUserSignEvent extends MessageHandler {
     private static final int MIN_SIGN_ID = 0;
-    private static final int MAX_SIGN_ID = 10;
+    // Nitro exposes the numeric signs plus the special signs 11-17.
+    private static final int MAX_SIGN_ID = 17;
 
     @Override
     public void handle() throws Exception {

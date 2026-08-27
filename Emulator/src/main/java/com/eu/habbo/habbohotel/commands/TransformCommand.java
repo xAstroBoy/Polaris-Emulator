@@ -14,7 +14,7 @@ import java.util.Collections;
 
 public class TransformCommand extends Command {
     protected TransformCommand() {
-        super("cmd_transform", new String[]{"transform"});
+        super("cmd_transform", Emulator.getTexts().getValue("commands.keys.cmd_transform").split(";"));
     }
 
     @Override
