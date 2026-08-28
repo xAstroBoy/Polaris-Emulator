@@ -215,10 +215,37 @@ final class RoomItemOwnershipService {
         }
     }
 
+    void pickAllTo(Habbo picker) {
+        if (picker == null || picker.getHabboInfo() == null) {
+            return;
+        }
+
+        Set<HabboItem> items = new HashSet<>();
+        synchronized (this.index.items()) {
+            for (HabboItem item : this.index.items().values()) {
+                if (!(item instanceof InteractionPostIt)) {
+                    items.add(item);
+                }
+            }
+        }
+
+        int pickerId = picker.getHabboInfo().getId();
+        for (HabboItem item : items) {
+            if (BuildersClubRoomSupport.isTrackedItem(item.getId())) {
+                BuildersClubRoomSupport.deleteTrackedItem(item.getId());
+            }
+            item.setUserId(pickerId);
+            this.pickUp(item, picker);
+        }
+
+        BuildersClubRoomSupport.syncRoom(this.room);
+        BuildersClubRoomSupport.sendPlacementStatusForPool(this.room, pickerId);
+    }
+
     private void addOwnerName(HabboItem item) {
-        if (item.getUserId() == BuildersClubRoomSupport.VIRTUAL_OWNER_ID
-                && BuildersClubRoomSupport.isTrackedItem(item.getId())) {
-            this.index.ownerNames().put(item.getUserId(), BuildersClubRoomSupport.DISPLAY_OWNER_NAME);
+        HabboInfo roomOwner = HabboManager.getOfflineHabboInfo(this.room.getOwnerId());
+        if (roomOwner != null) {
+            this.index.ownerNames().put(item.getUserId(), roomOwner.getUsername());
             return;
         }
 

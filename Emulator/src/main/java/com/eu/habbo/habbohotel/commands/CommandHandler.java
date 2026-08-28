@@ -30,8 +30,10 @@ public class CommandHandler {
     private static final Map<String, Command> commands = new HashMap<>(5);
     private static final Comparator<Command> ALPHABETICAL_ORDER = new Comparator<Command>() {
         public int compare(Command c1, Command c2) {
-            int res = String.CASE_INSENSITIVE_ORDER.compare(c1.permission, c2.permission);
-            return (res != 0) ? res : c1.permission.compareTo(c2.permission);
+            String first = c1.permission == null ? c1.keys[0] : c1.permission;
+            String second = c2.permission == null ? c2.keys[0] : c2.permission;
+            int res = String.CASE_INSENSITIVE_ORDER.compare(first, second);
+            return (res != 0) ? res : first.compareTo(second);
         }
     };
 
@@ -171,19 +173,18 @@ public class CommandHandler {
 
                     if (room.getCurrentPets().isEmpty()) return false;
 
+                    String normalizedLine = commandLine.trim();
                     for (Pet pet : room.getCurrentPets().values()) {
                         if (pet != null) {
-                            if (pet.getName().equalsIgnoreCase(args[0])) {
-                                StringBuilder s = new StringBuilder();
-
-                                for (int i = 1; i < args.length; i++) {
-                                    s.append(args[i]).append(" ");
-                                }
-
-                                s = new StringBuilder(s.substring(0, s.length() - 1));
+                            String petName = pet.getName() == null ? "" : pet.getName().trim();
+                            if (!petName.isEmpty()
+                                    && normalizedLine.length() > petName.length()
+                                    && normalizedLine.regionMatches(true, 0, petName, 0, petName.length())
+                                    && Character.isWhitespace(normalizedLine.charAt(petName.length()))) {
+                                String commandText = normalizedLine.substring(petName.length()).trim();
 
                                 for (PetCommand command : pet.getPetData().getPetCommands()) {
-                                    if (command.key.equalsIgnoreCase(s.toString())) {
+                                    if (command != null && command.matches(commandText)) {
                                         if (pet instanceof RideablePet && ((RideablePet) pet).getRider() != null) {
                                             if (((RideablePet) pet)
                                                             .getRider()
@@ -201,9 +202,7 @@ public class CommandHandler {
                                             break;
                                         }
 
-                                        if (command.level <= pet.getLevel())
-                                            pet.handleCommand(command, gameClient.getHabbo(), args);
-                                        else pet.say(pet.getPetData().randomVocal(PetVocalsType.UNKNOWN_COMMAND));
+                                        pet.handleCommand(command, gameClient.getHabbo(), commandText.split("\\s+"));
 
                                         break;
                                     }
@@ -291,6 +290,7 @@ public class CommandHandler {
         addCommand(new MuteBotsCommand());
         addCommand(new MuteCommand());
         addCommand(new MutePetsCommand());
+        addCommand(new MaxPetStatCommand());
         addCommand(new OnlineCommand());
         addCommand(new PetInfoCommand());
         addCommand(new PickallCommand());
@@ -408,6 +408,7 @@ public class CommandHandler {
         addCommand(new ListPrefixesCommand());
         addCommand(new RemovePrefixCommand());
         addCommand(new WiredCommand());
+        addCommand(new WiredHelpCommand());
         addCommand(new TestCommand());
     }
 
@@ -422,8 +423,9 @@ public class CommandHandler {
             for (Command command : commands.values()) {
                 if (allowedCommands.contains(command)) continue;
 
-                if (permissions.containsKey(command.permission)
-                        && permissions.get(command.permission).setting != PermissionSetting.DISALLOWED) {
+                if (command.permission == null
+                        || (permissions.containsKey(command.permission)
+                        && permissions.get(command.permission).setting != PermissionSetting.DISALLOWED)) {
                     allowedCommands.add(command);
                 }
             }

@@ -6,6 +6,7 @@ import com.eu.habbo.habbohotel.pets.Pet;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomTile;
 import com.eu.habbo.habbohotel.users.Habbo;
+import com.eu.habbo.habbohotel.permissions.Permission;
 import com.eu.habbo.messages.incoming.MessageHandler;
 import com.eu.habbo.threading.runnables.RoomUnitWalkToLocation;
 
@@ -33,7 +34,9 @@ public class ScratchPetEvent extends MessageHandler {
             return;
         }
 
-        if (habbo.getHabboStats().petRespectPointsToGive > 0 || pet instanceof MonsterplantPet) {
+        if (habbo.getHabboStats().petRespectPointsToGive > 0
+                || habbo.hasPermission(Permission.ACC_INFINITE_RESPECT)
+                || pet instanceof MonsterplantPet) {
 
             List<Runnable> tasks = new ArrayList<>();
             tasks.add(() -> {

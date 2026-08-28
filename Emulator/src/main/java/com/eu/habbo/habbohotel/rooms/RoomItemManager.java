@@ -555,6 +555,10 @@ public class RoomItemManager {
         this.ownership.ejectAll(habbo);
     }
 
+    public void pickAllTo(Habbo habbo) {
+        this.ownership.pickAllTo(habbo);
+    }
+
     // ==================== LOCKED TILES ====================
 
     /**

@@ -8,6 +8,7 @@ import com.eu.habbo.habbohotel.items.interactions.pets.InteractionPetToy;
 import com.eu.habbo.habbohotel.items.interactions.pets.InteractionPetTree;
 import com.eu.habbo.habbohotel.rooms.*;
 import com.eu.habbo.habbohotel.users.Habbo;
+import com.eu.habbo.habbohotel.permissions.Permission;
 import com.eu.habbo.habbohotel.users.HabboItem;
 import com.eu.habbo.messages.ISerialize;
 import com.eu.habbo.messages.ServerMessage;
@@ -783,8 +784,12 @@ public class Pet implements ISerialize, Runnable {
         this.needsUpdate = true;
 
         if (habbo != null) {
-            habbo.getHabboStats().petRespectPointsToGive--;
+            if (!habbo.hasPermission(Permission.ACC_INFINITE_RESPECT)) {
+                habbo.getHabboStats().petRespectPointsToGive--;
+            }
             habbo.getHabboInfo().getCurrentRoom().sendComposer(new RoomPetRespectComposer(this).compose());
+            this.say("*" + this.getName() + " ha ricevuto un grattino da "
+                    + habbo.getHabboInfo().getUsername());
 
             AchievementManager.progressAchievement(habbo, Emulator.getGameEnvironment().getAchievementManager().getAchievement("PetRespectGiver"));
         }

@@ -8,7 +8,9 @@ import java.util.Comparator;
 import java.util.ArrayList;
 
 public class CommandsCommand extends Command {
-    private static final int COMMANDS_PER_PAGE = 16;
+    // :help is an overview, so show every command granted to the caller in
+    // one complete alert instead of forcing them through partial pages.
+    private static final int COMMANDS_PER_PAGE = Integer.MAX_VALUE;
 
     public CommandsCommand() {
         super("cmd_commands", Emulator.getTexts().getValue("commands.keys.cmd_commands").split(";"));

@@ -10,7 +10,9 @@ import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectSendS
 import com.eu.habbo.habbohotel.items.interactions.wired.triggers.WiredTriggerReceiveSignal;
 import com.eu.habbo.habbohotel.permissions.Permission;
 import com.eu.habbo.habbohotel.users.Habbo;
+import com.eu.habbo.habbohotel.users.HabboInfo;
 import com.eu.habbo.habbohotel.users.HabboItem;
+import com.eu.habbo.habbohotel.users.HabboManager;
 import com.eu.habbo.messages.outgoing.rooms.items.AddFloorItemComposer;
 import com.eu.habbo.messages.outgoing.rooms.items.AddWallItemComposer;
 import com.eu.habbo.plugin.Event;
@@ -287,14 +289,11 @@ final class RoomItemPlacementService {
     }
 
     private void ensureOwnerName(HabboItem item, Habbo owner) {
-        if (!this.index.ownerNames().containsKey(item.getUserId()) && owner != null) {
-            this.index
-                    .ownerNames()
-                    .put(
-                            item.getUserId(),
-                            item.getUserId() == BuildersClubRoomSupport.VIRTUAL_OWNER_ID
-                                    ? BuildersClubRoomSupport.DISPLAY_OWNER_NAME
-                                    : owner.getHabboInfo().getUsername());
+        if (!this.index.ownerNames().containsKey(item.getUserId())) {
+            HabboInfo roomOwner = HabboManager.getOfflineHabboInfo(this.room.getOwnerId());
+            if (roomOwner != null) {
+                this.index.ownerNames().put(item.getUserId(), roomOwner.getUsername());
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class InteractionDice extends HabboItem {
+    private volatile long rolledAt;
     public InteractionDice(int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
         super(id, userId, item, extradata, limitedStack, limitedSells);
     }
@@ -88,5 +89,16 @@ public class InteractionDice extends HabboItem {
     @Override
     public boolean isUsable() {
         return true;
+    }
+
+    public void markRolled() {
+        this.rolledAt = System.currentTimeMillis();
+    }
+
+    public boolean canCloseManually() {
+        // Nitro can emit DICE_OFF while the roll animation is finishing. Do
+        // not let that packet erase the freshly selected face. A deliberate
+        // corner click after the animation still closes the die normally.
+        return System.currentTimeMillis() - this.rolledAt >= 10000L;
     }
 }

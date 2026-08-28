@@ -39,6 +39,7 @@ import com.eu.habbo.messages.incoming.catalog.RequestGiftConfigurationEvent;
 import com.eu.habbo.messages.incoming.catalog.RequestMarketplaceConfigEvent;
 import com.eu.habbo.messages.incoming.catalog.RequestPetBreedsEvent;
 import com.eu.habbo.messages.incoming.catalog.TargetOfferStateEvent;
+import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminBulkOffersEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminCreateOfferEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminCreatePageEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminDeleteOfferEvent;
@@ -725,6 +726,7 @@ public class PacketManager {
         this.registerHandler(Incoming.CatalogAdminDeletePageEvent, CatalogAdminDeletePageEvent.class);
         this.registerHandler(Incoming.CatalogAdminSaveOfferEvent, CatalogAdminSaveOfferEvent.class);
         this.registerHandler(Incoming.CatalogAdminCreateOfferEvent, CatalogAdminCreateOfferEvent.class);
+        this.registerHandler(Incoming.CatalogAdminBulkOffersEvent, CatalogAdminBulkOffersEvent.class); // CATALOG_BULK_OFFERS_V2
         this.registerHandler(Incoming.CatalogAdminDeleteOfferEvent, CatalogAdminDeleteOfferEvent.class);
         this.registerHandler(Incoming.CatalogAdminMoveOfferEvent, CatalogAdminMoveOfferEvent.class);
         this.registerHandler(Incoming.CatalogAdminMovePageEvent, CatalogAdminMovePageEvent.class);

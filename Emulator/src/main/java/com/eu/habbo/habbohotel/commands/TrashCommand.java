@@ -46,13 +46,18 @@ public class TrashCommand extends Command {
         if (commandKey.equalsIgnoreCase("tornado") || commandKey.equalsIgnoreCase("trash")) {
             return handleTornado(gameClient);
         }
-        return handleSharknado(gameClient);
+        return handleSharknado(gameClient, params.length >= 2 ? params[1] : null);
     }
 
-    private static boolean handleSharknado(GameClient gameClient) {
+    private static boolean handleSharknado(GameClient gameClient, String targetName) {
         Habbo caller = gameClient.getHabbo();
         Room room = caller.getHabboInfo().getCurrentRoom();
         if (room == null) return true;
+        Habbo target = targetName == null ? caller : room.getHabbo(targetName);
+        if (target == null) {
+            caller.whisper("Utente non trovato nella stanza.", RoomChatMessageBubbles.ALERT);
+            return true;
+        }
 
         Long eventId = RoomFunEventLock.tryAcquire(room);
         if (eventId == null) {
@@ -63,7 +68,7 @@ public class TrashCommand extends Command {
         }
 
         List<Item> sharkBaseItems = resolveSharkBaseItems();
-        List<RoomTile> orbit = buildOrbit(room, caller.getRoomUnit().getCurrentLocation());
+        List<RoomTile> orbit = buildOrbit(room, target.getRoomUnit().getCurrentLocation());
         if (sharkBaseItems.isEmpty() || orbit.size() < 2) {
             RoomFunEventLock.release(room, eventId);
             caller.whisper(
@@ -72,7 +77,7 @@ public class TrashCommand extends Command {
             return true;
         }
 
-        List<PreviousEffect> previousEffects = captureEffects(room);
+        List<PreviousEffect> previousEffects = captureEffects(target);
         List<TransientShark> sharks = spawnSharks(room, caller, sharkBaseItems, orbit);
         for (PreviousEffect previous : previousEffects) {
             room.giveEffect(previous.habbo(), RAIN_CLOUD_EFFECT, 3);
@@ -262,6 +267,11 @@ public class TrashCommand extends Command {
             previousEffects.add(new PreviousEffect(habbo, unit.getEffectId(), unit.getEffectEndTimestamp()));
         }
         return previousEffects;
+    }
+
+    private static List<PreviousEffect> captureEffects(Habbo habbo) {
+        RoomUnit unit = habbo.getRoomUnit();
+        return List.of(new PreviousEffect(habbo, unit.getEffectId(), unit.getEffectEndTimestamp()));
     }
 
     private static List<TransientShark> spawnSharks(

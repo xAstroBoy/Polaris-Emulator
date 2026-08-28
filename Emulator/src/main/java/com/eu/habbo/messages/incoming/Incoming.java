@@ -507,6 +507,7 @@ public class Incoming {
     public static final int CatalogStudioDocumentApplyEvent = 10080;
     public static final int CatalogProductMetadataEvent = 10081;
     public static final int CatalogRuntimeConfigurationEvent = 10082;
+    public static final int CatalogAdminBulkOffersEvent = 10083; // CATALOG_BULK_OFFERS_V2
 
     // Custom Prefixes
     public static final int RequestUserPrefixesEvent = 7011;

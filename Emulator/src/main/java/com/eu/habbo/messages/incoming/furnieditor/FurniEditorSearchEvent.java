@@ -10,7 +10,8 @@ import java.util.List;
 
 public class FurniEditorSearchEvent extends MessageHandler {
 
-    private static final int PAGE_SIZE = 20;
+    // CATALOG_BULK_OFFERS_V2
+    private static final int PAGE_SIZE = 200;
 
     @Override
     public void handle() throws Exception {

@@ -99,11 +99,14 @@ public final class JdbcCatalogLiveEntityWriter implements CatalogLiveEntityWrite
             statement.setInt(7, page.iconImage());
             statement.setInt(8, page.minRank());
             statement.setInt(9, page.orderNum());
-            statement.setBoolean(10, page.visible());
-            statement.setBoolean(11, page.enabled());
-            statement.setBoolean(12, page.clubOnly());
+            // The live catalog schema stores flags as ENUM('0','1'). Binding
+            // them as JDBC booleans makes MariaDB 12 strict mode receive an
+            // invalid enum value and abort the mutation.
+            statement.setString(10, enumFlag(page.visible()));
+            statement.setString(11, enumFlag(page.enabled()));
+            statement.setString(12, page.clubOnly() ? "1" : "0");
             statement.setString(13, page.catalogMode());
-            statement.setBoolean(14, page.vipOnly());
+            statement.setString(14, enumFlag(page.vipOnly()));
             statement.setString(15, page.pageHeadline());
             statement.setString(16, page.pageTeaser());
             statement.setString(17, page.pageSpecial());
@@ -126,8 +129,8 @@ public final class JdbcCatalogLiveEntityWriter implements CatalogLiveEntityWrite
             statement.setInt(5, page.iconColor());
             statement.setInt(6, page.iconImage());
             statement.setInt(7, page.orderNum());
-            statement.setBoolean(8, page.visible());
-            statement.setBoolean(9, page.enabled());
+            statement.setString(8, enumFlag(page.visible()));
+            statement.setString(9, enumFlag(page.enabled()));
             statement.setString(10, page.pageHeadline());
             statement.setString(11, page.pageTeaser());
             statement.setString(12, page.pageSpecial());
@@ -154,8 +157,8 @@ public final class JdbcCatalogLiveEntityWriter implements CatalogLiveEntityWrite
             statement.setInt(11, offer.offerIdClient());
             statement.setInt(12, offer.songId());
             statement.setString(13, offer.extradata());
-            statement.setBoolean(14, offer.haveOffer());
-            statement.setBoolean(15, offer.clubOnly());
+            statement.setString(14, enumFlag(offer.haveOffer()));
+            statement.setString(15, enumFlag(offer.clubOnly()));
             if (statement.executeUpdate() == 0) throw new SQLException("Live catalog offer upsert changed no row");
         }
     }
@@ -170,5 +173,9 @@ public final class JdbcCatalogLiveEntityWriter implements CatalogLiveEntityWrite
             statement.setString(6, offer.extradata());
             if (statement.executeUpdate() == 0) throw new SQLException("Live builder offer upsert changed no row");
         }
+    }
+
+    private static String enumFlag(boolean value) {
+        return value ? "1" : "0";
     }
 }

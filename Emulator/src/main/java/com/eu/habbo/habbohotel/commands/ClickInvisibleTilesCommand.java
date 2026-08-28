@@ -6,6 +6,7 @@ import com.eu.habbo.habbohotel.catalog.CatalogPage;
 import com.eu.habbo.habbohotel.gameclients.GameClient;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomChatMessageBubbles;
+import com.eu.habbo.habbohotel.rooms.RoomConfInvisSupport;
 import com.eu.habbo.habbohotel.users.HabboItem;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,8 @@ public class ClickInvisibleTilesCommand extends Command {
         }
 
         Set<Integer> invisibleFurnitureIds = invisibleFurnitureIds();
-        int clicked = 0;
+        String requestedState = requestedState(params);
+        int updated = 0;
         List<HabboItem> roomItems = new java.util.ArrayList<>(room.getFloorItems());
         roomItems.addAll(room.getWallItems());
         for (HabboItem item : roomItems) {
@@ -42,8 +44,14 @@ public class ClickInvisibleTilesCommand extends Command {
                     || item.getBaseItem() == null
                     || !invisibleFurnitureIds.contains(item.getBaseItem().getId())) continue;
             try {
-                item.onClick(gameClient, room, new Object[] {0});
-                clicked++;
+                if (requestedState == null) {
+                    item.onClick(gameClient, room, new Object[] {0});
+                } else if (!requestedState.equals(item.getExtradata())) {
+                    item.setExtradata(requestedState);
+                    item.needsUpdate(true);
+                    room.updateItemState(item);
+                }
+                updated++;
             } catch (Exception exception) {
                 LOGGER.error("Failed to click invisible-category furniture {}", item.getId(), exception);
             }
@@ -52,9 +60,16 @@ public class ClickInvisibleTilesCommand extends Command {
         gameClient.getHabbo().whisper(
                 Emulator.getTexts()
                         .getValue("commands.success.cmd_click_invisible_tiles")
-                        .replace("%count%", Integer.toString(clicked)),
+                        .replace("%count%", Integer.toString(updated)),
                 RoomChatMessageBubbles.ALERT);
         return true;
+    }
+
+    private static String requestedState(String[] params) {
+        if (params.length < 2) return null;
+        if (params[1].equalsIgnoreCase("hide")) return "1";
+        if (params[1].equalsIgnoreCase("show")) return "0";
+        return null;
     }
 
     static Set<Integer> invisibleFurnitureIds() {

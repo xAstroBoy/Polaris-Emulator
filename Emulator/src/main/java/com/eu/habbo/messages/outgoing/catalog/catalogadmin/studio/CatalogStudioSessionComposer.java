@@ -1,5 +1,6 @@
 package com.eu.habbo.messages.outgoing.catalog.catalogadmin.studio;
 
+import com.eu.habbo.habbohotel.catalog.versioning.CatalogOfferSnapshot;
 import com.eu.habbo.habbohotel.catalog.versioning.CatalogPageSnapshot;
 import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.messages.outgoing.MessageComposer;
@@ -15,6 +16,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * Catalog Studio session snapshot.
+ *
+ * V2 sends BOTH pages and offers in one compressed JSON payload and includes
+ * authoritative counts before the chunks. The Nitro parser validates those
+ * counts, so a partial/truncated snapshot cannot silently become an empty
+ * offer list.
+ */
 public final class CatalogStudioSessionComposer extends MessageComposer {
     private static final String SNAPSHOT_ENCODING = "GZIP_BASE64_JSON_COUNTS_V2";
     private static final int MAX_STRING_CHUNK_LENGTH = Short.MAX_VALUE;
@@ -30,7 +39,11 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
     private final int validationIssueCount;
     private final List<CatalogStudioPublishedVersion> publishedVersions;
     private final List<CatalogPageSnapshot> pages;
-    private final List<CatalogStudioSessionOffer> offers;
+    private final List<CatalogOfferSnapshot> offers;
+
+    private record SnapshotPayload(
+            List<CatalogPageSnapshot> pages,
+            List<CatalogOfferSnapshot> offers) {}
 
     public CatalogStudioSessionComposer(
             long activeVersionId,
@@ -58,6 +71,10 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
                 List.of());
     }
 
+    /**
+     * Backward-compatible constructor used by older tests/callers.
+     * It intentionally produces a zero-offer snapshot.
+     */
     public CatalogStudioSessionComposer(
             long activeVersionId,
             long draftVersionId,
@@ -97,7 +114,7 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
             int validationIssueCount,
             List<CatalogStudioPublishedVersion> publishedVersions,
             List<CatalogPageSnapshot> pages,
-            List<CatalogStudioSessionOffer> offers) {
+            List<CatalogOfferSnapshot> offers) {
         this.activeVersionId = activeVersionId;
         this.draftVersionId = draftVersionId;
         this.revision = revision;
@@ -122,48 +139,52 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
         this.response.appendString(draftCreatedAt.toString());
         this.response.appendInt(pendingCount);
         this.response.appendInt(actors.size());
+
         for (CatalogStudioActor actor : actors) {
             this.response.appendInt(actor.id());
             this.response.appendString(actor.username());
         }
+
         this.response.appendBoolean(validationCurrent);
         this.response.appendInt(validationIssueCount);
         this.response.appendInt(publishedVersions.size());
+
         for (CatalogStudioPublishedVersion version : publishedVersions) {
             this.response.appendInt(Math.toIntExact(version.id()));
             this.response.appendString(version.label());
             this.response.appendString(version.publishedAt().toString());
         }
-        CatalogStudioSnapshotPayload payload = new CatalogStudioSnapshotPayload(pages, offers);
-        String snapshotJson = new Gson().toJson(payload);
-        List<String> pageChunks = encodeSnapshotChunks(payload, snapshotJson);
+
+        SnapshotPayload snapshot = new SnapshotPayload(pages, offers);
+        String snapshotJson = new Gson().toJson(snapshot);
+        List<String> chunks = encodeSnapshotChunks(snapshotJson);
+
         this.response.appendString(SNAPSHOT_ENCODING);
         this.response.appendInt(pages.size());
         this.response.appendInt(offers.size());
-        this.response.appendInt(pageChunks.size());
-        pageChunks.forEach(this.response::appendString);
+        this.response.appendInt(chunks.size());
+        chunks.forEach(this.response::appendString);
+
         return this.response;
     }
 
-    private static List<String> encodeSnapshotChunks(CatalogStudioSnapshotPayload payload, String snapshotJson) {
-        if (payload.pages().isEmpty() && payload.offers().isEmpty()) return List.of();
-
+    private static List<String> encodeSnapshotChunks(String snapshotJson) {
         byte[] json = snapshotJson.getBytes(StandardCharsets.UTF_8);
         ByteArrayOutputStream compressed = new ByteArrayOutputStream();
+
         try (GZIPOutputStream gzip = new GZIPOutputStream(compressed)) {
             gzip.write(json);
         } catch (IOException exception) {
-            throw new IllegalStateException("Failed to compress the Catalog Studio page index", exception);
+            throw new IllegalStateException("Failed to compress the Catalog Studio snapshot", exception);
         }
 
         String encoded = Base64.getEncoder().encodeToString(compressed.toByteArray());
         List<String> chunks = new ArrayList<>((encoded.length() / MAX_STRING_CHUNK_LENGTH) + 1);
+
         for (int offset = 0; offset < encoded.length(); offset += MAX_STRING_CHUNK_LENGTH) {
             chunks.add(encoded.substring(offset, Math.min(offset + MAX_STRING_CHUNK_LENGTH, encoded.length())));
         }
+
         return List.copyOf(chunks);
     }
-
-    private record CatalogStudioSnapshotPayload(
-            List<CatalogPageSnapshot> pages, List<CatalogStudioSessionOffer> offers) {}
 }

@@ -1990,6 +1990,14 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
         this.itemManager.ejectAll(habbo);
     }
 
+    /**
+     * Picks every removable room item up into the inventory of the Habbo who
+     * executed the command, regardless of the item's former owner.
+     */
+    public void pickAllTo(Habbo habbo) {
+        this.itemManager.pickAllTo(habbo);
+    }
+
     public void refreshGuild(Guild guild) {
         this.guildService.refresh(guild);
     }

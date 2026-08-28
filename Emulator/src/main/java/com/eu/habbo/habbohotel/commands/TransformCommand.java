@@ -8,6 +8,7 @@ import com.eu.habbo.habbohotel.rooms.RoomUnit;
 import com.eu.habbo.habbohotel.rooms.RoomUnitType;
 import com.eu.habbo.messages.outgoing.generic.alerts.MessagesForYouComposer;
 import com.eu.habbo.messages.outgoing.rooms.users.RoomUserRemoveComposer;
+import com.eu.habbo.messages.outgoing.rooms.users.RoomUsersComposer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +20,19 @@ public class TransformCommand extends Command {
 
     @Override
     public boolean handle(GameClient gameClient, String[] params) throws Exception {
+        if (params.length >= 2 && params[1].equalsIgnoreCase("habbo")) {
+            RoomUnit roomUnit = gameClient.getHabbo().getRoomUnit();
+            if (roomUnit.getRoomUnitType() != RoomUnitType.PET) return true;
+
+            roomUnit.setRoomUnitType(RoomUnitType.USER);
+            gameClient.getHabbo().getHabboStats().cache.remove("pet_type");
+            gameClient.getHabbo().getHabboStats().cache.remove("pet_race");
+            gameClient.getHabbo().getHabboStats().cache.remove("pet_color");
+            gameClient.getHabbo().getHabboInfo().getCurrentRoom().sendComposer(new RoomUserRemoveComposer(roomUnit).compose());
+            gameClient.getHabbo().getHabboInfo().getCurrentRoom().sendComposer(new RoomUsersComposer(gameClient.getHabbo()).compose());
+            return true;
+        }
+
         if (params.length == 1) {
             StringBuilder petNames = new StringBuilder();
             petNames.append(Emulator.getTexts().getValue("commands.generic.cmd_transform.title"));
