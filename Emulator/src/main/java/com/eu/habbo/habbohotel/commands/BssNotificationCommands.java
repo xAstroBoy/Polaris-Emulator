@@ -29,16 +29,30 @@ final class BssNotificationCommand extends Command {
         String type = requestedType == null ? "" : requestedType.toLowerCase(Locale.ROOT);
         if (room == null || !TYPES.contains(type)) return usage(gameClient);
 
-        String configured = Emulator.getConfig().getValue(
-                "bss.notification." + type + ".text",
+        String headline = Emulator.getConfig().getValue(
+                "bss.notification." + type + ".headline",
                 switch (type) {
-                    case "arb" -> "Gli arbitri sono richiesti";
-                    case "staff" -> "Lo staff e richiesto";
-                    case "pok" -> "Il poker e aperto";
-                    default -> "Un evento e iniziato";
+                    case "arb" -> "ARBITRI RICHIESTI";
+                    case "staff" -> "STAFF RICHIESTO";
+                    case "pok" -> "ZONA POKER APERTA";
+                    default -> "EVENTO IN CORSO";
                 });
-        String message = configured + "\r\nStanza: " + room.getName();
-        String link = "event:navigator/goto/" + room.getId();
+        String body = Emulator.getConfig().getValue(
+                "bss.notification." + type + ".text",
+                "pok".equals(type)
+                        ? "Ora e aperto un poker da %user%. Clicca qui per andare."
+                        : "Vieni qui per vincere un raro v10 o altri premi!");
+        String description = room.getDescription() == null || room.getDescription().isBlank()
+                ? "Nessuna descrizione"
+                : room.getDescription();
+        String message = "[ " + headline + " ]\r\n"
+                + body.replace("%user%", gameClient.getHabbo().getHabboInfo().getUsername())
+                        .replace("%room%", room.getName())
+                        .replace("%description%", description)
+                + "\r\n\r\nStanza: " + room.getName()
+                + "\r\nDescrizione: " + description
+                + "\r\n\r\nClicca qui per entrare!";
+        String link = "navigator/goto/" + room.getId();
         ServerMessage alert = new StaffAlertWithLinkComposer(message, link).compose();
 
         for (Habbo recipient : Emulator.getGameEnvironment().getHabboManager().getOnlineHabbos().values()) {

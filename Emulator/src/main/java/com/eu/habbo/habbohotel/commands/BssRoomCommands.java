@@ -110,7 +110,7 @@ final class BssRoomStateCommand extends Command {
 
     @Override
     public boolean handle(GameClient gameClient, String[] params) {
-        Room room = BssRoomCommandSupport.ownerRoom(gameClient);
+        Room room = gameClient.getHabbo().getHabboInfo().getCurrentRoom();
         if (room == null) return true;
         room.setState(targetState);
         room.setNeedsUpdate(true);
