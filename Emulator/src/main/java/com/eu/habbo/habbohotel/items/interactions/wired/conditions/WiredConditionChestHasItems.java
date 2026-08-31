@@ -13,7 +13,6 @@ import com.eu.habbo.habbohotel.wired.WiredConditionType;
 import com.eu.habbo.habbohotel.wired.core.WiredContext;
 import com.eu.habbo.habbohotel.wired.core.WiredManager;
 import com.eu.habbo.messages.ServerMessage;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,7 +33,8 @@ public class WiredConditionChestHasItems extends InteractionWiredCondition {
         super(set, baseItem);
     }
 
-    public WiredConditionChestHasItems(int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
+    public WiredConditionChestHasItems(
+            int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
         super(id, userId, item, extradata, limitedStack, limitedSells);
     }
 
@@ -46,8 +46,10 @@ public class WiredConditionChestHasItems extends InteractionWiredCondition {
         int total = 0;
         for (Integer id : this.chestIds) {
             HabboItem item = room.getHabboItem(id);
-            if (item instanceof InteractionWiredChest chest) {
-                total += chest.getContents().total(ChestStorage.KIND_CURRENCY) + chest.getContents().total(ChestStorage.KIND_FURNI);
+            // Wired only reaches a chest whose owner upgraded it to answer wired.
+            if (item instanceof InteractionWiredChest chest && chest.answersWired()) {
+                total += chest.getContents().total(ChestStorage.KIND_CURRENCY)
+                        + chest.getContents().total(ChestStorage.KIND_FURNI);
             }
         }
         return WiredComparison.compare(total, this.amount, this.comparison);

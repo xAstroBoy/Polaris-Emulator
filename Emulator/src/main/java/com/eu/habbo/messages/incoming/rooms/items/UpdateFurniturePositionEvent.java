@@ -9,11 +9,15 @@ import com.eu.habbo.messages.outgoing.generic.alerts.BubbleAlertComposer;
 import com.eu.habbo.messages.outgoing.generic.alerts.BubbleAlertKeys;
 import com.eu.habbo.messages.outgoing.rooms.WiredMovementsComposer;
 import com.eu.habbo.messages.outgoing.rooms.items.FloorItemUpdateComposer;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateFurniturePositionEvent extends MessageHandler {
+    @Override
+    public int getRatelimit() {
+        return 100;
+    }
+
     @Override
     public void handle() throws Exception {
         Room room = currentRoom();
@@ -35,7 +39,8 @@ public class UpdateFurniturePositionEvent extends MessageHandler {
 
         FurnitureMovementError error = room.canPlaceFurnitureAt(item, this.client.getHabbo(), tile, rotation);
         if (error != FurnitureMovementError.NONE) {
-            this.client.sendResponse(new BubbleAlertComposer(BubbleAlertKeys.FURNITURE_PLACEMENT_ERROR.key, error.errorCode));
+            this.client.sendResponse(
+                    new BubbleAlertComposer(BubbleAlertKeys.FURNITURE_PLACEMENT_ERROR.key, error.errorCode));
             this.client.sendResponse(new FloorItemUpdateComposer(item));
             return;
         }
@@ -45,7 +50,8 @@ public class UpdateFurniturePositionEvent extends MessageHandler {
 
         error = room.moveFurniTo(item, tile, rotation, z, this.client.getHabbo(), false, true);
         if (error != FurnitureMovementError.NONE) {
-            this.client.sendResponse(new BubbleAlertComposer(BubbleAlertKeys.FURNITURE_PLACEMENT_ERROR.key, error.errorCode));
+            this.client.sendResponse(
+                    new BubbleAlertComposer(BubbleAlertKeys.FURNITURE_PLACEMENT_ERROR.key, error.errorCode));
             this.client.sendResponse(new FloorItemUpdateComposer(item));
             return;
         }

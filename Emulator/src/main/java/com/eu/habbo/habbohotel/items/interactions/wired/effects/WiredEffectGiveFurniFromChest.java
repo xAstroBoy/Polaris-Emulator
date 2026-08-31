@@ -5,6 +5,7 @@ import com.eu.habbo.habbohotel.gameclients.GameClient;
 import com.eu.habbo.habbohotel.items.Item;
 import com.eu.habbo.habbohotel.items.interactions.InteractionWiredEffect;
 import com.eu.habbo.habbohotel.items.interactions.wired.WiredSettings;
+import com.eu.habbo.habbohotel.items.interactions.wired.chest.ChestNotifications;
 import com.eu.habbo.habbohotel.items.interactions.wired.chest.ChestStorage;
 import com.eu.habbo.habbohotel.items.interactions.wired.chest.InteractionWiredChest;
 import com.eu.habbo.habbohotel.rooms.Room;
@@ -19,7 +20,6 @@ import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.messages.incoming.wired.WiredSaveException;
 import com.eu.habbo.messages.outgoing.inventory.AddHabboItemComposer;
 import com.eu.habbo.messages.outgoing.inventory.InventoryRefreshComposer;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -41,7 +41,8 @@ public class WiredEffectGiveFurniFromChest extends InteractionWiredEffect {
         super(set, baseItem);
     }
 
-    public WiredEffectGiveFurniFromChest(int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
+    public WiredEffectGiveFurniFromChest(
+            int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
         super(id, userId, item, extradata, limitedStack, limitedSells);
     }
 
@@ -67,13 +68,16 @@ public class WiredEffectGiveFurniFromChest extends InteractionWiredEffect {
                 int given = contents.take(ChestStorage.KIND_FURNI, entry.type, this.amount);
                 if (given > 0) {
                     for (int i = 0; i < given; i++) {
-                        HabboItem created = Emulator.getGameEnvironment().getItemManager().createItem(habbo.getHabboInfo().getId(), baseItem, 0, 0, "");
+                        HabboItem created = Emulator.getGameEnvironment()
+                                .getItemManager()
+                                .createItem(habbo.getHabboInfo().getId(), baseItem, 0, 0, "");
                         if (created == null) continue;
                         habbo.getClient().sendResponse(new AddHabboItemComposer(created));
                         habbo.getInventory().getItemsComponent().addItem(created);
                     }
                     habbo.getClient().sendResponse(new InventoryRefreshComposer());
-                    chest.persistContents();
+                    chest.persistContents(room);
+                    ChestNotifications.wired(chest, room, 1);
                 }
                 break;
             }
@@ -83,7 +87,8 @@ public class WiredEffectGiveFurniFromChest extends InteractionWiredEffect {
     private InteractionWiredChest resolveChest(Room room) {
         for (Integer id : this.chestIds) {
             HabboItem item = room.getHabboItem(id);
-            if (item instanceof InteractionWiredChest chest) {
+            // Wired only reaches a chest whose owner upgraded it to answer wired.
+            if (item instanceof InteractionWiredChest chest && chest.answersWired()) {
                 return chest;
             }
         }
@@ -122,7 +127,8 @@ public class WiredEffectGiveFurniFromChest extends InteractionWiredEffect {
 
     @Override
     public String getWiredData() {
-        return WiredManager.getGson().toJson(new JsonData(this.amount, this.userSource, this.getDelay(), this.chestIds));
+        return WiredManager.getGson()
+                .toJson(new JsonData(this.amount, this.userSource, this.getDelay(), this.chestIds));
     }
 
     @Override

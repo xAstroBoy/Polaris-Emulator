@@ -13,7 +13,6 @@ import com.eu.habbo.habbohotel.wired.WiredConditionType;
 import com.eu.habbo.habbohotel.wired.core.WiredContext;
 import com.eu.habbo.habbohotel.wired.core.WiredManager;
 import com.eu.habbo.messages.ServerMessage;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,7 +35,8 @@ public class WiredConditionChestHasItemType extends InteractionWiredCondition {
         super(set, baseItem);
     }
 
-    public WiredConditionChestHasItemType(int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
+    public WiredConditionChestHasItemType(
+            int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
         super(id, userId, item, extradata, limitedStack, limitedSells);
     }
 
@@ -48,7 +48,8 @@ public class WiredConditionChestHasItemType extends InteractionWiredCondition {
         int total = 0;
         for (Integer id : this.chestIds) {
             HabboItem item = room.getHabboItem(id);
-            if (item instanceof InteractionWiredChest chest) {
+            // Wired only reaches a chest whose owner upgraded it to answer wired.
+            if (item instanceof InteractionWiredChest chest && chest.answersWired()) {
                 total += chest.getContents().count(ChestStorage.KIND_FURNI, this.baseItemId);
             }
         }
@@ -84,7 +85,8 @@ public class WiredConditionChestHasItemType extends InteractionWiredCondition {
 
     @Override
     public String getWiredData() {
-        return WiredManager.getGson().toJson(new JsonData(this.baseItemId, this.amount, this.comparison, this.chestIds));
+        return WiredManager.getGson()
+                .toJson(new JsonData(this.baseItemId, this.amount, this.comparison, this.chestIds));
     }
 
     @Override
