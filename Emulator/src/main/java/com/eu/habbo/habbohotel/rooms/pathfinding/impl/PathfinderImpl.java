@@ -106,6 +106,49 @@ public class PathfinderImpl implements Pathfinder {
     AdjacentTileFinder.calculateCost(context, currentAdj, current, openList);
   }
 
+
+  // CLOSEST_REACHABLE_PATHFINDER_V1
+  private static long distanceSquared(RoomTile a, RoomTile b) {
+    long dx = (long) a.getX() - b.getX();
+    long dy = (long) a.getY() - b.getY();
+    return dx * dx + dy * dy;
+  }
+
+  private static boolean isBetterPartial(RoomTile candidate, RoomTile best, RoomTile target) {
+    if (candidate == null) {
+      return false;
+    }
+    if (best == null) {
+      return true;
+    }
+
+    long candidateDistance = distanceSquared(candidate, target);
+    long bestDistance = distanceSquared(best, target);
+
+    if (candidateDistance != bestDistance) {
+      return candidateDistance < bestDistance;
+    }
+
+    return candidate.getgCosts() < best.getgCosts();
+  }
+
+  private Deque<RoomTile> traceBestPartial(
+      PathfinderContext context, RoomTile oldTile, RoomTile bestReachable) {
+    if (bestReachable == null
+        || (bestReachable.getX() == oldTile.getX() && bestReachable.getY() == oldTile.getY())) {
+      return new LinkedList<>();
+    }
+
+    RoomTile start =
+        AdjacentTileFinder.findTile(context, oldTile.getX(), oldTile.getY());
+
+    if (start == null) {
+      return new LinkedList<>();
+    }
+
+    return this.tracePath(start, bestReachable);
+  }
+
   @Override
   public Deque<RoomTile> findPath(RoomTile oldTile, RoomTile newTile, RoomTile goalLocation,
       RoomUnit roomUnit, boolean isWalkthroughRetry) {
@@ -130,18 +173,24 @@ public class PathfinderImpl implements Pathfinder {
     openList.add(oldTile.copy());
     PathfinderContext context = PathfinderContext.buildContext(this.room, newTile, goalLocation,
         roomUnit, isWalkthroughRetry);
+    RoomTile bestReachable = null;
 
     try {
       while (!openList.isEmpty()) {
         if (CACHED_TIMEOUT_ENABLED && (++iterationCount & (TIMEOUT_CHECK_INTERVAL - 1)) == 0
             && System.nanoTime() - startTime > CACHED_TIMEOUT_NANOS) {
-          return new LinkedList<>();
+          return this.traceBestPartial(context, oldTile, bestReachable);
         }
 
         RoomTile current = openList.poll();
         if (current == null) {
           break;
         }
+
+        if (isBetterPartial(current, bestReachable, newTile)) {
+          bestReachable = current;
+        }
+
         if (processCurrent(context, current, openList, closedList)) {
           return this.tracePath(
               AdjacentTileFinder.findTile(context, oldTile.getX(), oldTile.getY()), current);
@@ -152,7 +201,7 @@ public class PathfinderImpl implements Pathfinder {
         return this.findPath(oldTile, newTile, goalLocation, roomUnit, true);
       }
 
-      return new LinkedList<>();
+      return this.traceBestPartial(context, oldTile, bestReachable);
     } finally {
       // Optional: Clear collections for immediate memory release
       // (GC will handle this anyway, but clearing can help in high-frequency scenarios)

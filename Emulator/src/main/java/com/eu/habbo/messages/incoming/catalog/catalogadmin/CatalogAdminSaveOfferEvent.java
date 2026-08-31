@@ -105,8 +105,8 @@ public class CatalogAdminSaveOfferEvent extends MessageHandler {
                         if (existingItem == null) {
                             throw new IllegalArgumentException("Offer not found: " + offerId);
                         }
-                        if (payload.limitedStack < existingItem.limitedStack()) {
-                            throw new IllegalArgumentException("Limited stack cannot be reduced");
+                        if (payload.limitedStack != 0 && payload.limitedStack < existingItem.limitedStack()) {
+                            throw new IllegalArgumentException("Limited stack cannot be reduced unless LTD is removed with 0");
                         }
                     });
             var result = CatalogAdminLiveRequest.smartSaveResult(

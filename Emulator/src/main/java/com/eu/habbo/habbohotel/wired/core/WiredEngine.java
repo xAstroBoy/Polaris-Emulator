@@ -67,7 +67,7 @@ public final class WiredEngine {
     public static volatile int MAX_RECURSION_DEPTH = 10;
 
     /** Maximum events of same type per room within rate limit window before banning */
-    public static volatile int MAX_EVENTS_PER_WINDOW = 100;
+    public static volatile int MAX_EVENTS_PER_WINDOW = Integer.MAX_VALUE;
 
     /** Time window for counting rapid events (milliseconds) */
     public static volatile long RATE_LIMIT_WINDOW_MS = 10000;

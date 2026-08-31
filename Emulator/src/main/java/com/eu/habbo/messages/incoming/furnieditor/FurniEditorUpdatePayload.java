@@ -92,7 +92,7 @@ public class FurniEditorUpdatePayload {
     private static String itemType(JsonPrimitive primitive) {
         String value = boundedString(primitive, 1, 3);
         if (value == null) return null;
-        return value.matches("[a-z]+") ? value : null;
+        return ("s".equals(value) || "i".equals(value)) ? value : null;
     }
 
     private static Integer boundedInt(JsonPrimitive primitive, int min, int max) {

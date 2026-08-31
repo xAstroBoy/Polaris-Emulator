@@ -18,7 +18,19 @@ public final class WiredSourceUtil {
     public static final int SOURCE_SELECTOR = 200;
     public static final int SOURCE_SIGNAL = 201;
 
+    // WIRED_SELECTOR_REENTRY_GUARD_V1
+    //
+    // Selector effects execute as one pipeline. SOURCE_SELECTOR inside that
+    // pipeline means "consume targets produced so far"; it must never recursively
+    // execute the complete selector stack again.
+    private static final ThreadLocal<Integer> SELECTOR_EXECUTION_DEPTH =
+            ThreadLocal.withInitial(() -> 0);
+
     private WiredSourceUtil() {}
+
+    private static boolean isExecutingSelectors() {
+        return SELECTOR_EXECUTION_DEPTH.get() > 0;
+    }
 
     public static List<HabboItem> resolveItems(WiredContext ctx, int sourceType, Collection<HabboItem> selectedItems) {
         List<HabboItem> resolvedItems = resolveItemsInternal(ctx, sourceType, selectedItems, false);
@@ -104,6 +116,10 @@ public final class WiredSourceUtil {
             return ctx.targets();
         }
 
+        if (isExecutingSelectors()) {
+            return ctx.targets();
+        }
+
         WiredContext selectorContext = executeSelectors(ctx);
 
         if (selectorContext == null) {
@@ -126,6 +142,10 @@ public final class WiredSourceUtil {
             return null;
         }
 
+        if (isExecutingSelectors()) {
+            return originalCtx;
+        }
+
         Room room = originalCtx.room();
         HabboItem triggerItem = originalCtx.triggerItem();
 
@@ -142,13 +162,29 @@ public final class WiredSourceUtil {
                 originalCtx.legacySettings());
         selectorCtx.setIncludeWiredSelectorItems(originalCtx.includeWiredSelectorItems());
 
-        List<InteractionWiredEffect> selectorEffects = getOrderedSelectorEffects(originalCtx, room, triggerItem);
-        executeSelectorEffects(selectorCtx, selectorEffects, false);
-        executeSelectorEffects(selectorCtx, selectorEffects, true);
+        int previousDepth = SELECTOR_EXECUTION_DEPTH.get();
+        SELECTOR_EXECUTION_DEPTH.set(previousDepth + 1);
 
-        applySelectionFilterExtras(room, triggerItem, selectorCtx);
+        try {
+            List<InteractionWiredEffect> selectorEffects =
+                    getOrderedSelectorEffects(originalCtx, room, triggerItem);
 
-        return selectorCtx;
+            // Phase 1: independent selectors. Their results are accumulated.
+            executeSelectorEffects(selectorCtx, selectorEffects, false);
+
+            // Phase 2: "filter existing" selectors. These intentionally replace/
+            // filter the accumulated result from phase 1.
+            executeSelectorEffects(selectorCtx, selectorEffects, true);
+
+            applySelectionFilterExtras(room, triggerItem, selectorCtx);
+            return selectorCtx;
+        } finally {
+            if (previousDepth == 0) {
+                SELECTOR_EXECUTION_DEPTH.remove();
+            } else {
+                SELECTOR_EXECUTION_DEPTH.set(previousDepth);
+            }
+        }
     }
 
     private static void executeSelectorEffects(
@@ -162,6 +198,23 @@ public final class WiredSourceUtil {
                 continue;
             }
 
+            // WIRED_MULTI_SELECTOR_UNION_V2
+            //
+            // Non-deferred selectors are independent producers. Multiple selector
+            // furni in the same stack must accumulate as a set union:
+            //
+            //   selector A {1,2} + selector B {3,4} => {1,2,3,4}
+            //
+            // Deferred selectors (usesExistingSelectorTargets() == true) are the
+            // explicit "filter existing" stage and are allowed to replace/filter
+            // the accumulated target set.
+            List<RoomUnit> usersBefore = deferred
+                    ? Collections.emptyList()
+                    : new ArrayList<>(selectorCtx.targets().users());
+            List<HabboItem> itemsBefore = deferred
+                    ? Collections.emptyList()
+                    : new ArrayList<>(selectorCtx.targets().items());
+
             try {
                 selectorCtx.state().step();
                 WiredExecutionScope.execute(effect, selectorCtx);
@@ -171,6 +224,16 @@ public final class WiredSourceUtil {
                         selectorCtx.room().getId(),
                         effect.getId(),
                         ignored);
+            } finally {
+                if (!deferred) {
+                    // LinkedHashSet inside WiredTargets deduplicates automatically.
+                    for (RoomUnit user : usersBefore) {
+                        selectorCtx.targets().addUser(user);
+                    }
+                    for (HabboItem item : itemsBefore) {
+                        selectorCtx.targets().addItem(item);
+                    }
+                }
             }
         }
     }

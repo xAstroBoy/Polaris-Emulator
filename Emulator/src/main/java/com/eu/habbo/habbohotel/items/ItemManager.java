@@ -458,6 +458,7 @@ public class ItemManager {
         long millis = System.currentTimeMillis();
 
         this.loadItemInteractions();
+        this.registerDatabaseInteractionFallbacks();
         this.loadItems();
         this.loadCrackable();
         this.loadSoundTracks();
@@ -470,6 +471,9 @@ public class ItemManager {
 
     protected void loadItemInteractions() {
         this.interactionsList.add(new ItemInteraction("default", InteractionDefault.class));
+        // Sound-effect furni use the ordinary state cycle; Nitro plays the
+        // embedded sound when the state update reaches the client.
+        this.interactionsList.add(new ItemInteraction("sound_fx", InteractionDefault.class));
         this.interactionsList.add(new ItemInteraction("gate", InteractionGate.class));
         this.interactionsList.add(new ItemInteraction("guild_furni", InteractionGuildFurni.class));
         this.interactionsList.add(new ItemInteraction("guild_gate", InteractionGuildGate.class));
@@ -1053,6 +1057,42 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("totem_leg", InteractionTotemLegs.class));
         this.interactionsList.add(new ItemInteraction("totem_head", InteractionTotemHead.class));
         this.interactionsList.add(new ItemInteraction("totem_planet", InteractionTotemPlanet.class));
+    }
+
+    /**
+     * Registers every interaction name present in items_base.
+     *
+     * <p>Catalog imports regularly introduce legacy/custom interaction names. An unknown name must
+     * never make the furni disappear or become impossible to instantiate: known aliases retain
+     * their specialized handler, while genuinely unknown modes retain normal state-toggle
+     * behaviour until a dedicated implementation is added.</p>
+     */
+    private void registerDatabaseInteractionFallbacks() {
+        try (Connection connection = Emulator.getDatabase().getDataSource().getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet set = statement.executeQuery(
+                        "SELECT DISTINCT interaction_type FROM items_base "
+                                + "WHERE interaction_type IS NOT NULL AND TRIM(interaction_type) <> ''")) {
+            while (set.next()) {
+                String databaseType = set.getString("interaction_type").trim();
+                if (this.interactionsList.find(databaseType) != null) continue;
+
+                String alias = LEGACY_INTERACTION_ALIASES.get(databaseType.toLowerCase(Locale.ROOT));
+                ItemInteraction aliasInteraction = alias == null ? null : this.interactionsList.find(alias);
+                Class<? extends HabboItem> handler = aliasInteraction != null && aliasInteraction.getType() != null
+                        ? aliasInteraction.getType()
+                        : InteractionDefault.class;
+
+                this.interactionsList.add(new ItemInteraction(databaseType, handler));
+                if (aliasInteraction == null) {
+                    LOGGER.warn(
+                            "Registered unsupported database interaction '{}' with safe default state handling",
+                            databaseType);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Could not register database interaction fallbacks", e);
+        }
     }
 
     public void addItemInteraction(ItemInteraction itemInteraction) {

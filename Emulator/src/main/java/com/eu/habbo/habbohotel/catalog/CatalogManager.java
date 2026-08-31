@@ -294,6 +294,8 @@ public class CatalogManager {
     private final List<Voucher> vouchers;
     public final Int2ObjectMap<int[]> furnitureValues;
     private volatile byte[] rareValuesPayloadCache;
+    private volatile CatalogSearchIndex searchIndex = CatalogSearchIndex.empty();
+    private volatile boolean searchIndexDirty = true;
 
     public CatalogManager() {
         this(true);
@@ -343,6 +345,22 @@ public class CatalogManager {
         this.loadRecycler();
         this.loadGiftWrappers();
         this.loadFurnitureValues();
+        this.rebuildSearchIndex();
+    }
+
+    public synchronized void rebuildSearchIndex() {
+        if (!this.searchIndexDirty) return;
+        this.searchIndex = CatalogSearchIndex.build(this.catalogPages.values());
+        this.searchIndexDirty = false;
+    }
+
+    public void invalidateSearchIndex() {
+        this.searchIndexDirty = true;
+    }
+
+    public List<CatalogSearchIndex.Hit> searchCatalog(String query, int userRank, int maximumResults) {
+        if (this.searchIndexDirty) this.rebuildSearchIndex();
+        return this.searchIndex.search(query, userRank, maximumResults);
     }
 
     private synchronized void loadFurnitureValues() {

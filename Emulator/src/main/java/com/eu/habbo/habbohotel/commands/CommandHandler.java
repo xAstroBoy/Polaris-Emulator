@@ -318,6 +318,8 @@ public class CommandHandler {
         addCommand(new BssReloadCreditsCommand());
         addCommand(new BssRoomBanCommand());
         addCommand(new BssTogglePyramidsCommand());
+        addCommand(new BssNotificationCommand());
+        addCommand(new BssOpenPokerCommand());
         addCommand(new BssTagCommand("cmd_bss_add_tag", BssTagCommand.Operation.ADD));
         addCommand(new BssTagCommand("cmd_bss_remove_tag", BssTagCommand.Operation.REMOVE));
         addCommand(new BssTagCommand("cmd_bss_clear_tags", BssTagCommand.Operation.CLEAR));

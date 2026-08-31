@@ -35,6 +35,7 @@ public final class CatalogAdminCacheSync {
         if (page == null) return;
 
         CatalogManager catalogManager = currentCatalogManager();
+        catalogManager.invalidateSearchIndex();
 
         // CREATE must attach even when page.getParentId() already equals
         // parentId (which is the normal case for an object reconstructed from
@@ -52,6 +53,7 @@ public final class CatalogAdminCacheSync {
         if (page == null) return;
 
         CatalogManager catalogManager = currentCatalogManager();
+        catalogManager.invalidateSearchIndex();
         int oldParentId = page.getParentId();
 
         if (oldParentId != newParentId) {
@@ -74,6 +76,7 @@ public final class CatalogAdminCacheSync {
     // Full PAGE cache synchronization for Catalog Studio live mutations.
     public static boolean reloadCatalogPage(int pageId, CatalogPageType pageType) {
         CatalogManager catalogManager = currentCatalogManager();
+        catalogManager.invalidateSearchIndex();
         CatalogPage existing = catalogManager.getCatalogPage(pageId, pageType);
 
         String sql = (pageType == CatalogPageType.BUILDER)
@@ -240,6 +243,7 @@ public final class CatalogAdminCacheSync {
             CatalogPageType pageType) {
         if (page == null) return;
 
+        currentCatalogManager().invalidateSearchIndex();
         if (page.getParentId() != parentId) {
             reparentPage(page, parentId, orderNum, pageType);
         } else {
@@ -275,6 +279,7 @@ public final class CatalogAdminCacheSync {
         if (page == null) return;
 
         CatalogManager catalogManager = currentCatalogManager();
+        catalogManager.invalidateSearchIndex();
         CatalogPage parent = catalogManager.getCatalogPage(page.getParentId(), pageType);
 
         if (parent != null) {
@@ -286,6 +291,7 @@ public final class CatalogAdminCacheSync {
 
     public static boolean reloadCatalogItem(int offerId, CatalogPageType pageType) {
         CatalogManager catalogManager = currentCatalogManager();
+        catalogManager.invalidateSearchIndex();
         CatalogItem existing = catalogManager.getCatalogItem(offerId, pageType);
         int previousPageId = existing != null ? existing.getPageId() : -1;
 
@@ -344,6 +350,7 @@ public final class CatalogAdminCacheSync {
 
     public static void removeCatalogItem(int offerId, CatalogPageType pageType, int pageIdHint) {
         CatalogManager catalogManager = currentCatalogManager();
+        catalogManager.invalidateSearchIndex();
         CatalogItem item = catalogManager.getCatalogItem(offerId, pageType);
 
         if (item != null) {

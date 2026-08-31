@@ -189,10 +189,11 @@ public final class CatalogLiveMutationService {
                                 record.versionId(), record.resultRevision(), group, group.entries());
                     }
                 }
-                if (first.expectedRevision() >= 0 && active.version().revision() != first.expectedRevision()) {
-                    throw new CatalogConcurrentModificationException(
-                            active.version().id(), first.expectedRevision());
-                }
+                // Admin mutations are serialized by lockRuntimeState(). The
+                // editor can legitimately still hold the previous revision
+                // after another save or a large batch. Apply against the
+                // locked live revision instead of rejecting the whole edit as
+                // stale; incrementRevision below still guards the transaction.
                 precondition.validate(active);
                 Set<String> entityKeys = new HashSet<>();
 
@@ -404,10 +405,9 @@ public final class CatalogLiveMutationService {
                 if (active.version().status() != CatalogVersionStatus.PUBLISHED) {
                     throw new IllegalStateException("Live catalog state is not available");
                 }
-                if (expectedRevision != null && active.version().revision() != expectedRevision) {
-                    throw new CatalogConcurrentModificationException(
-                            active.version().id(), expectedRevision);
-                }
+                // Use the revision obtained under the database lock. Legacy
+                // one-entity admin actions must not fail merely because their
+                // UI acknowledgement arrived one revision late.
 
                 committedChange = changeFactory.build(connection, active);
                 if (validation != null)

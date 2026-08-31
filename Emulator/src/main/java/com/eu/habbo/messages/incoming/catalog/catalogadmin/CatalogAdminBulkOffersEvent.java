@@ -17,8 +17,10 @@ import com.eu.habbo.messages.outgoing.catalog.catalogadmin.CatalogAdminResultCom
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public final class CatalogAdminBulkOffersEvent extends MessageHandler {
     private static final int MAX_BATCH_SIZE = 500;
@@ -134,10 +136,42 @@ public final class CatalogAdminBulkOffersEvent extends MessageHandler {
                     payload));
         }
 
-        int actorId = this.client.getHabbo().getHabboInfo().getId();
-        List<CatalogLiveMutationRequest> requests = new ArrayList<>(prepared.size());
+        var liveMutations = CatalogStudioRuntime.services().liveMutations();
+        var currentLive = liveMutations.loadLive();
 
+        Map<String, CatalogOfferSnapshot> existingByItems = new LinkedHashMap<>();
+        for (CatalogOfferSnapshot offer : currentLive.offers()) {
+            if (offer.catalogType() == pageType) {
+                existingByItems.putIfAbsent(normalizeItemIds(offer.itemIds()), offer);
+            }
+        }
+
+        // A bulk import is idempotent. Repeated rows in the same payload are
+        // collapsed (the last row wins), while an item already present anywhere
+        // in this catalog is updated/moved instead of receiving another ID.
+        Map<String, PreparedAction> createsByItems = new LinkedHashMap<>();
+        List<PreparedAction> effectivePrepared = new ArrayList<>(prepared.size());
         for (PreparedAction action : prepared) {
+            if (!"CREATE".equals(action.kind())) {
+                effectivePrepared.add(action);
+                continue;
+            }
+
+            String itemKey = normalizeItemIds(action.payload().itemIds);
+            CatalogOfferSnapshot existing = existingByItems.get(itemKey);
+            PreparedAction resolved = existing == null
+                    ? action
+                    : new PreparedAction("UPDATE", existing.offerId(), action.payload());
+
+            if (createsByItems.containsKey(itemKey)) createsByItems.remove(itemKey);
+            createsByItems.put(itemKey, resolved);
+        }
+        effectivePrepared.addAll(createsByItems.values());
+
+        int actorId = this.client.getHabbo().getHabboInfo().getId();
+        List<CatalogLiveMutationRequest> requests = new ArrayList<>(effectivePrepared.size());
+
+        for (PreparedAction action : effectivePrepared) {
             switch (action.kind()) {
                 case "CREATE" -> requests.add(CatalogAdminLiveRequest.of(
                         envelope,
@@ -170,13 +204,11 @@ public final class CatalogAdminBulkOffersEvent extends MessageHandler {
             }
         }
 
-        var liveMutations = CatalogStudioRuntime.services().liveMutations();
-
         try {
             var result = liveMutations.applyBatch(
                     requests,
                     live -> {
-                        for (PreparedAction action : prepared) {
+                        for (PreparedAction action : effectivePrepared) {
                             if (action.payload() != null
                                     && live.page(pageType, action.payload().pageId).isEmpty()) {
                                 throw new IllegalArgumentException(
@@ -192,9 +224,11 @@ public final class CatalogAdminBulkOffersEvent extends MessageHandler {
                                             "Offer not found: " + action.offerId());
                                 }
 
-                                if (action.payload().limitedStack < existing.limitedStack()) {
+                                if (action.payload().limitedStack != 0
+                                        && action.payload().limitedStack < existing.limitedStack()) {
                                     throw new IllegalArgumentException(
-                                            "Limited stack cannot be reduced for offer " + action.offerId());
+                                            "Limited stack cannot be reduced for offer " + action.offerId()
+                                                    + " unless LTD is removed with 0");
                                 }
                             }
 
@@ -219,6 +253,22 @@ public final class CatalogAdminBulkOffersEvent extends MessageHandler {
                     false,
                     "[BULK_OFFERS] " + message));
         }
+    }
+
+    private static String normalizeItemIds(String itemIds) {
+        if (itemIds == null || itemIds.isBlank()) return "";
+
+        String[] raw = itemIds.split(",");
+        List<Integer> ids = new ArrayList<>(raw.length);
+        for (String value : raw) {
+            try {
+                ids.add(Integer.parseInt(value.trim()));
+            } catch (NumberFormatException ignored) {
+                return itemIds.trim().toLowerCase(Locale.ROOT);
+            }
+        }
+        ids.sort(Integer::compareTo);
+        return ids.stream().distinct().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
     }
 
     private record PreparedAction(

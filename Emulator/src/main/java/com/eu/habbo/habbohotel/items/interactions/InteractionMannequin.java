@@ -15,6 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class InteractionMannequin extends HabboItem {
+    private static final String[] CLOTHING_PART_TYPES = {"ch", "cc", "lg", "sh", "wa", "ca"};
+
     public InteractionMannequin(ResultSet set, Item baseItem) throws SQLException {
         super(set, baseItem);
     }
@@ -32,8 +34,8 @@ public class InteractionMannequin extends HabboItem {
     public void serializeExtradata(ServerMessage serverMessage) {
         serverMessage.appendInt(1 + (this.isLimited() ? 256 : 0));
         serverMessage.appendInt(3);
-        if (this.getExtradata().split(":").length >= 2) {
-            String[] data = this.getExtradata().split(":");
+        String[] data = this.getExtradata().split(":", 3);
+        if (data.length >= 2) {
             serverMessage.appendString("GENDER");
             serverMessage.appendString(data[0].toLowerCase());
             serverMessage.appendString("FIGURE");
@@ -47,7 +49,7 @@ public class InteractionMannequin extends HabboItem {
             serverMessage.appendString("");
             serverMessage.appendString("OUTFIT_NAME");
             serverMessage.appendString("My Look");
-            this.setExtradata("m: :My look");
+            this.setExtradata("m::My look");
             this.needsUpdate(true);
             Emulator.getThreading().run(this);
         }
@@ -66,7 +68,7 @@ public class InteractionMannequin extends HabboItem {
 
     @Override
     public void onClick(GameClient client, Room room, Object[] objects) throws Exception {
-        String[] data = this.getExtradata().split(":");
+        String[] data = this.getExtradata().split(":", 3);
 
         if(data.length < 2)
             return;
@@ -77,23 +79,24 @@ public class InteractionMannequin extends HabboItem {
         if (gender.isEmpty() || figure.isEmpty() || (!gender.equalsIgnoreCase("m") && !gender.equalsIgnoreCase("f")) || !client.getHabbo().getHabboInfo().getGender().name().equalsIgnoreCase(gender))
             return;
 
-        String newFigure = "";
+        StringBuilder newFigure = new StringBuilder();
 
         for (String playerFigurePart : client.getHabbo().getHabboInfo().getLook().split("\\.")) {
-            if (!playerFigurePart.startsWith("ch") && !playerFigurePart.startsWith("lg"))
-                newFigure += playerFigurePart + ".";
+            if (!isClothingPart(playerFigurePart))
+                newFigure.append(playerFigurePart).append('.');
         }
 
-        String newFigureParts = figure;
-
-        for (String newFigurePart : newFigureParts.split("\\.")) {
-            if (newFigurePart.startsWith("hd"))
-                newFigureParts = newFigureParts.replace(newFigurePart, "");
+        StringBuilder newFigureParts = new StringBuilder();
+        for (String newFigurePart : figure.split("\\.")) {
+            if (isClothingPart(newFigurePart)) {
+                if (newFigureParts.length() > 0) newFigureParts.append('.');
+                newFigureParts.append(newFigurePart);
+            }
         }
 
-        if (newFigureParts.equals("")) return;
+        if (newFigureParts.length() == 0) return;
 
-        String newLook = newFigure + newFigureParts;
+        String newLook = newFigure.append(newFigureParts).toString();
 
         if (newLook.length() > 512)
             return;
@@ -101,6 +104,13 @@ public class InteractionMannequin extends HabboItem {
         client.getHabbo().getHabboInfo().setLook(ClothingValidationManager.VALIDATE_ON_MANNEQUIN ? ClothingValidationManager.validateLook(client.getHabbo(), newLook, client.getHabbo().getHabboInfo().getGender().name()) : newLook);
         room.sendComposer(new RoomUserDataComposer(client.getHabbo()).compose());
         client.sendResponse(new UserDataComposer(client.getHabbo()));
+    }
+
+    private static boolean isClothingPart(String figurePart) {
+        for (String type : CLOTHING_PART_TYPES) {
+            if (figurePart.startsWith(type + "-")) return true;
+        }
+        return false;
     }
 
     @Override
