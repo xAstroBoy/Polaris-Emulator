@@ -98,9 +98,8 @@ public class InteractionDice extends HabboItem {
     }
 
     public boolean canCloseManually() {
-        // Nitro can emit DICE_OFF while the roll animation is finishing. Do
-        // not let that packet erase the freshly selected face. A deliberate
-        // corner click after the animation still closes the die normally.
-        return System.currentTimeMillis() - this.rolledAt >= 10000L;
+        // The roll animation window is already protected by the "-1" state check in
+        // CloseDiceEvent; a corner click after the face is shown must close immediately.
+        return true;
     }
 }

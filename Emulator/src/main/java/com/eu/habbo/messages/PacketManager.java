@@ -343,6 +343,8 @@ import com.eu.habbo.messages.incoming.rooms.items.TriggerColorWheelEvent;
 import com.eu.habbo.messages.incoming.rooms.items.TriggerDiceEvent;
 import com.eu.habbo.messages.incoming.rooms.items.TriggerOneWayGateEvent;
 import com.eu.habbo.messages.incoming.rooms.items.UpdateFurniturePositionEvent;
+import com.eu.habbo.messages.incoming.rooms.items.SetFurnitureStateEvent;
+import com.eu.habbo.messages.incoming.rooms.SetRoomPaintEvent;
 import com.eu.habbo.messages.incoming.rooms.items.UseRandomStateItemEvent;
 import com.eu.habbo.messages.incoming.rooms.items.WiredChestLockEvent;
 import com.eu.habbo.messages.incoming.rooms.items.WiredChestRoomLogsEvent;
@@ -892,6 +894,7 @@ public class PacketManager {
         this.registerHandler(Incoming.PurchasePrefixEvent, PurchasePrefixEvent.class);
         this.registerHandler(Incoming.PurchaseCatalogPrefixEvent, PurchaseCatalogPrefixEvent.class);
         this.registerHandler(Incoming.SetDisplayOrderEvent, SetDisplayOrderEvent.class);
+        this.registerHandler(Incoming.SetNameColorEvent, com.eu.habbo.messages.incoming.inventory.prefixes.SetNameColorEvent.class);
 
         // Nick Icons
         this.registerHandler(Incoming.RequestUserNickIconsEvent, RequestUserNickIconsEvent.class);
@@ -1023,6 +1026,8 @@ public class PacketManager {
         this.registerHandler(Incoming.RoomUnFavoriteEvent, RoomUnFavoriteEvent.class);
         this.registerHandler(Incoming.UseRandomStateItemEvent, UseRandomStateItemEvent.class);
         this.registerHandler(Incoming.UpdateFurniturePositionEvent, UpdateFurniturePositionEvent.class);
+        this.registerHandler(Incoming.SetFurnitureStateEvent, SetFurnitureStateEvent.class);
+        this.registerHandler(Incoming.SetRoomPaintEvent, SetRoomPaintEvent.class);
     }
 
     void registerPolls() throws Exception {

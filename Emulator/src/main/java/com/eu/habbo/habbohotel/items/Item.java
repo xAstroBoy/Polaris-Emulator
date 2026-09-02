@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Item implements ISerialize {
+    private int assetStates;
 
     private int id;
     private int spriteId;
@@ -103,6 +104,12 @@ public class Item implements ISerialize {
                 .resolveItemInteraction(interactionTypeName, this.name, this.fullName);
 
         this.stateCount = set.getShort("interaction_modes_count");
+        int assetStatesValue = 0;
+        try {
+            assetStatesValue = set.getInt("asset_states"); // states the .nitro asset really has (furni audit)
+        } catch (SQLException ignored) {
+        }
+        this.assetStates = assetStatesValue;
         this.effectM = set.getShort("effect_id_male");
         this.effectF = set.getShort("effect_id_female");
         this.customParams = set.getString("customparams");
@@ -211,6 +218,11 @@ public class Item implements ISerialize {
 
     public boolean allowInventoryStack() {
         return this.allowInventoryStack;
+    }
+
+    /** Number of states the furni asset defines (0 = unknown, use getStateCount()). */
+    public int getAssetStates() {
+        return this.assetStates;
     }
 
     public int getStateCount() {

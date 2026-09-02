@@ -76,8 +76,16 @@ public class InteractionMannequin extends HabboItem {
         String gender = data[0];
         String figure = data[1];
 
-        if (gender.isEmpty() || figure.isEmpty() || (!gender.equalsIgnoreCase("m") && !gender.equalsIgnoreCase("f")) || !client.getHabbo().getHabboInfo().getGender().name().equalsIgnoreCase(gender))
+        if (figure.isEmpty()) return;
+
+        // This hotel lets anyone wear a mannequin's outfit (staff looks are usually saved by one
+        // gender only); set hotel.mannequin.require_gender=true for the official behaviour.
+        if (Emulator.getConfig().getBoolean("hotel.mannequin.require_gender", false)
+                && (gender.isEmpty()
+                        || (!gender.equalsIgnoreCase("m") && !gender.equalsIgnoreCase("f"))
+                        || !client.getHabbo().getHabboInfo().getGender().name().equalsIgnoreCase(gender))) {
             return;
+        }
 
         StringBuilder newFigure = new StringBuilder();
 

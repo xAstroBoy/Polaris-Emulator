@@ -38,7 +38,12 @@ public class FurnidataWriter {
         this.backupKeep = Math.max(1, backupKeep);
     }
 
-    /** @return true if an entry for classname was found and written. */
+    /**
+     * @return true if an entry for classname exists (written, or already holding the requested
+     *     values — a no-op edit is still a successful edit). Falls back to the classname without
+     *     its {@code *N} colour suffix when the exact classname has no entry, matching the lookup
+     *     the editor uses to display the entry.
+     */
     public boolean write(String classname, String name, String description) throws IOException {
         String cn = classname == null ? "" : classname.trim().toLowerCase(java.util.Locale.ROOT);
         if (cn.isEmpty()) return false;
@@ -46,17 +51,30 @@ public class FurnidataWriter {
         String safeDesc = FurnitureTextProvider.sanitize(description);
 
         Path target = locateFile(cn);
-        if (target == null) return false;
+        if (target == null) {
+            int star = cn.indexOf('*');
+            String stripped = star >= 0 ? cn.substring(0, star).trim() : "";
+            if (stripped.isEmpty() || stripped.equals(cn)) return false;
+            cn = stripped;
+            target = locateFile(cn);
+            if (target == null) return false;
+        }
 
         String raw = Files.readString(target, StandardCharsets.UTF_8);
         String edited = replaceEntryFields(raw, cn, safeName, safeDesc);
-        if (edited == null || edited.equals(raw)) {
-            // classname not present in this file, or no change
-            return edited != null && !edited.equals(raw);
-        }
+        if (edited == null) return false; // classname not present in this file
+        if (edited.equals(raw)) return true; // already up to date
         backup(target);
         atomicWrite(target, edited);
         return true;
+    }
+
+    /** Classname of the entry that already uses furnidata {@code id}, or null. */
+    public String classnameForId(int id) {
+        for (FurnidataEntry e : new FurnidataReader(source, maxBytes).read()) {
+            if (e.id() == id && e.classname() != null && !e.classname().isBlank()) return e.classname().trim();
+        }
+        return null;
     }
 
     /** Outcome of a {@link #create} attempt. */
@@ -91,12 +109,15 @@ public class FurnidataWriter {
             return CreateResult.NO_TARGET;
         }
 
-        // Guard: duplicate classname / id collision (scan the whole source).
+        // Guard: duplicate classname / id collision (scan the whole source). An existing
+        // entry for the classname wins over an id collision regardless of file order.
+        boolean idCollision = false;
         for (FurnidataEntry e : new FurnidataReader(source, maxBytes).read()) {
             String ecn = e.classname() == null ? "" : e.classname().trim().toLowerCase(java.util.Locale.ROOT);
             if (ecn.equals(cn)) return CreateResult.ALREADY_EXISTS;
-            if (e.id() == id) return CreateResult.ID_COLLISION;
+            if (e.id() == id) idCollision = true;
         }
+        if (idCollision) return CreateResult.ID_COLLISION;
 
         try {
             Path target = resolveCreateTarget(createTier);

@@ -96,6 +96,13 @@ public class RoomPlaceItemEvent extends MessageHandler {
             rotation = BssPlacementPreferences.resolveRotation(
                     this.client.getHabbo().getHabboInfo().getId(), rotation);
 
+            // restore the rotation the furni had when it was picked up (items.rot is kept on pickup);
+            // the client always sends the furnidata default here, :forcerot still wins
+            if (!BssPlacementPreferences.hasForcedRotation(this.client.getHabbo().getHabboInfo().getId())
+                    && item.getRotation() != 0) {
+                rotation = item.getRotation();
+            }
+
             RoomTile tile = room.getLayout().getTile(x, y);
 
             if (tile == null) {

@@ -1043,6 +1043,28 @@ public final class WiredEngine {
         return this.executionGuard.snapshot(roomId);
     }
 
+    private static boolean roomOwnerHasBadge(Room room, String badge) {
+        try {
+            com.eu.habbo.habbohotel.users.Habbo owner =
+                    WiredPlatform.gameEnvironment().getHabboManager().getHabbo(room.getOwnerId());
+            if (owner != null) {
+                return owner.getInventory().getBadgesComponent().hasBadge(badge);
+            }
+            try (java.sql.Connection connection = com.eu.habbo.Emulator.getDatabase().getDataSource().getConnection();
+                    java.sql.PreparedStatement statement = connection.prepareStatement(
+                            "SELECT 1 FROM users_badges WHERE user_id = ? AND badge_code = ? LIMIT 1")) {
+                statement.setInt(1, room.getOwnerId());
+                statement.setString(2, badge);
+                try (java.sql.ResultSet set = statement.executeQuery()) {
+                    return set.next();
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Could not check badge {} for room owner {}", badge, room.getOwnerId(), e);
+            return false;
+        }
+    }
+
     private void handleRateLimit(
             Room room,
             WiredEvent.Type eventType,
@@ -1050,6 +1072,12 @@ public final class WiredEngine {
             WiredExecutionGuard.LimitSource limits,
             boolean banned) {
         int roomId = room.getId();
+        if (banned && roomOwnerHasBadge(room, "UNLIMWIRED")) {
+            // UNLIMWIRED badge: the owner's rooms are never wired-banned; only the rate limit applies.
+            this.executionGuard.clearRoomBan(roomId);
+            LOGGER.info("Wired rate limit hit in room {} ({}) but owner {} holds UNLIMWIRED; ban skipped.", roomId, room.getName(), room.getOwnerName());
+            return;
+        }
         if (banned) {
             long banMinutes = limits.banDurationMs() / 60000;
 

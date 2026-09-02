@@ -83,7 +83,13 @@ public enum WiredEffectType {
     PLAY_YOUTUBE(92),
     QUICK_BOPPER(93),
     SET_ROOM_AD(94),
-    CHANGE_OPACITY(114);
+    CHANGE_OPACITY(114),
+    // Hotel-specific effects that reuse existing client dialogs (furni picker / message text).
+    FURNI_COLLISION(0),
+    ROLL_DICE(0),
+    HIDE_FURNI(0),
+    UNHIDE_FURNI(0),
+    REMOVE_LOOK(7);
 
     public final int code;
 

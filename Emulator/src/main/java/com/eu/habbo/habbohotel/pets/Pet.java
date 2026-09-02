@@ -372,10 +372,10 @@ public class Pet implements ISerialize, Runnable {
                     } else if (this.happiness < 40 && this.energy > 50 && this.task == null && Emulator.getRandom().nextInt(100) < 30) {
                         // 30% chance to seek toy when moderately bored
                         this.findToy();
-                    } else if (this.levelHunger > 50) {
+                    } else if (this.levelHunger > 50 && this.hasFoodAvailable()) {
                         this.say(this.petData.randomVocal(PetVocalsType.HUNGRY));
                         this.eat();
-                    } else if (this.levelThirst > 50) {
+                    } else if (this.levelThirst > 50 && this.hasDrinkAvailable()) {
                         this.say(this.petData.randomVocal(PetVocalsType.THIRSTY));
                         this.drink();
                     }
@@ -528,10 +528,10 @@ public class Pet implements ISerialize, Runnable {
         } else if (this.happiness <= 5) {
             this.randomSadAction();
             this.roomUnit.setStatus(RoomUnitStatus.GESTURE, PetGestures.SAD.getKey());
-        } else if (this.levelHunger > 80) {
+        } else if (this.levelHunger > 80 && this.hasFoodAvailable()) {
             this.roomUnit.setStatus(RoomUnitStatus.GESTURE, PetGestures.HUNGRY.getKey());
             this.eat();
-        } else if (this.levelThirst > 80) {
+        } else if (this.levelThirst > 80 && this.hasDrinkAvailable()) {
             this.roomUnit.setStatus(RoomUnitStatus.GESTURE, PetGestures.THIRSTY.getKey());
             this.drink();
         } else if (this.idleCommandTicks > 240) {
@@ -601,6 +601,18 @@ public class Pet implements ISerialize, Runnable {
     /**
      * Makes the pet walk to a drink item and drink from it.
      */
+    /** True when the room has a drink item this pet accepts. */
+    public boolean hasDrinkAvailable() {
+        if (this.room == null || this.room.getRoomSpecialTypes() == null || this.petData == null) return false;
+        return this.petData.randomDrinkItem(this.room.getRoomSpecialTypes().getPetDrinks()) != null;
+    }
+
+    /** True when the room has a food item this pet accepts. */
+    public boolean hasFoodAvailable() {
+        if (this.room == null || this.room.getRoomSpecialTypes() == null || this.petData == null) return false;
+        return this.petData.randomFoodItem(this.room.getRoomSpecialTypes().getPetFoods()) != null;
+    }
+
     public void drink() {
         if (this.room == null || this.room.getRoomSpecialTypes() == null || this.petData == null) {
             return;
@@ -797,6 +809,11 @@ public class Pet implements ISerialize, Runnable {
         AchievementManager.progressAchievement(Emulator.getGameEnvironment().getHabboManager().getHabbo(this.userId), Emulator.getGameEnvironment().getAchievementManager().getAchievement("PetRespectReceiver"));
     }
 
+
+    /** Only for transient pets that are never saved (e.g. a morphed user's infostand). */
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getId() {
         return this.id;

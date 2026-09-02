@@ -291,6 +291,12 @@ public class CommandHandler {
         addCommand(new MuteCommand());
         addCommand(new MutePetsCommand());
         addCommand(new MaxPetStatCommand());
+        addCommand(new AutoStackHeightCommand());
+        addCommand(new HotelNotificationCommand());
+        addCommand(new PokerNotificationCommand());
+        addCommand(RoomDoorbellCommand.close());
+        addCommand(RoomDoorbellCommand.open());
+        addCommand(new RideHorseCommand());
         addCommand(new OnlineCommand());
         addCommand(new PetInfoCommand());
         addCommand(new PickallCommand());

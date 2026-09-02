@@ -9,13 +9,21 @@ import com.eu.habbo.habbohotel.rooms.RoomChatMessageBubbles;
 import com.eu.habbo.messages.outgoing.rooms.pets.PetTrainingPanelComposer;
 
 public final class MaxPetStatCommand extends Command {
-    public MaxPetStatCommand() { super("cmd_pet_info", new String[] {"maxpetstat"}); }
+    public MaxPetStatCommand() {
+        super(null, Emulator.getTexts().getValue("commands.keys.cmd_maxpetstat", "maxpetstat;maxpet;potenziapet").split(";"));
+    }
 
     @Override
     public boolean handle(GameClient gameClient, String[] params) {
         Room room = gameClient.getHabbo().getHabboInfo().getCurrentRoom();
-        if (room == null || params.length != 2) return true;
-        Pet pet = room.getCurrentPets().values().stream().filter(p -> p.getName().equalsIgnoreCase(params[1])).findFirst().orElse(null);
+        if (room == null || params.length < 2) return true;
+        // Room owners may boost their own pets; everyone else needs the pet-info permission.
+        if (!room.isOwner(gameClient.getHabbo()) && !gameClient.getHabbo().hasPermission("cmd_pet_info")) {
+            gameClient.getHabbo().whisper("Solo il proprietario della stanza può usare questo comando.", RoomChatMessageBubbles.ALERT);
+            return true;
+        }
+        String wanted = String.join(" ", java.util.Arrays.copyOfRange(params, 1, params.length));
+        Pet pet = room.getCurrentPets().values().stream().filter(p -> p.getName().equalsIgnoreCase(wanted)).findFirst().orElse(null);
         if (pet == null || pet.getUserId() != gameClient.getHabbo().getHabboInfo().getId()) {
             gameClient.getHabbo().whisper("Il tuo pet deve essere presente nella stanza.", RoomChatMessageBubbles.ALERT);
             return true;

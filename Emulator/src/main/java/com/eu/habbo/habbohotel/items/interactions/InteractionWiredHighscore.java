@@ -9,6 +9,7 @@ import com.eu.habbo.habbohotel.users.HabboItem;
 import com.eu.habbo.habbohotel.wired.WiredEffectType;
 import com.eu.habbo.habbohotel.wired.core.WiredManager;
 import com.eu.habbo.habbohotel.wired.highscores.WiredHighscoreClearType;
+import com.eu.habbo.habbohotel.wired.highscores.WiredHighscoreManager;
 import com.eu.habbo.habbohotel.wired.highscores.WiredHighscoreRow;
 import com.eu.habbo.habbohotel.wired.highscores.WiredHighscoreScoreType;
 import com.eu.habbo.messages.ServerMessage;
@@ -25,6 +26,9 @@ public class InteractionWiredHighscore extends HabboItem {
     public WiredHighscoreClearType clearType;
 
     private List<WiredHighscoreRow> data;
+
+    /** {@link WiredHighscoreManager#getRevision()} the current {@link #data} was built from. */
+    private long loadedRevision = -1L;
 
     public InteractionWiredHighscore(ResultSet set, Item baseItem) throws SQLException {
         super(set, baseItem);
@@ -100,12 +104,16 @@ public class InteractionWiredHighscore extends HabboItem {
         }
 
         if (client != null && !(objects.length >= 2 && objects[1] instanceof WiredEffectType)) {
-            WiredManager.triggerFurniStateChanged(room, client.getHabbo().getRoomUnit(), this);
+            // dispatched by ToggleFloorItemEvent: WiredManager.triggerFurniStateChanged(room, client.getHabbo().getRoomUnit(), this);
         }
     }
 
     @Override
     public void serializeExtradata(ServerMessage serverMessage) {
+        // Rows are written to the manager first (Game.onEnd / reset effects); re-read them here
+        // whenever that happened since the last render so every update packet carries fresh data.
+        this.reloadIfStale();
+
         serverMessage.appendInt(6);
         serverMessage.appendString(this.getExtradata());
         serverMessage.appendInt(this.scoreType.type);
@@ -148,12 +156,35 @@ public class InteractionWiredHighscore extends HabboItem {
         if (this.data != null) {
             this.data.clear();
         }
+        this.loadedRevision = -1L;
     }
 
     public void reloadData() {
-        this.data = Emulator.getGameEnvironment()
-                .getItemManager()
-                .getHighscoreManager()
-                .getHighscoreRowsForItem(this.getId(), this.clearType, this.scoreType);
+        WiredHighscoreManager manager = highscoreManager();
+        if (manager == null) {
+            return;
+        }
+
+        this.data = manager.getHighscoreRowsForItem(this.getId(), this.clearType, this.scoreType);
+        this.loadedRevision = manager.getRevision();
+    }
+
+    private void reloadIfStale() {
+        WiredHighscoreManager manager = highscoreManager();
+        if (manager != null && this.loadedRevision != manager.getRevision()) {
+            this.reloadData();
+        }
+    }
+
+    private static WiredHighscoreManager highscoreManager() {
+        try {
+            if (Emulator.getGameEnvironment() == null || Emulator.getGameEnvironment().getItemManager() == null) {
+                return null;
+            }
+
+            return Emulator.getGameEnvironment().getItemManager().getHighscoreManager();
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 }

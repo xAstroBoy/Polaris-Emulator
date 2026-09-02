@@ -40,7 +40,7 @@ public class WiredEffectMoveFurniAsGroup extends InteractionWiredEffect {
 
     private final List<HabboItem> items = new ArrayList<>();
     private int direction;
-    private int furniSource = WiredSourceUtil.SOURCE_TRIGGER;
+    private int furniSource = WiredSourceUtil.SOURCE_SELECTED;
 
     public WiredEffectMoveFurniAsGroup(ResultSet set, Item baseItem) throws SQLException {
         super(set, baseItem);
@@ -187,7 +187,7 @@ public class WiredEffectMoveFurniAsGroup extends InteractionWiredEffect {
         this.setDelay(0);
         this.items.clear();
         this.direction = 0;
-        this.furniSource = WiredSourceUtil.SOURCE_TRIGGER;
+        this.furniSource = WiredSourceUtil.SOURCE_SELECTED;
     }
 
     @Override

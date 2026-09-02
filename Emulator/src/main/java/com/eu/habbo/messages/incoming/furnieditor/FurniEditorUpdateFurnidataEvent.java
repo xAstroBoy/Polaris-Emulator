@@ -33,7 +33,7 @@ public class FurniEditorUpdateFurnidataEvent extends MessageHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(FurniEditorUpdateFurnidataEvent.class);
 
     /** Rate-limit: min milliseconds between successive calls per admin user id. */
-    private static final long RATE_LIMIT_MS = 1_000L;
+    private static final long RATE_LIMIT_MS = 150L;
 
     /** Per-admin last-call timestamp map. */
     private static final Map<Integer, Long> LAST_CALL = new ConcurrentHashMap<>();
@@ -138,10 +138,19 @@ public class FurniEditorUpdateFurnidataEvent extends MessageHandler {
                         writer.write(classname, safeName, safeDesc);
                         written = true;
                         break;
-                    case ID_COLLISION:
-                        this.client.sendResponse(
-                                new FurniEditorResultComposer(false, "Sprite id already used by another classname"));
-                        return;
+                    case ID_COLLISION: {
+                        // The renderer resolves this sprite id to the colliding entry, so that entry
+                        // is the name the client shows for this furni: edit it instead of refusing.
+                        String owner = writer.classnameForId(item.getSpriteId());
+                        if (owner == null || !writer.write(owner, safeName, safeDesc)) {
+                            this.client.sendResponse(new FurniEditorResultComposer(
+                                    false, "Sprite id already used by another classname"));
+                            return;
+                        }
+                        classname = owner;
+                        written = true;
+                        break;
+                    }
                     default:
                         this.client.sendResponse(
                                 new FurniEditorResultComposer(false, "Failed to create furnidata entry"));

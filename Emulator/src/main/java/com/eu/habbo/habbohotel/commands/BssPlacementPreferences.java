@@ -21,6 +21,11 @@ public final class BssPlacementPreferences {
         state(userId).forcedRotation = rotation;
     }
 
+    /** True while :forcerot is active for this user. */
+    public static boolean hasForcedRotation(int userId) {
+        return state(userId).forcedRotation != null;
+    }
+
     public static int resolveRotation(int userId, int requestedRotation) {
         Integer forced = state(userId).forcedRotation;
         return forced == null ? requestedRotation : forced;

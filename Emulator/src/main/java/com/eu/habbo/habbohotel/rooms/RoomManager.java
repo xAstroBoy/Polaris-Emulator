@@ -284,10 +284,10 @@ public class RoomManager {
     public Map<Integer, List<Room>> findRooms(
             NavigatorFilterField filterField, String value, int category, boolean showInvisible) {
         Map<Integer, List<Room>> rooms = new HashMap<>();
+        int limit = Math.max(1, NavigatorManager.MAXIMUM_RESULTS_PER_PAGE);
         String query = filterField.databaseQuery + " AND rooms.state NOT LIKE " + (showInvisible ? "''" : "'invisible'")
-                + (category >= 0 ? "AND rooms.category = '" + category + "'" : "")
-                + "  ORDER BY rooms.users, rooms.id DESC LIMIT " + (page * NavigatorManager.MAXIMUM_RESULTS_PER_PAGE)
-                + "" + ((page * NavigatorManager.MAXIMUM_RESULTS_PER_PAGE) + NavigatorManager.MAXIMUM_RESULTS_PER_PAGE);
+                + (category >= 0 ? " AND rooms.category = '" + category + "'" : "")
+                + " ORDER BY rooms.users DESC, rooms.id DESC LIMIT " + (page * limit) + ", " + limit;
         try (Connection connection = Emulator.getDatabase().getDataSource().getConnection();
                 PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(

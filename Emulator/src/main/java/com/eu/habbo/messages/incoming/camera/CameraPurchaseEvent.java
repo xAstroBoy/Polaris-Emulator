@@ -34,17 +34,21 @@ public class CameraPurchaseEvent extends MessageHandler {
         Habbo habbo = this.client.getHabbo();
         HabboInfo habboInfo = habbo.getHabboInfo();
 
-        if (habboInfo.getCredits() < CAMERA_PURCHASE_CREDITS) {
+        int purchaseCredits = purchaseCredits();
+        int purchasePoints = purchasePoints();
+        int purchasePointsType = purchasePointsType();
+
+        if (habboInfo.getCredits() < purchaseCredits) {
             habbo.alert("You don't have enough credits!");
             this.client.sendResponse(new NotEnoughPointsTypeComposer(true, false, 0));
             return;
         }
 
-        if (habboInfo.getCurrencyAmount(CAMERA_PURCHASE_POINTS_TYPE) < CAMERA_PURCHASE_POINTS) {
+        if (purchasePoints > 0 && habboInfo.getCurrencyAmount(purchasePointsType) < purchasePoints) {
             String alertMessage = "You don't have enough "
-                    + Emulator.getTexts().getValue("seasonal.name." + CAMERA_PURCHASE_POINTS_TYPE, "currency") + "!";
+                    + Emulator.getTexts().getValue("seasonal.name." + purchasePointsType, "currency") + "!";
             habbo.alert(alertMessage);
-            this.client.sendResponse(new NotEnoughPointsTypeComposer(false, true, CAMERA_PURCHASE_POINTS_TYPE));
+            this.client.sendResponse(new NotEnoughPointsTypeComposer(false, true, purchasePointsType));
             return;
         }
 
@@ -110,11 +114,27 @@ public class CameraPurchaseEvent extends MessageHandler {
         this.client.sendResponse(new AddHabboItemComposer(photoItem));
         this.client.sendResponse(new InventoryRefreshComposer());
 
-        habbo.giveCredits(-CAMERA_PURCHASE_CREDITS);
-        habbo.givePoints(CAMERA_PURCHASE_POINTS_TYPE, -CAMERA_PURCHASE_POINTS);
+        if (purchaseCredits > 0) habbo.giveCredits(-purchaseCredits);
+        if (purchasePoints > 0) habbo.givePoints(purchasePointsType, -purchasePoints);
 
         AchievementManager.progressAchievement(
                 habbo, Emulator.getGameEnvironment().getAchievementManager().getAchievement("CameraPhotoCount"));
+    }
+
+    /**
+     * The camera.price.* settings are what RequestCameraConfigurationEvent advertises,
+     * so the purchase must charge the same values (the statics stay as fallbacks).
+     */
+    public static int purchaseCredits() {
+        return Emulator.getConfig().getInt("camera.price.credits", CAMERA_PURCHASE_CREDITS);
+    }
+
+    public static int purchasePoints() {
+        return Emulator.getConfig().getInt("camera.price.points", CAMERA_PURCHASE_POINTS);
+    }
+
+    public static int purchasePointsType() {
+        return Emulator.getConfig().getInt("camera.price.points.type", CAMERA_PURCHASE_POINTS_TYPE);
     }
 
     static int getCameraItemId(String requestedPhotoSize) {

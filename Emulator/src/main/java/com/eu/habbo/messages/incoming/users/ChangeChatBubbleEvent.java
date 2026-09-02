@@ -23,5 +23,8 @@ public class ChangeChatBubbleEvent extends MessageHandler {
         }
 
         this.client.getHabbo().getHabboStats().chatColor = RoomChatMessageBubbles.getBubble(chatBubble);
+
+        // persist the bubble now, so it survives a relogin / reload
+        Emulator.getThreading().run(this.client.getHabbo().getHabboStats());
     }
 }

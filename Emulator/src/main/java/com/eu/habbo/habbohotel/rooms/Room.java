@@ -673,7 +673,18 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
     }
 
     public void pickUpItem(HabboItem item, Habbo picker) {
+        java.util.Set<RoomTile> footprint = null;
+        double previousZ = item != null ? item.getZ() : 0.0D;
+        if (item != null && this.getLayout() != null && item.getBaseItem() != null) {
+            RoomTile base = this.getLayout().getTile(item.getX(), item.getY());
+            if (base != null) {
+                footprint = this.getLayout().getTilesAt(
+                        base, item.getBaseItem().getWidth(), item.getBaseItem().getLength(), item.getRotation());
+            }
+        }
         this.itemManager.pickUpItem(item, picker);
+        // Furniture that was stacked on the picked-up item drops to the new stack height.
+        if (footprint != null) RoomAutoStackSupport.settleAbove(this, footprint, previousZ, item);
     }
 
     public void updateHabbosAt(Rectangle rectangle) {
@@ -1310,7 +1321,7 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
     }
 
     public String[] filterAnything() {
-        return new String[] {this.getOwnerName(), this.getGuildName(), this.getDescription(), this.getPromotionDesc()};
+        return new String[] {this.getName(), this.getOwnerName(), this.getTags(), this.getGuildName(), this.getDescription(), this.getPromotionDesc()};
     }
 
     public long getCycleTimestamp() {

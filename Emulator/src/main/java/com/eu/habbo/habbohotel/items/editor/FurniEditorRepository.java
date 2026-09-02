@@ -196,7 +196,15 @@ public final class FurniEditorRepository {
                 PreparedStatement statement = connection.prepareStatement(sql)) {
             int next = bind(statement, values);
             statement.setInt(next, itemId);
-            return statement.executeUpdate() > 0;
+            if (statement.executeUpdate() > 0) return true;
+        }
+        // Drivers configured for affected-rows semantics report 0 for a no-op update.
+        try (Connection connection = this.dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement("SELECT 1 FROM items_base WHERE id = ?")) {
+            statement.setInt(1, itemId);
+            try (ResultSet set = statement.executeQuery()) {
+                return set.next();
+            }
         }
     }
 

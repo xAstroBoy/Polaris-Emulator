@@ -438,7 +438,7 @@ public class RoomCycleManager {
             } else {
                 if (!unit.hasStatus(RoomUnitStatus.LAY)) {
                     BedProfile bedProfile = new BedProfile(topItem);
-                    double layHeight = Item.getCurrentHeight(topItem) * 1.0D + bedProfile.getLayZOffset();
+                    double layHeight = bedProfile.getLayHeight(Item.getCurrentHeight(topItem));
                     LOGGER.debug(
                             "[BedProfile] item={} stackHeight={} isFlat={} isDouble={} X={} Y={} Z={}",
                             topItem.getBaseItem().getName(),

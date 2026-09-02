@@ -230,17 +230,28 @@ public class WheelManager {
         }
     }
 
+    /** A furni prize accepts either the items_base id or the classname, so admins can type "throne". */
+    private static Item resolveBaseItem(String value) {
+        if (value == null) return null;
+        String needle = value.trim();
+        if (needle.isEmpty()) return null;
+
+        try {
+            Item byId = Emulator.getGameEnvironment().getItemManager().getItem(Integer.parseInt(needle));
+            if (byId != null) return byId;
+        } catch (NumberFormatException ignored) {
+        }
+
+        for (Item item : Emulator.getGameEnvironment().getItemManager().getItems().values()) {
+            if (item.getName() != null && item.getName().equalsIgnoreCase(needle)) return item;
+        }
+        return null;
+    }
+
     private void giveItem(Habbo habbo, WheelPrize prize, int quantity) {
         if (quantity <= 0 || prize.value == null) return;
 
-        int baseId;
-        try {
-            baseId = Integer.parseInt(prize.value.trim());
-        } catch (NumberFormatException e) {
-            return;
-        }
-
-        Item base = Emulator.getGameEnvironment().getItemManager().getItem(baseId);
+        Item base = resolveBaseItem(prize.value);
         if (base == null) return;
 
         Set<HabboItem> items = new HashSet<>();

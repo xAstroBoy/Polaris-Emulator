@@ -55,10 +55,12 @@ public class CameraRoomPictureEvent extends MessageHandler {
         HabboStats habboStats = habbo.getHabboStats();
         int timestamp = Emulator.getIntUnixTimestamp();
 
+        int renderDelay = renderDelay();
+
         if (habboStats.cache.containsKey("camera_render_cooldown")) {
             int cameraTimestamp = (Integer) habboStats.cache.get("camera_render_cooldown");
-            if (timestamp - cameraTimestamp < CAMERA_RENDER_DELAY) {
-                String alertMessage = Emulator.getTexts().getValue("camera.wait").replace("%seconds%", Integer.toString(CAMERA_RENDER_DELAY - (timestamp - cameraTimestamp)));
+            if (timestamp - cameraTimestamp < renderDelay) {
+                String alertMessage = Emulator.getTexts().getValue("camera.wait").replace("%seconds%", Integer.toString(renderDelay - (timestamp - cameraTimestamp)));
                 habbo.alert(alertMessage);
                 if (habboInfo.getPhotoURL() != null) {
                     String[] splittedPhotoURL = habboInfo.getPhotoURL().split("/");
@@ -173,6 +175,11 @@ public class CameraRoomPictureEvent extends MessageHandler {
         }
 
         this.client.sendResponse(new CameraURLComposer(URL));
+    }
+
+    /** camera.render.delay is the registered setting; the static is only the fallback. */
+    public static int renderDelay() {
+        return Emulator.getConfig().getInt("camera.render.delay", CAMERA_RENDER_DELAY);
     }
 
     static String normalizeCameraBaseUrl(String configured) {

@@ -626,6 +626,8 @@ public class Outgoing {
     public static final int CatalogStudioDocumentResultComposer = 10078;
     public static final int CatalogProductMetadataComposer = 10081;
     public static final int CatalogRuntimeConfigurationComposer = 10082;
+    public static final int PetMorphListComposer = 10090; // CUSTOM
+    public static final int NotificationDialogComposer = 1992; // Nitro notification dialog
 
     // Custom Prefixes
     public static final int UserPrefixesComposer = 7001;

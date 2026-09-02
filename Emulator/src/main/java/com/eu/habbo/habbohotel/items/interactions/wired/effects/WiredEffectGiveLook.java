@@ -108,6 +108,9 @@ public class WiredEffectGiveLook extends InteractionWiredEffect {
             String validated = ClothingValidationManager.validateLook(this.figure, gender);
             if (validated == null || validated.isEmpty()) continue;
 
+            if (habbo.getHabboInfo().getWiredOriginalLook() == null) {
+                habbo.getHabboInfo().setWiredOriginalLook(habbo.getHabboInfo().getLook());
+            }
             habbo.getHabboInfo().setLook(validated);
             if (habbo.getClient() != null) {
                 habbo.getClient().sendResponse(new UpdateUserLookComposer(habbo));

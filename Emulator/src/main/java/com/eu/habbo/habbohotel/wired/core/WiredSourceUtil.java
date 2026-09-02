@@ -295,7 +295,12 @@ public final class WiredSourceUtil {
             case SOURCE_TRIGGER:
                 return resolveTriggerItems(ctx, allowTriggerItemFallback);
             case SOURCE_SELECTED:
-                return (selectedItems != null) ? new ArrayList<>(selectedItems) : Collections.emptyList();
+                // "furni selezionati manualmente" with nothing selected behaves like the old
+                // SOURCE_TRIGGER default so existing wireds keep working.
+                if (selectedItems == null || selectedItems.isEmpty()) {
+                    return resolveTriggerItems(ctx, allowTriggerItemFallback);
+                }
+                return new ArrayList<>(selectedItems);
             case SOURCE_SELECTOR:
                 WiredTargets itemTargets = getSelectorTargets(ctx);
                 return itemTargets.isItemsModifiedBySelector()
@@ -329,7 +334,10 @@ public final class WiredSourceUtil {
                 }
                 return Collections.emptyList();
             case SOURCE_SELECTED:
-                return (selectedUsers != null) ? new ArrayList<>(selectedUsers) : Collections.emptyList();
+                if (selectedUsers == null || selectedUsers.isEmpty()) {
+                    return ctx.actor().map(Collections::singletonList).orElse(Collections.emptyList());
+                }
+                return new ArrayList<>(selectedUsers);
             case SOURCE_SELECTOR:
                 WiredTargets userTargets = getSelectorTargets(ctx);
                 return userTargets.isUsersModifiedBySelector()

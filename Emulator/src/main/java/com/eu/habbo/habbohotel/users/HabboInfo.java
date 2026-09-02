@@ -33,6 +33,7 @@ public class HabboInfo implements Runnable {
     private String username;
     private String motto;
     private String look;
+    private transient String wiredOriginalLook;
     private HabboGender gender;
     private String mail;
     private String sso;
@@ -443,6 +444,14 @@ public class HabboInfo implements Runnable {
 
     public void setRank(Rank rank) {
         this.rank = rank;
+    }
+
+    public String getWiredOriginalLook() {
+        return this.wiredOriginalLook;
+    }
+
+    public void setWiredOriginalLook(String look) {
+        this.wiredOriginalLook = look;
     }
 
     public String getLook() {

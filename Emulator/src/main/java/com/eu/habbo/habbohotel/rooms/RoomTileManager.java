@@ -19,6 +19,17 @@ import java.util.Set;
  * Manages tile state calculations and heightmap operations for a room.
  */
 public class RoomTileManager {
+
+    /**
+     * items_base.allow_walk, except for items whose walkability is decided by their state
+     * (gates, one-way gates): for those only {@link HabboItem#isWalkable()} counts.
+     */
+    private static boolean baseAllowsWalk(HabboItem item) {
+        if (item == null || item.getBaseItem() == null) return false;
+        if (item instanceof com.eu.habbo.habbohotel.items.interactions.InteractionGate
+                || item instanceof com.eu.habbo.habbohotel.items.interactions.InteractionOneWayGate) return false;
+        return item.getBaseItem().allowWalk();
+    }
     private static final Logger LOGGER = LoggerFactory.getLogger(RoomTileManager.class);
 
     private final Room room;
@@ -84,12 +95,27 @@ public class RoomTileManager {
                 return RoomTileState.LAY;
             }
 
-            if (tallestItem != null && tallestItem.getZ() + Item.getCurrentHeight(tallestItem)
-                > item.getZ() + Item.getCurrentHeight(item)) {
+            double itemTop = item.getZ() + Item.getCurrentHeight(item);
+            double tallestTop = tallestItem == null ? Double.NEGATIVE_INFINITY
+                : tallestItem.getZ() + Item.getCurrentHeight(tallestItem);
+            if (tallestItem != null && tallestTop > itemTop) {
                 continue;
             }
 
-            result = this.checkStateForItem(item, tile);
+            RoomTileState itemState = this.checkStateForItem(item, tile);
+            if (tallestItem != null && tallestTop == itemTop) {
+                // Tie at the same top height: the blocking item wins. Set iteration order must
+                // never decide walkability (it made tiles randomly open under blocking furni).
+                if (itemState == RoomTileState.BLOCKED || result == RoomTileState.BLOCKED) {
+                    result = RoomTileState.BLOCKED;
+                } else if (itemState == RoomTileState.SIT || result == RoomTileState.SIT) {
+                    result = RoomTileState.SIT;
+                } else {
+                    result = itemState;
+                }
+            } else {
+                result = itemState;
+            }
             tallestItem = item;
         }
 
@@ -116,7 +142,7 @@ public class RoomTileManager {
                 if (exclude != null && item == exclude) {
                     continue;
                 }
-                if (item.isWalkable() || item.getBaseItem().allowWalk() || item.getBaseItem().allowSit() || item.getBaseItem().allowLay()) {
+                if (item.isWalkable() || baseAllowsWalk(item) || item.getBaseItem().allowSit() || item.getBaseItem().allowLay()) {
                     double itemTop = item.getZ() + Item.getCurrentHeight(item);
                     if (itemTop > walkHeight) {
                         walkHeight = itemTop;
@@ -236,7 +262,7 @@ public class RoomTileManager {
             double itemTop = item.getZ() + (item.getBaseItem().allowSit() ? 0 : Item.getCurrentHeight(item));
 
             // Underpass: if the top item is blocking but high enough to walk under, use floor height
-            if (this.room.isAllowUnderpass() && !item.isWalkable() && !item.getBaseItem().allowWalk() && !item.getBaseItem().allowSit() && !item.getBaseItem().allowLay()) {
+            if (this.room.isAllowUnderpass() && !item.isWalkable() && !baseAllowsWalk(item) && !item.getBaseItem().allowSit() && !item.getBaseItem().allowLay()) {
                 RoomLayout layout2 = this.room.getLayout();
                 RoomTile tile = layout2 != null ? layout2.getTile(x, y) : null;
                 Set<HabboItem> allItems = tile != null ? this.room.getItemManager().getItemsAt(tile) : null;
@@ -445,12 +471,23 @@ public class RoomTileManager {
 
                 if (item.getZ() > topItem.getZ()) {
                     topItem = item;
-                    canWalk = topItem.isWalkable() || topItem.getBaseItem().allowWalk();
+                    canWalk = topItem.isWalkable() || baseAllowsWalk(topItem);
                 } else if (item.getZ() == topItem.getZ() && canWalk) {
-                    if ((!topItem.isWalkable() && !topItem.getBaseItem().allowWalk()) || (
-                        !item.getBaseItem().allowWalk() && !item.isWalkable())) {
+                    if ((!topItem.isWalkable() && !baseAllowsWalk(topItem)) || (
+                        !baseAllowsWalk(item) && !item.isWalkable())) {
                         canWalk = false;
                     }
+                }
+            }
+        }
+
+        // gate priority: a closed gate anywhere on the tile blocks, whatever is stacked above or below it
+        if (items != null) {
+            for (HabboItem item : items) {
+                boolean stateGate = item instanceof com.eu.habbo.habbohotel.items.interactions.InteractionGate
+                        || item instanceof com.eu.habbo.habbohotel.items.interactions.InteractionOneWayGate;
+                if (stateGate && !item.isWalkable()) {
+                    return false;
                 }
             }
         }

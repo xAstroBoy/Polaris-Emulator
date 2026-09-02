@@ -528,7 +528,8 @@ final class RoomItemMovementService {
             height = stackHelper.getZ();
         } else if (item instanceof InteractionStackWalkHelper) {
             height = this.placement.resolveStackWalkHelperHeight(item, tile, occupiedTiles);
-        } else if (item == topItem) {
+        } else if (item == topItem && !RoomAutoStackSupport.isEnabled(this.room)) {
+            // legacy behaviour: an item that is still the top item keeps its height
             height = item.getZ();
         } else if (magicTile) {
             if (topItem == null) {
@@ -575,6 +576,7 @@ final class RoomItemMovementService {
             return FurnitureMovementError.CANT_STACK;
         }
 
+        double previousZ = item.getZ();
         item.setX(tile.x);
         item.setY(tile.y);
         item.setZ(height);
@@ -622,6 +624,9 @@ final class RoomItemMovementService {
         occupiedTiles.removeAll(oldOccupiedTiles);
         occupiedTiles.addAll(oldOccupiedTiles);
         this.room.updateTiles(occupiedTiles);
+
+        // Furniture that was resting on this item drops down to the new stack height.
+        RoomAutoStackSupport.settleAbove(this.room, oldOccupiedTiles, previousZ, item);
 
         // Update Habbos at old position
         for (RoomTile t : occupiedTiles) {
@@ -752,7 +757,8 @@ final class RoomItemMovementService {
             height = stackHelper.getZ();
         } else if (item instanceof InteractionStackWalkHelper) {
             height = this.placement.resolveStackWalkHelperHeight(item, tile, occupiedTiles);
-        } else if (item == topItem) {
+        } else if (item == topItem && !RoomAutoStackSupport.isEnabled(this.room)) {
+            // legacy behaviour: an item that is still the top item keeps its height
             height = item.getZ();
         } else if (magicTile) {
             if (topItem == null) {

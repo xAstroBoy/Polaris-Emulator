@@ -225,7 +225,28 @@ import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectBotTe
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectBotWalkToFurni;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectCancelTransaction;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectChangeFurniDirection;
+import com.eu.habbo.habbohotel.items.interactions.wired.conditions.WiredConditionNoBattleBanzaiRunning;
+import com.eu.habbo.habbohotel.items.interactions.wired.conditions.WiredConditionTriggerFurniAdjacentState;
+import com.eu.habbo.habbohotel.items.interactions.wired.conditions.WiredConditionUserOnFurniWithState;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectBotDance;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectChangeOpacity;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectFurniCollision;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectHideFurni;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectRemoveLook;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectRollDice;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectUnhideFurni;
+import com.eu.habbo.habbohotel.items.interactions.wired.conditions.WiredConditionDailyTrigger;
+import com.eu.habbo.habbohotel.items.interactions.wired.conditions.WiredConditionFirstTrigger;
+import com.eu.habbo.habbohotel.items.interactions.wired.conditions.WiredConditionUserCooldown;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveOrTakeFurni;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGivePointsType;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectPlayYoutube;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectQuickBopper;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectSetRollerSpeed;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectSetRoomAd;
+import com.eu.habbo.habbohotel.items.interactions.wired.triggers.WiredTriggerDiceRolled;
+import com.eu.habbo.habbohotel.items.interactions.wired.triggers.WiredTriggerPressKeybind;
+import com.eu.habbo.habbohotel.items.interactions.wired.triggers.WiredTriggerUserGetsHandItem;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectChangeVariableValue;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectControlClock;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectForwardUserToRoom;
@@ -246,6 +267,8 @@ import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveH
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveLook;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveRespect;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveReward;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGameEnd;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGameStart;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveScore;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveScoreToTeam;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectGiveVariable;
@@ -418,7 +441,62 @@ public class ItemManager {
             Map.entry("yt_tv", "youtube"),
             Map.entry("yt_jukebox", "youtube"),
             Map.entry("multieheight", "multiheight"),
-            Map.entry("defult", "default"));
+            Map.entry("defult", "default"),
+            Map.entry("wf_pyramid", "pyramid"),
+            // 2026-09-01 wired audit: BSS/custom classnames whose DB type is "default" → existing handlers
+            Map.entry("wf_act_endgame_team", "wf_act_game_end"),
+            Map.entry("wf_act_game_mode_on", "wf_act_game_start"),
+            Map.entry("wf_act_game_mode_off", "wf_act_game_end"),
+            Map.entry("wf_act_coli_room", "wf_act_furni_collision"),
+            Map.entry("wf_act_forwa", "wf_act_move_to_dir"),
+            Map.entry("wf_act_give_pointse", "wf_act_give_score"),
+            Map.entry("wf_give_user_xpoints", "wf_act_give_score"),
+            Map.entry("wf_act_reset_points", "wf_act_reset_highscore_cstm"),
+            Map.entry("wf_act_give_tag", "wf_act_add_tag"),
+            Map.entry("wf_act_global_add_tag", "wf_act_add_tag_perm"),
+            Map.entry("wf_act_global_remove_tag", "wf_act_remove_tag"),
+            Map.entry("wf_act_pt_tele_furni_player_2", "wf_act_teleport_to"),
+            Map.entry("wf_act_teleport_t2", "wf_act_teleport_to"),
+            Map.entry("wf_act_teleport_tu", "wf_act_teleport_to"),
+            Map.entry("wf_shn_teleport_to", "wf_act_teleport_to"),
+            Map.entry("wf_act_raise", "wf_act_raise_furni"),
+            Map.entry("wf_act_resst_timers", "wf_act_reset_timers"),
+            Map.entry("wf_act_resta_timers", "wf_act_reset_timers"),
+            Map.entry("wf_act_set_close_dice", "wf_act_close_dice"),
+            Map.entry("wf_act_set_up_timer", "wf_act_adjust_clock"),
+            Map.entry("wf_act_show_effetwi", "wf_act_give_effect"),
+            Map.entry("wf_act_teggle_state", "wf_act_toggle_state"),
+            Map.entry("wf_act_toggle_negat", "wf_act_toggle_state_down"),
+            Map.entry("wf_act_tuggle_to_rnd", "wf_act_toggle_to_rnd"),
+            Map.entry("wf_act_usr_clothes", "wf_act_give_look"),
+            Map.entry("wf_act_tour_ne_ava", "wf_act_rotate_habbo"),
+            Map.entry("wf_act_super_wiredd", "wf_act_give_name_color"),
+            Map.entry("wf_cnd_furnis_hv_prson", "wf_cnd_furnis_hv_avtrs"),
+            Map.entry("wf_cnd_hsn_handitem", "wf_cnd_not_has_handitem"),
+            Map.entry("wf_cnd_neg_handitem", "wf_cnd_not_has_handitem"),
+            Map.entry("wf_cnd_pos_handitem", "wf_cnd_has_handitem"),
+            Map.entry("wf_cnd_loha_il_badge", "wf_cnd_habbo_owns_badge"),
+            Map.entry("wf_cnd_not_ha_badges", "wf_cnd_not_habbo_owns_badge"),
+            Map.entry("wf_cnd_trigrer_on_frn", "wf_cnd_trggrer_on_frn"),
+            Map.entry("wf_cstm_enable", "wf_act_give_enable"),
+            Map.entry("wf_cstm_hnitem", "wf_act_give_handitem"),
+            Map.entry("wf_cstm_freeze", "wf_act_freeze"),
+            Map.entry("wf_cstm_sfreeze", "wf_act_unfreeze"),
+            Map.entry("wf_exe_pile_wireds", "wf_act_call_stacks"),
+            Map.entry("wf_sct_fuite", "wf_act_flee"),
+            Map.entry("wf_trg_afkkddormeur", "wf_trg_idles"),
+            Map.entry("wf_trg_at_time_long_day", "wf_trg_at_time_long"),
+            Map.entry("wf_trg_bule_motdepass", "wf_trg_says_something"),
+            Map.entry("wf_trg_state_changdd", "wf_trg_state_changed"),
+            Map.entry("wf_pressureplate_black", "pressureplate"),
+            Map.entry("wf_pressureplate_white", "pressureplate"),
+            Map.entry("wf_ringplate_black", "pressureplate"),
+            Map.entry("wf_ringplate_white", "pressureplate"),
+            Map.entry("wf_arrowplate_black", "pressureplate"),
+            Map.entry("wf_arrowplate_white", "pressureplate"),
+            Map.entry("wf_act_set_furni_opacity", "wf_act_change_opacity"),
+            Map.entry("wf_act_play_youtube", "wf_act_play_youtube_sound"),
+            Map.entry("wf_cnd_not_battlebz", "wf_cnd_not_battlebanzai"));
     private static final String BASE_ITEMS_SQL = """
             SELECT id, sprite_id, public_name, item_name, type, width, length,
                    stack_height, allow_stack, allow_sit, allow_lay, allow_walk,
@@ -987,6 +1065,51 @@ public class ItemManager {
 
         this.interactionsList.add(new ItemInteraction("wf_highscore", InteractionWiredHighscore.class));
         this.interactionsList.add(new ItemInteraction("wf_act_change_opacity", WiredEffectChangeOpacity.class));
+
+        // Wired handlers that ship with their own client dialog code but were never registered, so
+        // furniture using these items_base.interaction_type values loaded as inert default furni.
+        this.interactionsList.add(new ItemInteraction("wf_act_roller_speed", WiredEffectSetRollerSpeed.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_bot_start_dance", WiredEffectBotDance.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_bot_stop_dance", WiredEffectBotDance.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_give_points_type", WiredEffectGivePointsType.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_give_or_take_furni", WiredEffectGiveOrTakeFurni.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_play_youtube_sound", WiredEffectPlayYoutube.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_quick_bopper", WiredEffectQuickBopper.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_set_room_ad", WiredEffectSetRoomAd.class));
+        this.interactionsList.add(new ItemInteraction("wf_trg_dice_rolled", WiredTriggerDiceRolled.class));
+        this.interactionsList.add(new ItemInteraction("wf_trg_press_keybind", WiredTriggerPressKeybind.class));
+        this.interactionsList.add(new ItemInteraction("wf_trg_user_gets_handitem", WiredTriggerUserGetsHandItem.class));
+        this.interactionsList.add(
+                new ItemInteraction("wf_cnd_not_battlebanzai", WiredConditionNoBattleBanzaiRunning.class));
+        this.interactionsList.add(
+                new ItemInteraction("wf_cnd_user_on_furni_with_state", WiredConditionUserOnFurniWithState.class));
+        this.interactionsList.add(
+                new ItemInteraction("wf_cnd_trg_frn_adjacent_state", WiredConditionTriggerFurniAdjacentState.class));
+
+        // BSS-only wired furniture that had no handler at all (loaded as inert default furni).
+        this.interactionsList.add(new ItemInteraction("wf_act_furni_collision", WiredEffectFurniCollision.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_tiles", WiredEffectFurniCollision.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_tilss", WiredEffectFurniCollision.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_execute_for_furni", WiredEffectFurniCollision.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_roll_dice", WiredEffectRollDice.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_hide_trg_item", WiredEffectHideFurni.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_unhide_items", WiredEffectUnhideFurni.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_remove_look", WiredEffectRemoveLook.class));
+        this.interactionsList.add(new ItemInteraction("wf_cnd_user_cooldown", WiredConditionUserCooldown.class));
+        this.interactionsList.add(new ItemInteraction("wf_cnd_first_trg", WiredConditionFirstTrigger.class));
+        this.interactionsList.add(new ItemInteraction("wf_cnd_daily_trg", WiredConditionDailyTrigger.class));
+
+        // Wired game lifecycle and game-point aliases. The DB-only names loaded as inert default
+        // furni; start/end drive the room's game timers (or a timer-less wired round) so wired
+        // games record items_highscore_data rows, and give_gamep is the give-score dialog.
+        this.interactionsList.add(new ItemInteraction("wf_act_game_start", WiredEffectGameStart.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_start_timer_game", WiredEffectGameStart.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_game_end", WiredEffectGameEnd.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_end_game", WiredEffectGameEnd.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_stop_timer_game", WiredEffectGameEnd.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_give_gamep", WiredEffectGiveScore.class));
+        this.interactionsList.add(
+                new ItemInteraction("wf_act_reset_highscore_cstm", WiredEffectResetHighscores.class));
 
         this.interactionsList.add(new ItemInteraction("battlebanzai_tile", InteractionBattleBanzaiTile.class));
         this.interactionsList.add(

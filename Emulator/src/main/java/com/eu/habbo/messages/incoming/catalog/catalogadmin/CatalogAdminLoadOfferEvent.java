@@ -22,7 +22,7 @@ public class CatalogAdminLoadOfferEvent extends MessageHandler {
         this.packet.readInt(); // legacy revision field
         var offer = CatalogStudioRuntime.services()
                 .liveMutations()
-                .loadLiveForRead()
+                .loadLive()
                 .offer(pageType, offerId)
                 .orElse(null);
         if (offer == null) {

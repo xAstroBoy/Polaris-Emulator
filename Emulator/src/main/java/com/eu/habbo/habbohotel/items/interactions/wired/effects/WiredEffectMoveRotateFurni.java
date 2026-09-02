@@ -41,7 +41,7 @@ public class WiredEffectMoveRotateFurni extends InteractionWiredEffect implement
     private final Set<HabboItem> items = new LinkedHashSet<>(WiredManager.MAXIMUM_FURNI_SELECTION / 2);
     private int direction;
     private int rotation;
-    private int furniSource = WiredSourceUtil.SOURCE_TRIGGER;
+    private int furniSource = WiredSourceUtil.SOURCE_SELECTED;
     // Use thread-safe set for cooldowns since execute() can be called from async threads
     private final Set<HabboItem> itemCooldowns = ConcurrentHashMap.newKeySet();
     // Pre-selected directions from simulation (itemId -> direction)
@@ -272,7 +272,7 @@ public class WiredEffectMoveRotateFurni extends InteractionWiredEffect implement
         this.direction = 0;
         this.rotation = 0;
         this.items.clear();
-        this.furniSource = WiredSourceUtil.SOURCE_TRIGGER;
+        this.furniSource = WiredSourceUtil.SOURCE_SELECTED;
         this.setDelay(0);
     }
 

@@ -48,10 +48,16 @@ public class PetCommand implements Comparable<PetCommand> {
 
     public boolean matches(String commandText) {
         String normalized = normalize(commandText);
+        if (normalized.isEmpty()) return false;
         if (normalize(this.key).equals(normalized)) return true;
 
         // Nitro displays the official localized pet-command label but pet_commands_data
-        // stores the English wire label. Accept the Italian label typed by the user too.
+        // stores the English wire label. Accept every localized label configured in
+        // emulator_texts as "pet.command.<id>" (";"-separated synonyms) as well.
+        for (String alias : Emulator.getTexts().getValue("pet.command." + this.id, "").split("[;|]")) {
+            if (!alias.isBlank() && normalize(alias).equals(normalized)) return true;
+        }
+
         return this.id == 36 && (normalized.equals("sputa fuoco") || normalized.equals("soffia fuoco"));
     }
 

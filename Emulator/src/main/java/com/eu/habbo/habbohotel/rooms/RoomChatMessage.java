@@ -219,6 +219,7 @@ public class RoomChatMessage implements Runnable, ISerialize, DatabaseLoggable {
             message.appendString(customizationData.prefixFont);
             message.appendString(customizationData.nickIcon);
             message.appendString(customizationData.displayOrder);
+            message.appendString(customizationData.nameColor);
         } catch (Exception e) {
             LOGGER.error("Caught exception", e);
         }

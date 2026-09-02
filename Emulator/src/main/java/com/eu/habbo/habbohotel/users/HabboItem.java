@@ -350,14 +350,8 @@ public abstract class HabboItem implements Runnable, IEventTriggers {
                 }
             }
 
-            boolean isTogglingInteraction = Arrays.stream(HabboItem.TOGGLING_INTERACTIONS)
-                    .anyMatch(type -> type.isAssignableFrom(this.getClass()));
-
-            if ((this.getBaseItem().getStateCount() > 1 && !(this instanceof InteractionDice))
-                    || isTogglingInteraction
-                    || (objects != null && objects.length == 1 && objects[0].equals("TOGGLE_OVERRIDE"))) {
-                WiredManager.triggerFurniStateChanged(room, client.getHabbo().getRoomUnit(), this);
-            }
+            // "Furni usato" (wf_trg_state_changed) is dispatched once by ToggleFloorItemEvent for
+            // every user double-click, so nothing to do here.
         }
     }
 

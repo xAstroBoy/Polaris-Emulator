@@ -458,6 +458,8 @@ public class Incoming {
 
     // CUSTOM
     public static final int UpdateFurniturePositionEvent = 10019;
+    public static final int SetFurnitureStateEvent = 10093; // build tool: exact furni state
+    public static final int SetRoomPaintEvent = 10094; // :modificastanza room paint editor
     public static final int ClickUserEvent = 10020;
     public static final int WiredMonitorRequestEvent = 10021;
     public static final int WiredRoomSettingsRequestEvent = 10022;
@@ -529,6 +531,7 @@ public class Incoming {
     public static final int SetActiveNickIconEvent = 7017;
     public static final int PurchaseCatalogPrefixEvent = 7018;
     public static final int SetDisplayOrderEvent = 7019;
+    public static final int SetNameColorEvent = 7020; // CUSTOM
 
     // YouTube Room Broadcast
     public static final int YouTubeRoomPlayEvent = 8001;
