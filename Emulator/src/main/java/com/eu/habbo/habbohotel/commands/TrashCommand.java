@@ -42,9 +42,14 @@ public class TrashCommand extends Command {
 
     @Override
     public boolean handle(GameClient gameClient, String[] params) {
+        Habbo caller = gameClient.getHabbo();
+        Room room = caller.getHabboInfo().getCurrentRoom();
+        if (room == null) return true;
+        if (!RoomFunCommandAccess.requireOwnerOrStaff(caller, room)) return true;
+
         String commandKey = params.length == 0 ? "sharknado" : params[0].replace(":", "");
         if (commandKey.equalsIgnoreCase("tornado") || commandKey.equalsIgnoreCase("trash")) {
-            return handleTornado(gameClient);
+            return handleTornado(gameClient, params.length >= 2 ? params[1] : null);
         }
         return handleSharknado(gameClient, params.length >= 2 ? params[1] : null);
     }
@@ -55,7 +60,9 @@ public class TrashCommand extends Command {
         if (room == null) return true;
         Habbo target = targetName == null ? caller : room.getHabbo(targetName);
         if (target == null) {
-            caller.whisper("Utente non trovato nella stanza.", RoomChatMessageBubbles.ALERT);
+            caller.whisper(
+                    Emulator.getTexts().getValue("commands.error.target_not_found").replace("%user%", targetName),
+                    RoomChatMessageBubbles.ALERT);
             return true;
         }
 
@@ -95,10 +102,17 @@ public class TrashCommand extends Command {
         return true;
     }
 
-    private static boolean handleTornado(GameClient gameClient) {
+    private static boolean handleTornado(GameClient gameClient, String targetName) {
         Habbo caller = gameClient.getHabbo();
         Room room = caller.getHabboInfo().getCurrentRoom();
         if (room == null) return true;
+        Habbo target = targetName == null ? caller : room.getHabbo(targetName);
+        if (target == null) {
+            caller.whisper(
+                    Emulator.getTexts().getValue("commands.error.target_not_found").replace("%user%", targetName),
+                    RoomChatMessageBubbles.ALERT);
+            return true;
+        }
 
         Long eventId = RoomFunEventLock.tryAcquire(room);
         if (eventId == null) {
@@ -108,7 +122,7 @@ public class TrashCommand extends Command {
             return true;
         }
 
-        RoomUnit unit = caller.getRoomUnit();
+        RoomUnit unit = target.getRoomUnit();
         List<RoomTile> orbit = buildOrbit(room, unit.getCurrentLocation());
         if (orbit.size() < 2) {
             RoomFunEventLock.release(room, eventId);
@@ -119,7 +133,7 @@ public class TrashCommand extends Command {
         }
 
         TornadoUserState userState = new TornadoUserState(
-                caller,
+                target,
                 unit.getCurrentLocation(),
                 unit.getZ(),
                 unit.canWalk(),
@@ -127,8 +141,8 @@ public class TrashCommand extends Command {
                 unit.getEffectEndTimestamp());
         List<TornadoFurni> furni = captureTornadoFurni(room, orbit.size());
         unit.setCanWalk(false);
-        room.giveEffect(caller, RAIN_CLOUD_EFFECT, 3);
-        caller.whisper(
+        room.giveEffect(target, RAIN_CLOUD_EFFECT, 3);
+        target.whisper(
                 Emulator.getTexts().getValue("commands.action.cmd_tornado.warning"),
                 RoomChatMessageBubbles.THUNDER);
         Emulator.getThreading().run(

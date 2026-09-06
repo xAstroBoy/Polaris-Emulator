@@ -37,6 +37,8 @@ public class PunchCommand extends Command {
 
         String sender = gameClient.getHabbo().getHabboInfo().getUsername();
         String receiver = target.getHabboInfo().getUsername();
+        room.giveEffect(gameClient.getHabbo(), 33, 3);
+        room.giveEffect(target, 34, 3);
         room.sendComposer(new RoomUserTalkComposer(new RoomChatMessage(
                         Emulator.getTexts().getValue("commands.action.punch.sender").replace("%target%", receiver),
                         gameClient.getHabbo(), gameClient.getHabbo(), RoomChatMessageBubbles.RED))

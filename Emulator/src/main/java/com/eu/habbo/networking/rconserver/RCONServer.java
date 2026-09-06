@@ -36,7 +36,12 @@ import com.eu.habbo.messages.rcon.StressStart;
 import com.eu.habbo.messages.rcon.StressStatus;
 import com.eu.habbo.messages.rcon.StressStop;
 import com.eu.habbo.messages.rcon.TalkUser;
+import com.eu.habbo.messages.rcon.TileState;
 import com.eu.habbo.messages.rcon.UpdateCatalog;
+import com.eu.habbo.messages.rcon.UpdateChatBubbles;
+import com.eu.habbo.messages.rcon.UpdateConfig;
+import com.eu.habbo.messages.rcon.UpdatePermissions;
+import com.eu.habbo.messages.rcon.UpdateTexts;
 import com.eu.habbo.messages.rcon.UpdateItems;
 import com.eu.habbo.messages.rcon.UpdateSoundboard;
 import com.eu.habbo.messages.rcon.UpdateUser;
@@ -109,6 +114,11 @@ public class RCONServer extends Server {
         this.addRCONMessage("updatewheel", UpdateWheel.class);
         this.addRCONMessage("updatesoundboard", UpdateSoundboard.class);
         this.addRCONMessage("updatecatalog", UpdateCatalog.class);
+        this.addRCONMessage("updateconfig", UpdateConfig.class); // CUSTOM: housekeeping reload buttons
+        this.addRCONMessage("updatetexts", UpdateTexts.class);
+        this.addRCONMessage("updatechatbubbles", UpdateChatBubbles.class);
+        this.addRCONMessage("updatepermissions", UpdatePermissions.class);
+        this.addRCONMessage("tilestate", TileState.class); // CUSTOM: walkability diagnostic
         this.addRCONMessage("executecommand", ExecuteCommand.class);
         this.addRCONMessage("progressachievement", ProgressAchievement.class);
         this.addRCONMessage("updateuser", UpdateUser.class);

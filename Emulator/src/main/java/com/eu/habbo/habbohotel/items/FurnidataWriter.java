@@ -69,6 +69,65 @@ public class FurnidataWriter {
         return true;
     }
 
+    /**
+     * Edits the entry whose furnidata {@code id} (= items_base.sprite_id) matches. The client names a furni by
+     * that id and a classname can appear more than once with different ids (e.g. invisibile1Wal), so the
+     * classname lookup could edit a copy the client never shows.
+     *
+     * @return false when no entry carries that id
+     */
+    public boolean writeById(int id, String name, String description) throws IOException {
+        if (id <= 0) return false;
+        String safeName = FurnitureTextProvider.sanitize(name);
+        String safeDesc = FurnitureTextProvider.sanitize(description);
+
+        Path target = locateFileById(id);
+        if (target == null) return false;
+
+        String raw = Files.readString(target, StandardCharsets.UTF_8);
+        String edited = replaceEntryFieldsById(raw, id, safeName, safeDesc);
+        if (edited == null) return false;
+        if (edited.equals(raw)) return true;
+        backup(target);
+        atomicWrite(target, edited);
+        return true;
+    }
+
+    private Path locateFileById(int id) throws IOException {
+        if (!directory) return containsId(source, id) ? source : null;
+        Path winner = null;
+        for (Path tierFile : splitTierFilesInOrder()) {
+            if (containsId(tierFile, id)) winner = tierFile;
+        }
+        return winner;
+    }
+
+    private boolean containsId(Path file, int id) {
+        for (FurnidataEntry e : new FurnidataReader(file, maxBytes).read()) {
+            if (e.id() == id) return true;
+        }
+        return false;
+    }
+
+    /** Same as {@link #replaceEntryFields} but the object is the one holding {@code "id": <id>}. */
+    static String replaceEntryFieldsById(String raw, int id, String name, String description) {
+        Pattern idProp = Pattern.compile("\"id\"\\s*:\\s*(\\d+)");
+        Matcher m = idProp.matcher(raw);
+        String wanted = String.valueOf(id);
+        int objStart = -1, objEnd = -1;
+        while (m.find()) {
+            if (!m.group(1).equals(wanted)) continue;
+            objStart = lastUnbalancedBrace(raw, m.start());
+            objEnd = matchingClose(raw, objStart);
+            break;
+        }
+        if (objStart < 0 || objEnd < 0) return null;
+        String obj = raw.substring(objStart, objEnd + 1);
+        String newObj = replaceField(obj, "name", name);
+        newObj = replaceField(newObj, "description", description);
+        return raw.substring(0, objStart) + newObj + raw.substring(objEnd + 1);
+    }
+
     /** Classname of the entry that already uses furnidata {@code id}, or null. */
     public String classnameForId(int id) {
         for (FurnidataEntry e : new FurnidataReader(source, maxBytes).read()) {

@@ -9,6 +9,7 @@ import com.eu.habbo.habbohotel.items.FurnidataTypeMover;
 import com.eu.habbo.habbohotel.items.FurnidataLock;
 import com.eu.habbo.habbohotel.items.FurnidataEntry;
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.items.editor.FurniEditorLiveRefresh;
 import com.eu.habbo.habbohotel.items.editor.FurniEditorRepository;
 import com.eu.habbo.habbohotel.permissions.Permission;
 import com.eu.habbo.messages.incoming.MessageHandler;
@@ -60,11 +61,15 @@ public class FurniEditorUpdateEvent extends MessageHandler {
         // Reload emulator item definitions
         Emulator.getGameEnvironment().getItemManager().loadItems();
 
+        // Apply the change to the furni that are already alive in loaded rooms and online inventories
+        // (interaction class, special-type registry, tiles, sprite) — no room reload needed.
+        FurniEditorLiveRefresh.Result refresh = FurniEditorLiveRefresh.apply(id);
+
         if (requestedType != null) {
             syncFurnidataPlacementType(id, requestedType);
         }
 
-        this.client.sendResponse(new FurniEditorResultComposer(true, "Item updated", id));
+        this.client.sendResponse(new FurniEditorResultComposer(true, "Item updated" + refresh.describe(), id));
     }
 
     // FURNI_EDITOR_TYPE_SYNC_V1

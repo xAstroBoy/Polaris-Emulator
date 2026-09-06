@@ -6,7 +6,7 @@
 
     <groupId>com.eu.habbo</groupId>
     <artifactId>Polaris</artifactId>
-    <version>4.2.97</version>
+    <version>4.2.112</version>
     <name>Polaris</name>
     <licenses>
         <license>
@@ -70,6 +70,8 @@
     </properties>
 
     <build>
+        <!-- The former target/classes tree can retain unusable ACLs on the mapped Z: drive. -->
+        <directory>${project.basedir}/target-build</directory>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

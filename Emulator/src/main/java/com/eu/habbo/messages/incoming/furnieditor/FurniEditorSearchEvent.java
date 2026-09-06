@@ -15,7 +15,8 @@ public class FurniEditorSearchEvent extends MessageHandler {
 
     @Override
     public void handle() throws Exception {
-        if (!this.client.getHabbo().hasPermission(Permission.ACC_CATALOGFURNI)) {
+        if (!this.client.getHabbo().hasPermission(Permission.ACC_CATALOGFURNI)
+                && !this.client.getHabbo().hasPermission("acc_wheeladmin")) {
             this.client.sendResponse(new FurniEditorResultComposer(false, "No permission"));
             return;
         }
@@ -37,6 +38,13 @@ public class FurniEditorSearchEvent extends MessageHandler {
         List<String> furnidataClassnames = query.isEmpty()
                 ? List.of()
                 : Emulator.getGameEnvironment().getFurnitureTextProvider().findClassnamesByName(query);
+        // "rare" is a pseudo type: only furni whose sprite has a rare value (wheel / crackable prize pickers).
+        List<Integer> spriteIds = List.of();
+        if ("rare".equals(type)) {
+            spriteIds = new java.util.ArrayList<>(Emulator.getGameEnvironment().getCatalogManager().furnitureValues.keySet());
+            if (spriteIds.isEmpty()) spriteIds = List.of(-1);
+            type = "";
+        }
         var result = new FurniEditorRepository(Emulator.getDatabase().getDataSource())
                 .search(new FurniEditorRepository.SearchRequest(
                         query,
@@ -45,7 +53,8 @@ public class FurniEditorSearchEvent extends MessageHandler {
                         sortDir == null ? "" : sortDir,
                         PAGE_SIZE,
                         offset,
-                        furnidataClassnames));
+                        furnidataClassnames,
+                        spriteIds));
         this.client.sendResponse(new FurniEditorSearchComposer(result.items(), result.total(), page));
     }
 }

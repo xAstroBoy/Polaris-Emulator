@@ -35,7 +35,7 @@ public class FloorPlanEditorSaveEvent extends MessageHandler {
     public static volatile int MAXIMUM_FLOORPLAN_SIZE = 64 * 64;
 
     private static final int SAVE_COOLDOWN_SECONDS = 3;
-    private static final int MAX_AUTO_PICKUP_ITEMS = 500;
+    private static final int MAX_AUTO_PICKUP_ITEMS = 5000;
     private static final Pattern ALLOWED_MAP_CHARS = Pattern.compile("[a-zA-Z0-9\r]+");
 
     @Override
@@ -203,6 +203,12 @@ public class FloorPlanEditorSaveEvent extends MessageHandler {
             return;
         }
 
+        // The map currently in use, row by row, so unchanged tiles can be skipped below.
+        String previousMap = room.getLayout() != null && room.getLayout().getHeightmap() != null
+                ? room.getLayout().getHeightmap()
+                : "";
+        String[] previousRows = previousMap.replace("\r\n", "\r").replace('\n', '\r').split("\r");
+
         Set<RoomTile> locked_tileList = room.getLockedTiles();
         Set<RoomTile> new_tileList = new HashSet<>();
         Set<HabboItem> itemsToPickup = new HashSet<>();
@@ -214,6 +220,15 @@ public class FloorPlanEditorSaveEvent extends MessageHandler {
 
                 RoomTile tile = room.getLayout().getTile((short) x, (short) y);
                 new_tileList.add(tile);
+
+                // A tile that keeps exactly the same character cannot block the save: the furniture already
+                // standing there (even on a void tile of an imported room) is not affected by this change. Only
+                // tiles that really change height or become void are checked below.
+                char previous = (y < previousRows.length && x < previousRows[y].length())
+                        ? Character.toLowerCase(previousRows[y].charAt(x))
+                        : 'x';
+                if (previous == Character.toLowerCase(mapRows[y].charAt(x))) continue;
+
                 String square = String.valueOf(mapRows[y].charAt(x));
                 short height;
 

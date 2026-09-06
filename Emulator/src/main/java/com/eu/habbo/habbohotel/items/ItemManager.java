@@ -230,6 +230,7 @@ import com.eu.habbo.habbohotel.items.interactions.wired.conditions.WiredConditio
 import com.eu.habbo.habbohotel.items.interactions.wired.conditions.WiredConditionUserOnFurniWithState;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectBotDance;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectChangeOpacity;
+import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectColorFurni;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectFurniCollision;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectHideFurni;
 import com.eu.habbo.habbohotel.items.interactions.wired.effects.WiredEffectRemoveLook;
@@ -421,12 +422,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ItemManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ItemManager.class);
+    /** Pet base items ("a0 petN") carry their pet type in interaction_type: plain furni behaviour. */
+    private static final Pattern PET_INTERACTION = Pattern.compile("pet\\d+");
+
     private static final Map<String, String> LEGACY_INTERACTION_ALIASES = Map.ofEntries(
             Map.entry("teletile", "teleporttile"),
             Map.entry("tele_tile", "teleporttile"),
@@ -443,6 +448,44 @@ public class ItemManager {
             Map.entry("multieheight", "multiheight"),
             Map.entry("defult", "default"),
             Map.entry("wf_pyramid", "pyramid"),
+            // 2026-09-03 startup audit: names from imported furnidata that have no dedicated handler here
+            Map.entry("bed", "default"),
+            Map.entry("sit", "default"),
+            Map.entry("lay", "default"),
+            Map.entry("stairs", "default"),
+            Map.entry("toilet", "default"),
+            Map.entry("trax_machine", "jukebox"),
+            Map.entry("floor_switch", "switch"),
+            Map.entry("spinning_bottle", "random_state"),
+            Map.entry("crafting", "default"),
+            Map.entry("dino_fossil", "default"),
+            Map.entry("scoreboard", "default"),
+            Map.entry("glowball", "default"),
+            Map.entry("slotmachine", "default"),
+            Map.entry("slots_machine", "default"),
+            Map.entry("credits_slotmachine", "default"),
+            Map.entry("duckets_slotmachine", "default"),
+            Map.entry("diamonds_slotmachine", "default"),
+            Map.entry("credit_slot", "default"),
+            Map.entry("patch_carrot", "default"),
+            Map.entry("battleball_trigger", "default"),
+            Map.entry("alert", "default"),
+            Map.entry("room_event", "default"),
+            Map.entry("intelligence_bookcase", "default"),
+            Map.entry("privatearea", "default"),
+            Map.entry("roomeffect", "default"),
+            Map.entry("badge", "default"),
+            Map.entry("uiext_ttt_chair", "default"),
+            Map.entry("snowflake holo", "default"),
+            Map.entry("wf_act_give_name_color", "default"),
+            Map.entry("wf_act_give_daily_task_progress", "default"),
+            Map.entry("wf_act_disable_click_through", "default"),
+            Map.entry("wf_act_enable_click_through", "default"),
+            Map.entry("wf_cnd_x_points_leaderboard", "default"),
+            Map.entry("wf_cnd_not_x_points_leaderboard", "default"),
+            Map.entry("wf_cnd_furni_opacity_is", "default"),
+            Map.entry("wf_cnd_not_furni_opacity_is", "default"),
+            Map.entry("wf_xtra_exec_delay", "default"),
             // 2026-09-01 wired audit: BSS/custom classnames whose DB type is "default" → existing handlers
             Map.entry("wf_act_endgame_team", "wf_act_game_end"),
             Map.entry("wf_act_game_mode_on", "wf_act_game_start"),
@@ -962,7 +1005,7 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("wf_act_open_gates", WiredEffectMatchFurni.class));
         this.interactionsList.add(new ItemInteraction("wf_act_close_dice", WiredEffectToggleFurni.class));
         this.interactionsList.add(new ItemInteraction("wf_act_close_gates", WiredEffectToggleFurni.class));
-        this.interactionsList.add(new ItemInteraction("wf_act_color_furni", WiredEffectToggleFurni.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_color_furni", WiredEffectColorFurni.class));
         this.interactionsList.add(
                 new ItemInteraction("wf_act_move_furni_from_stack", WiredEffectMoveRotateFurni.class));
         this.interactionsList.add(new ItemInteraction("wf_act_move_rotate_no_under", WiredEffectMoveRotateFurni.class));
@@ -1200,7 +1243,11 @@ public class ItemManager {
                 String databaseType = set.getString("interaction_type").trim();
                 if (this.interactionsList.find(databaseType) != null) continue;
 
-                String alias = LEGACY_INTERACTION_ALIASES.get(databaseType.toLowerCase(Locale.ROOT));
+                String lowered = databaseType.toLowerCase(Locale.ROOT);
+                // Pets ("petN") and bare numbers left by importers are plain furni: register them quietly.
+                String alias = PET_INTERACTION.matcher(lowered).matches() || lowered.matches("\\d+")
+                        ? "default"
+                        : LEGACY_INTERACTION_ALIASES.get(lowered);
                 ItemInteraction aliasInteraction = alias == null ? null : this.interactionsList.find(alias);
                 Class<? extends HabboItem> handler = aliasInteraction != null && aliasInteraction.getType() != null
                         ? aliasInteraction.getType()

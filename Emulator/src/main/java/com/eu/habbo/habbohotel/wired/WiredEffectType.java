@@ -84,6 +84,7 @@ public enum WiredEffectType {
     QUICK_BOPPER(93),
     SET_ROOM_AD(94),
     CHANGE_OPACITY(114),
+    COLOR_FURNI(115), // CUSTOM: wf_act_furni_color — swaps colourable furni to a colour variant
     // Hotel-specific effects that reuse existing client dialogs (furni picker / message text).
     FURNI_COLLISION(0),
     ROLL_DICE(0),

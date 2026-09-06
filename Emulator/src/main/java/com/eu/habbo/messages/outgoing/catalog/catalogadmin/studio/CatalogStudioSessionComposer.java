@@ -25,7 +25,9 @@ import java.util.zip.GZIPOutputStream;
  * offer list.
  */
 public final class CatalogStudioSessionComposer extends MessageComposer {
-    private static final String SNAPSHOT_ENCODING = "GZIP_BASE64_JSON_COUNTS_V2";
+    public static final String SNAPSHOT_ENCODING = "GZIP_BASE64_JSON_COUNTS_V2";
+    /** Delta since a revision the client already holds: all pages, touched offers, deleted offer ids. */
+    public static final String DELTA_ENCODING = "GZIP_BASE64_JSON_DELTA_V3";
     private static final int MAX_STRING_CHUNK_LENGTH = Short.MAX_VALUE;
 
     private final long activeVersionId;
@@ -40,6 +42,10 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
     private final List<CatalogStudioPublishedVersion> publishedVersions;
     private final List<CatalogPageSnapshot> pages;
     private final List<CatalogOfferSnapshot> offers;
+    private final String encoding;
+    private final List<String> precomputedChunks;
+    private final int precomputedPageCount;
+    private final int precomputedOfferCount;
 
     private record SnapshotPayload(
             List<CatalogPageSnapshot> pages,
@@ -127,6 +133,52 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
         this.publishedVersions = List.copyOf(publishedVersions);
         this.pages = List.copyOf(pages);
         this.offers = List.copyOf(offers);
+        this.encoding = SNAPSHOT_ENCODING;
+        this.precomputedChunks = null;
+        this.precomputedPageCount = 0;
+        this.precomputedOfferCount = 0;
+    }
+
+    /** Sends an already encoded payload (cached full snapshot or a delta) without re-serializing anything. */
+    public CatalogStudioSessionComposer(
+            long activeVersionId,
+            long draftVersionId,
+            long revision,
+            Instant activeUpdatedAt,
+            Instant draftCreatedAt,
+            int pendingCount,
+            List<CatalogStudioActor> actors,
+            boolean validationCurrent,
+            int validationIssueCount,
+            List<CatalogStudioPublishedVersion> publishedVersions,
+            String encoding,
+            List<String> precomputedChunks,
+            int pageCount,
+            int offerCount) {
+        this.activeVersionId = activeVersionId;
+        this.draftVersionId = draftVersionId;
+        this.revision = revision;
+        this.activeUpdatedAt = Objects.requireNonNull(activeUpdatedAt, "activeUpdatedAt");
+        this.draftCreatedAt = Objects.requireNonNull(draftCreatedAt, "draftCreatedAt");
+        this.pendingCount = pendingCount;
+        this.actors = List.copyOf(actors);
+        this.validationCurrent = validationCurrent;
+        this.validationIssueCount = validationIssueCount;
+        this.publishedVersions = List.copyOf(publishedVersions);
+        this.pages = List.of();
+        this.offers = List.of();
+        this.encoding = Objects.requireNonNull(encoding, "encoding");
+        this.precomputedChunks = List.copyOf(precomputedChunks);
+        this.precomputedPageCount = pageCount;
+        this.precomputedOfferCount = offerCount;
+    }
+
+    public static List<String> encodeSnapshot(List<CatalogPageSnapshot> pages, List<CatalogOfferSnapshot> offers) {
+        return encodeSnapshotChunks(new Gson().toJson(new SnapshotPayload(pages, offers)));
+    }
+
+    public static List<String> encodeJson(String json) {
+        return encodeSnapshotChunks(json);
     }
 
     @Override
@@ -155,13 +207,13 @@ public final class CatalogStudioSessionComposer extends MessageComposer {
             this.response.appendString(version.publishedAt().toString());
         }
 
-        SnapshotPayload snapshot = new SnapshotPayload(pages, offers);
-        String snapshotJson = new Gson().toJson(snapshot);
-        List<String> chunks = encodeSnapshotChunks(snapshotJson);
+        List<String> chunks = this.precomputedChunks != null
+                ? this.precomputedChunks
+                : encodeSnapshotChunks(new Gson().toJson(new SnapshotPayload(pages, offers)));
 
-        this.response.appendString(SNAPSHOT_ENCODING);
-        this.response.appendInt(pages.size());
-        this.response.appendInt(offers.size());
+        this.response.appendString(this.encoding);
+        this.response.appendInt(this.precomputedChunks != null ? this.precomputedPageCount : pages.size());
+        this.response.appendInt(this.precomputedChunks != null ? this.precomputedOfferCount : offers.size());
         this.response.appendInt(chunks.size());
         chunks.forEach(this.response::appendString);
 

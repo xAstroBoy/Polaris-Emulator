@@ -71,7 +71,7 @@ public class RoomItemManager {
             LOGGER.error("Caught SQL exception", e);
         }
 
-        if (this.itemCount() > Room.MAXIMUM_FURNI) {
+        if (Room.MAXIMUM_FURNI > 0 && this.itemCount() > Room.MAXIMUM_FURNI) {
             LOGGER.error(
                     "Room ID: {} has exceeded the furniture limit ({} > {}).",
                     this.room.getId(),

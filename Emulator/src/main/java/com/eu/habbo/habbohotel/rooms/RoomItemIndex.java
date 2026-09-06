@@ -12,7 +12,11 @@ import it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -152,16 +156,24 @@ final class RoomItemIndex {
         return result;
     }
 
+    /**
+     * Ordered by item id, which is the order the furni were placed in.
+     *
+     * The client breaks a depth tie between two overlapping furni by the order it received them in, so a
+     * HashSet here painted the same room differently on every load - a rug over a floor sticker one time
+     * and under it the next. Placement order is both stable and the order a builder expects.
+     */
     private Set<HabboItem> itemsOfType(FurnitureType type) {
-        Set<HabboItem> result = new HashSet<>();
+        List<HabboItem> matches = new ArrayList<>();
         synchronized (this.items) {
             for (HabboItem item : this.items.values()) {
                 if (item.getBaseItem().getType() == type) {
-                    result.add(item);
+                    matches.add(item);
                 }
             }
         }
-        return result;
+        matches.sort(Comparator.comparingInt(HabboItem::getId));
+        return new LinkedHashSet<>(matches);
     }
 
     void clear() {

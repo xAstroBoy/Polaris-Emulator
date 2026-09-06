@@ -230,6 +230,7 @@ public class CommandHandler {
 
     public void reloadCommands() {
         addCommand(new AboutCommand());
+        addCommand(new InvseeCommand());
         addCommand(new AfkCommand());
         addCommand(new AlertCommand());
         addCommand(new AllowTradingCommand());

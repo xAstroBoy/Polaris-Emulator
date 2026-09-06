@@ -243,6 +243,7 @@ final class RoomItemOwnershipService {
     }
 
     private void addOwnerName(HabboItem item) {
+        // Everything placed in a room is presented as the room owner's property.
         HabboInfo roomOwner = HabboManager.getOfflineHabboInfo(this.room.getOwnerId());
         if (roomOwner != null) {
             this.index.ownerNames().put(item.getUserId(), roomOwner.getUsername());

@@ -45,7 +45,8 @@ final class RoomItemPlacementService {
     }
 
     FurnitureMovementError canPlaceFurnitureAt(HabboItem item, Habbo habbo, RoomTile tile, int rotation) {
-        if (this.facade.itemCount() >= Room.MAXIMUM_FURNI) {
+        // hotel.room.furni.max <= 0 disables the room furniture cap entirely.
+        if (Room.MAXIMUM_FURNI > 0 && this.facade.itemCount() >= Room.MAXIMUM_FURNI) {
             return FurnitureMovementError.MAX_ITEMS;
         }
         if (tile == null || tile.state == RoomTileState.INVALID) {
@@ -290,6 +291,7 @@ final class RoomItemPlacementService {
 
     private void ensureOwnerName(HabboItem item, Habbo owner) {
         if (!this.index.ownerNames().containsKey(item.getUserId())) {
+            // Everything placed in a room is presented as the room owner's property.
             HabboInfo roomOwner = HabboManager.getOfflineHabboInfo(this.room.getOwnerId());
             if (roomOwner != null) {
                 this.index.ownerNames().put(item.getUserId(), roomOwner.getUsername());

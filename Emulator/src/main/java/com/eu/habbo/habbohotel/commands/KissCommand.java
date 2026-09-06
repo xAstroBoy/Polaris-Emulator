@@ -44,13 +44,15 @@ public class KissCommand extends Command {
 
         String sender = gameClient.getHabbo().getHabboInfo().getUsername();
         String receiver = target.getHabboInfo().getUsername();
+        room.giveEffect(gameClient.getHabbo(), 9, 3);
+        room.giveEffect(target, 9, 3);
         room.sendComposer(new RoomUserTalkComposer(new RoomChatMessage(
                         Emulator.getTexts().getValue("commands.action.kiss.sender").replace("%target%", receiver),
-                        gameClient.getHabbo(), gameClient.getHabbo(), RoomChatMessageBubbles.HEARTS))
+                        gameClient.getHabbo(), gameClient.getHabbo(), RoomChatMessageBubbles.RED))
                 .compose());
         room.sendComposer(new RoomUserTalkComposer(new RoomChatMessage(
                         Emulator.getTexts().getValue("commands.action.kiss.receiver").replace("%sender%", sender),
-                        target, target, RoomChatMessageBubbles.HEARTS))
+                        target, target, RoomChatMessageBubbles.LIGHT_BLUE))
                 .compose());
         return true;
     }

@@ -403,7 +403,8 @@ public class CatalogBuyItemAsGiftEvent extends MessageHandler {
                                     .createOrUpdateLimitedConfig(item);
                         }
 
-                        limitedNumber = limitedConfiguration.getNumber();
+                        limitedNumber = limitedConfiguration.reserveNumberOrThrow(
+                                this.client.getHabbo().getHabboInfo().getId());
                         limitedStack = limitedConfiguration.getTotalSet();
                     }
 

@@ -205,6 +205,9 @@ public class PetData implements Comparable<PetData> {
         boolean allowAll = this.drinkItems.isEmpty() && PetData.generalDrinkItems.isEmpty();
 
         for (InteractionPetDrink drink : items) {
+            // An empty bowl is not a drink until someone refills it (double-click), so the pet does not walk to it.
+            if (!drink.hasWater()) continue;
+
             if (allowAll || this.haveDrinkItem(drink)) {
                 drinkList.add(drink);
             }

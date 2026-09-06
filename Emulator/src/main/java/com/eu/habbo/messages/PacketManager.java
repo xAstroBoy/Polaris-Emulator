@@ -56,6 +56,7 @@ import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminSavePageI
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminSavePageImagesEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminSetPageEnabledEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminSetPageVisibleEvent;
+import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioAutoFixEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioDocumentApplyEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioDocumentDryRunEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.studio.CatalogStudioExportEvent;
@@ -111,6 +112,11 @@ import com.eu.habbo.messages.incoming.friends.SearchUserEvent;
 import com.eu.habbo.messages.incoming.friends.SendMessengerMessageEvent;
 import com.eu.habbo.messages.incoming.friends.StalkFriendEvent;
 import com.eu.habbo.messages.incoming.furnieditor.FurniEditorBySpriteEvent;
+import com.eu.habbo.messages.incoming.furnieditor.FurniEditorCrackableEvent;
+import com.eu.habbo.messages.incoming.furnieditor.FurniEditorCrackableSaveEvent;
+import com.eu.habbo.messages.incoming.users.OnlineUsersRequestEvent;
+import com.eu.habbo.messages.incoming.gamedata.ExternalTextUpdateEvent;
+import com.eu.habbo.messages.incoming.users.EffectPolicyEvent;
 import com.eu.habbo.messages.incoming.furnieditor.FurniEditorDeleteEvent;
 import com.eu.habbo.messages.incoming.furnieditor.FurniEditorDetailEvent;
 import com.eu.habbo.messages.incoming.furnieditor.FurniEditorImportTextEvent;
@@ -730,6 +736,11 @@ public class PacketManager {
         this.registerHandler(Incoming.FurniEditorUpdateFurnidataEvent, FurniEditorUpdateFurnidataEvent.class);
         this.registerHandler(Incoming.FurniEditorRevertFurnidataEvent, FurniEditorRevertFurnidataEvent.class);
         this.registerHandler(Incoming.FurniEditorImportTextEvent, FurniEditorImportTextEvent.class);
+        this.registerHandler(Incoming.FurniEditorCrackableEvent, FurniEditorCrackableEvent.class);
+        this.registerHandler(Incoming.FurniEditorCrackableSaveEvent, FurniEditorCrackableSaveEvent.class);
+        this.registerHandler(Incoming.OnlineUsersRequestEvent, OnlineUsersRequestEvent.class);
+        this.registerHandler(Incoming.ExternalTextUpdateEvent, ExternalTextUpdateEvent.class);
+        this.registerHandler(Incoming.EffectPolicyEvent, EffectPolicyEvent.class);
 
         // Catalog Admin
         this.registerHandler(Incoming.CatalogAdminSavePageEvent, CatalogAdminSavePageEvent.class);
@@ -753,6 +764,7 @@ public class PacketManager {
         this.registerHandler(Incoming.CatalogStudioLoadHistoryEvent, CatalogStudioLoadHistoryEvent.class);
         this.registerHandler(Incoming.CatalogStudioUndoEvent, CatalogStudioUndoEvent.class);
         this.registerHandler(Incoming.CatalogStudioValidateEvent, CatalogStudioValidateEvent.class);
+        this.registerHandler(Incoming.CatalogStudioAutoFixEvent, CatalogStudioAutoFixEvent.class);
         this.registerHandler(Incoming.CatalogStudioExportEvent, CatalogStudioExportEvent.class);
         this.registerHandler(Incoming.CatalogStudioDocumentDryRunEvent, CatalogStudioDocumentDryRunEvent.class);
         this.registerHandler(Incoming.CatalogStudioDocumentApplyEvent, CatalogStudioDocumentApplyEvent.class);
@@ -1387,7 +1399,22 @@ public class PacketManager {
         this.registerHandler(
                 Incoming.WheelAdminSavePrizesEvent,
                 com.eu.habbo.messages.incoming.wheel.WheelAdminSavePrizesEvent.class);
+        this.registerHandler(
+                Incoming.WheelAdminClearWinsEvent,
+                com.eu.habbo.messages.incoming.wheel.WheelAdminClearWinsEvent.class);
+        this.registerHandler(
+                Incoming.WheelAdminSaveConfigEvent,
+                com.eu.habbo.messages.incoming.wheel.WheelAdminSaveConfigEvent.class);
 
+        this.registerHandler(
+                Incoming.InvseeRequestEvent,
+                com.eu.habbo.messages.incoming.invsee.InvseeRequestEvent.class);
+        this.registerHandler(
+                Incoming.InvseeTakeItemEvent,
+                com.eu.habbo.messages.incoming.invsee.InvseeTakeItemEvent.class);
+        this.registerHandler(
+                Incoming.InvseeGiveItemEvent,
+                com.eu.habbo.messages.incoming.invsee.InvseeGiveItemEvent.class);
         this.registerHandler(
                 Incoming.SoundboardPlayEvent, com.eu.habbo.messages.incoming.soundboard.SoundboardPlayEvent.class);
         this.registerHandler(

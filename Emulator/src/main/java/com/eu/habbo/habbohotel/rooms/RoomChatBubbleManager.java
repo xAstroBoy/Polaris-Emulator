@@ -37,6 +37,7 @@ public class RoomChatBubbleManager {
                 boolean triggersTalkingFurniture = resultSet.getBoolean("triggers_talking_furniture");
                 boolean enabled = resultSet.getBoolean("enabled");
                 int minRank = resultSet.getInt("min_rank");
+                int maxRank = readInt(resultSet, "max_rank");
                 Timestamp availableFromValue = resultSet.getTimestamp("available_from");
                 Instant availableFrom = availableFromValue == null ? null : availableFromValue.toInstant();
                 int durationWeeks = resultSet.getInt("duration_weeks");
@@ -44,7 +45,7 @@ public class RoomChatBubbleManager {
                 RoomChatMessageBubbles.addDynamicBubble(
                         type, name, permission, overridable, triggersTalkingFurniture);
                 this.availability.put(
-                        type, new BubbleAvailability(enabled, minRank, availableFrom, durationWeeks));
+                        type, new BubbleAvailability(enabled, minRank, maxRank, availableFrom, durationWeeks));
             }
         } catch (SQLException exception) {
             LOGGER.error("Failed to load chat bubbles from database.", exception);
@@ -59,7 +60,10 @@ public class RoomChatBubbleManager {
 
         BubbleAvailability rule = this.availability.get(type);
         if (rule == null) return type >= 0 && type <= 53;
-        if (!rule.enabled() || habbo.getHabboInfo().getRank().getId() < rule.minRank()) return false;
+        int rank = habbo.getHabboInfo().getRank().getId();
+        if (!rule.enabled() || rank < rule.minRank()) return false;
+        // CUSTOM: max_rank hides a bubble from higher ranks (e.g. a users-only bubble the staff must not use).
+        if (rule.maxRank() > 0 && rank > rule.maxRank()) return false;
         if (rule.availableFrom() == null) return true;
 
         Instant now = Instant.now();
@@ -68,5 +72,14 @@ public class RoomChatBubbleManager {
                 || now.isBefore(rule.availableFrom().plus(rule.durationWeeks(), ChronoUnit.WEEKS));
     }
 
-    private record BubbleAvailability(boolean enabled, int minRank, Instant availableFrom, int durationWeeks) {}
+    /** Column added by a later migration: tolerate an older schema. */
+    private static int readInt(ResultSet resultSet, String column) {
+        try {
+            return resultSet.getInt(column);
+        } catch (SQLException ignored) {
+            return 0;
+        }
+    }
+
+    private record BubbleAvailability(boolean enabled, int minRank, int maxRank, Instant availableFrom, int durationWeeks) {}
 }

@@ -114,7 +114,12 @@ public class FurniEditorUpdateFurnidataEvent extends MessageHandler {
         try {
             FurnidataWriter writer = new FurnidataWriter(
                     provider.getSource(), provider.isSourceDirectory(), provider.getMaxBytes(), 3 /* backupKeep */);
-            written = writer.write(classname, safeName, safeDesc);
+            // The client names a furni by its sprite id and a classname can appear more than once in the
+            // furnidata with different ids (e.g. invisibile1Wal): edit the entry the client actually shows.
+            Item spriteItem = Emulator.getGameEnvironment().getItemManager().getItem(itemId);
+            written = spriteItem != null && spriteItem.getSpriteId() > 0
+                    && writer.writeById(spriteItem.getSpriteId(), safeName, safeDesc);
+            if (!written) written = writer.write(classname, safeName, safeDesc);
             if (!written) {
                 // Upsert: no furnidata entry for this classname yet → create a
                 // complete one seeded from items_base (id = sprite id).

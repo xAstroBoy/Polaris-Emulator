@@ -98,8 +98,10 @@ public class Room implements Comparable<Room>, ISerialize, Runnable {
             | WIRED_ACCESS_GROUP_ADMINS;
     public static final int WIRED_ACCESS_ALLOWED_MODIFY_MASK =
             WIRED_ACCESS_USERS_WITH_RIGHTS | WIRED_ACCESS_GROUP_MEMBERS | WIRED_ACCESS_GROUP_ADMINS;
-    public static final int WIRED_ACCESS_DEFAULT_INSPECT_MASK = 0;
-    public static final int WIRED_ACCESS_DEFAULT_MODIFY_MASK = 0;
+    // Default for a room that never saved its own wired access: whoever holds rights in the room may open AND edit
+    // the wired boxes (the owner always can). A room that saved a mask keeps exactly what it saved.
+    public static final int WIRED_ACCESS_DEFAULT_MODIFY_MASK = WIRED_ACCESS_USERS_WITH_RIGHTS;
+    public static final int WIRED_ACCESS_DEFAULT_INSPECT_MASK = WIRED_ACCESS_USERS_WITH_RIGHTS;
 
     static {
         for (int i = 1; i <= 3; i++) {
