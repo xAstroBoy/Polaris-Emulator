@@ -72,6 +72,9 @@ public class WiredEffectRelativeMove extends InteractionWiredEffect {
             if (item == null || item.getRoomId() != this.getRoomId()) {
                 continue;
             }
+            if (room.getWiredRuntime().isFurnitureMoving(item)) {
+                continue;
+            }
 
             short targetX = (short) (item.getX() + deltaX);
             short targetY = (short) (item.getY() + deltaY);

@@ -108,6 +108,7 @@ public class WiredEffectMoveFurniAsGroup extends InteractionWiredEffect {
         for (HabboItem item : effectiveItems) {
             RoomTile current = room.getLayout().getTile(item.getX(), item.getY());
             if (current == null) continue;
+            if (room.getWiredRuntime().isFurnitureMoving(item)) continue;
 
             RoomTile target = room.getLayout().getTileInFront(current, this.direction, 1);
             if (target == null || !target.getAllowStack()) continue;

@@ -137,6 +137,9 @@ public class WiredEffectMoveFurniTo extends InteractionWiredEffect {
                             if (oldLocation == null) {
                                 continue;
                             }
+                            if (room.getWiredRuntime().isFurnitureMoving(movingItem)) {
+                                continue;
+                            }
 
                             FurnitureMovementError movementError = WiredMoveCarryHelper.moveFurni(
                                     room, this, movingItem, tile, movingItem.getRotation(), null, false, ctx);

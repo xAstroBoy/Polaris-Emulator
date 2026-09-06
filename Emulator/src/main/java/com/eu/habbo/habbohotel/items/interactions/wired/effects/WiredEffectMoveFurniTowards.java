@@ -226,6 +226,7 @@ public class WiredEffectMoveFurniTowards extends InteractionWiredEffect {
 
             RoomTile oldLocation = room.getLayout().getTile(item.getX(), item.getY());
             if (oldLocation == null) continue;
+            if (room.getWiredRuntime().isFurnitureMoving(item)) continue;
 
             RoomTile newTile = room.getLayout().getTileInFront(oldLocation, moveDirection.getValue());
 

@@ -101,6 +101,8 @@ public class WiredEffectMoveFurniAway extends InteractionWiredEffect {
                 RoomTile newLocation = room.getLayout().getTile((short) (item.getX() + x), (short) (item.getY() + y));
                 RoomTile oldLocation = room.getLayout().getTile(item.getX(), item.getY());
 
+                if (room.getWiredRuntime().isFurnitureMoving(item)) continue;
+
                 if (newLocation != null
                         && newLocation.state != RoomTileState.INVALID
                         && newLocation != oldLocation

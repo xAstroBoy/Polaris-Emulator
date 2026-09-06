@@ -107,6 +107,9 @@ public class WiredEffectMoveRotateFurni extends InteractionWiredEffect implement
             }
 
             boolean slideAnimation = item.getRotation() == newRotation;
+            if (slideAnimation && room.getWiredRuntime().isFurnitureMoving(item)) {
+                continue;
+            }
 
             FurnitureMovementError furniMoveTest =
                     WiredMoveCarryHelper.getMovementError(room, this, item, newLocation, newRotation, ctx);
