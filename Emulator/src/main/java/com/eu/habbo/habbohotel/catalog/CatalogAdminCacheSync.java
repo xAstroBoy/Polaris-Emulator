@@ -1,6 +1,7 @@
 package com.eu.habbo.habbohotel.catalog;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.gamedata.FurnitureDataOfferWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -388,6 +389,10 @@ public final class CatalogAdminCacheSync {
             CatalogPage page = catalogManager.getCatalogPage(item.getPageId(), pageType);
             removeOfferIdFromPage(page, searchOfferId);
         }
+
+        // La ricerca del client parte da FurnitureData: se questo furni non e piu venduto qui,
+        // il suo offerid va rifatto, altrimenti punta a un offerta che non esiste piu.
+        FurnitureDataOfferWriter.queue(item);
     }
 
     private static void removeOfferIdFromPage(CatalogPage page, int offerId) {
@@ -426,5 +431,7 @@ public final class CatalogAdminCacheSync {
                 catalogManager.offerDefs.put(searchOfferId, item.getId());
             }
         }
+
+        FurnitureDataOfferWriter.queue(item);
     }
 }

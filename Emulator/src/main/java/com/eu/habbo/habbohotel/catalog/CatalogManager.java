@@ -1,6 +1,7 @@
 package com.eu.habbo.habbohotel.catalog;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.gamedata.FurnitureDataOfferWriter;
 import com.eu.habbo.habbohotel.achievements.AchievementManager;
 import com.eu.habbo.habbohotel.bots.Bot;
 import com.eu.habbo.habbohotel.catalog.layouts.BadgeDisplayLayout;
@@ -672,6 +673,11 @@ public class CatalogManager {
                 }
             }
         }
+
+        // Questa strada ricostruisce le offerte direttamente dal database, senza passare
+        // dall editor: se gli id sono cambiati fuori di qui, e l unico momento in cui possiamo
+        // accorgercene e rimettere in pari il furnidata che usa la ricerca del client.
+        FurnitureDataOfferWriter.queueAll(this);
     }
 
     private synchronized void loadBuildersClubCatalogItems() {
