@@ -7,11 +7,10 @@ import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.messages.outgoing.MessageComposer;
 import com.eu.habbo.messages.outgoing.Outgoing;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InventoryItemsComposer extends MessageComposer {
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryItemsComposer.class);
@@ -90,7 +89,8 @@ public class InventoryItemsComposer extends MessageComposer {
         response.appendBoolean(habboItem.getBaseItem().allowTrade());
         response.appendBoolean(!habboItem.isLimited() && habboItem.getBaseItem().allowInventoryStack());
         response.appendBoolean(habboItem.getBaseItem().allowMarketplace());
-        response.appendInt(-1);
+        // Upstream's rentables: a rented furni has to tell the client how long it has left.
+        response.appendInt(habboItem.getSecondsToExpiration());
         response.appendBoolean(true);
         response.appendInt(-1);
 

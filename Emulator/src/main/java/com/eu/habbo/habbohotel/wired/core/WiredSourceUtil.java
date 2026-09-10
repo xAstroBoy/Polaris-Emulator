@@ -28,6 +28,8 @@ public final class WiredSourceUtil {
 
     private WiredSourceUtil() {}
 
+    // Kept past upstream's rewrite: the two call sites below are this fork's re-entrancy guard, and
+    // without it a selector that re-enters resolution recurses on itself.
     private static boolean isExecutingSelectors() {
         return SELECTOR_EXECUTION_DEPTH.get() > 0;
     }

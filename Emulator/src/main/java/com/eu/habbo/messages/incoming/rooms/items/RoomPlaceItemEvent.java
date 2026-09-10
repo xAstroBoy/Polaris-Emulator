@@ -187,6 +187,8 @@ public class RoomPlaceItemEvent extends MessageHandler {
 
         this.client.sendResponse(new RemoveHabboItemComposer(item.getGiftAdjustedId()));
         this.client.getHabbo().getInventory().getItemsComponent().removeHabboItem(item.getId());
+        com.eu.habbo.habbohotel.quests.QuestProgressEvents.progress(
+                this.client.getHabbo(), com.eu.habbo.habbohotel.quests.QuestGoalType.PLACE_FURNI, 1);
         item.setFromGift(false);
         com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(this.client.getHabbo(), "furni", 1); // CUSTOM: battle pass
 

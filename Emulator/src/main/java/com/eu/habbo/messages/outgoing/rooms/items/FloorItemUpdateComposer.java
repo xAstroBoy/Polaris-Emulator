@@ -26,8 +26,9 @@ public class FloorItemUpdateComposer extends MessageComposer {
                     ? ((InteractionMusicDisc) this.item).getSongId()
                     : (this.item instanceof InteractionStackWalkHelper ? 2147483001 : 0))
         );
+        // serializeItemData carries this fork's custom colours and tile shape; the expiry is upstream's.
         this.item.serializeItemData(this.response);
-        this.response.appendInt(-1);
+        this.response.appendInt(this.item.getSecondsToExpiration());
         this.response.appendInt(0);
         this.response.appendInt(this.item.getUserId());
         this.response.appendInt(this.item.getBaseItem().allowStack() ? 1 : 0);

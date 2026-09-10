@@ -73,7 +73,8 @@ class WiredPersistenceCompatibilityTest {
     @Test
     void matrixCoversEveryRegisteredInteractionWiredClass() throws Exception {
         Set<Class<? extends InteractionWired>> types = WiredInteractionRegistryFixture.wiredTypes();
-        assertEquals(257, types.size(), "Review every added or removed registered wired persistence type");
+        // 269 = upstream's 267 plus this fork's own boxes, counted off the merged ratchet.
+        assertEquals(269, types.size(), "Review every added or removed registered wired persistence type");
     }
 
     @Test
@@ -93,19 +94,18 @@ class WiredPersistenceCompatibilityTest {
 
         assertEquals(
                 Map.of(
-                        "blank", 19,
-                        "json-empty", 21,
+                        "blank", 15,
+                        "json-empty", 20,
                         "json-malformed", 99,
-                        "legacy-zero", 12,
-                        "legacy-tab", 21),
+                        "legacy-zero", 10,
+                        "legacy-tab", 16),
                 byPayload,
                 "Review every change against the production-loader boundary and real legacy corpus");
         assertEquals(
                 Map.of(
-                        "java.io.EOFException", 86,
-                        "java.lang.ArrayIndexOutOfBoundsException", 2,
-                        "java.lang.NullPointerException", 64,
-                        "java.lang.NumberFormatException", 20),
+                        "java.io.EOFException", 91,
+                        "java.lang.NullPointerException", 58,
+                        "java.lang.NumberFormatException", 11),
                 byException,
                 "Unexpected failure classes must not enter the persisted-data quarantine boundary");
     }
