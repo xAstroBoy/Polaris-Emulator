@@ -23,11 +23,19 @@ public class HotelAlertCommand extends Command {
                 message.append(params[i]).append(" ");
             }
 
-            ServerMessage msg = new StaffAlertWithLinkComposer(message + "\r\n-" + gameClient.getHabbo().getHabboInfo().getUsername(), "").compose();
+            Habbo sender = gameClient.getHabbo();
+            ServerMessage msg = new StaffAlertWithLinkComposer(message + "\r\n-" + sender.getHabboInfo().getUsername(), "").compose();
 
             for (Map.Entry<Integer, Habbo> set : Emulator.getGameEnvironment().getHabboManager().getOnlineHabbos().entrySet()) {
                 Habbo habbo = set.getValue();
-                if (habbo.getHabboStats().blockStaffAlerts)
+
+                // :blockalerts silences other people's alerts, not your own. Whoever sends the alert
+                // always sees it: otherwise a staffer with the flag on broadcasts to the whole hotel
+                // with no way of telling whether it went out or how it reads.
+                if (habbo.getHabboStats().blockStaffAlerts && habbo != sender)
+                    continue;
+
+                if (habbo.getClient() == null)
                     continue;
 
                 habbo.getClient().sendResponse(msg);

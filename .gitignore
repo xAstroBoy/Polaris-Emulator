@@ -10,6 +10,9 @@ TODO.txt
 packet.pkt
 plugins/**
 target/
+# The pom builds into target-build, not target: without this the jars and every
+# .class landed in the index the moment anything ran `git add -A`.
+target-build/
 config.ini
 !Emulator/abi-baseline/*.txt
 .DS_Store

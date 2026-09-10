@@ -1,5 +1,0 @@
-{
-  "name": "Released Polaris compatibility fixture",
-  "author": "Polaris tests",
-  "main": "fixture.polaris.ReleasedBehaviorPlugin"
-}
