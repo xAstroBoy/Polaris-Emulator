@@ -69,7 +69,15 @@ public final class CmsCommandScopes {
             Map.entry("updateitems", "cache"),
             Map.entry("updatewordfilter", "cache"),
             Map.entry("updatewheel", "cache"),
-            Map.entry("updatesoundboard", "cache"));
+            Map.entry("updatesoundboard", "cache"),
+            Map.entry("updatetexts", "cache"),
+            Map.entry("updatechatbubbles", "cache"),
+            // Its own group: these rewrite the running configuration and who may do what. A CMS key
+            // trusted to reload the catalog has no business changing ranks' permissions, and
+            // "tilestate" edits room geometry from outside the game.
+            Map.entry("updateconfig", "configuration"),
+            Map.entry("updatepermissions", "configuration"),
+            Map.entry("tilestate", "configuration"));
 
     private CmsCommandScopes() {}
 

@@ -4,10 +4,26 @@
   "basePath": "/api/cms",
   "sharesCommandRegistryWith": "rcon-contract.json",
   "endpoints": {
-    "index": { "method": "GET", "path": "/api/cms", "auth": "network-only" },
-    "ping": { "method": "GET", "path": "/api/cms/ping", "auth": "network-only" },
-    "commands": { "method": "GET", "path": "/api/cms/commands", "auth": "hmac" },
-    "command": { "method": "POST", "path": "/api/cms/command", "auth": "hmac" }
+    "index": {
+      "method": "GET",
+      "path": "/api/cms",
+      "auth": "network-only"
+    },
+    "ping": {
+      "method": "GET",
+      "path": "/api/cms/ping",
+      "auth": "network-only"
+    },
+    "commands": {
+      "method": "GET",
+      "path": "/api/cms/commands",
+      "auth": "hmac"
+    },
+    "command": {
+      "method": "POST",
+      "path": "/api/cms/command",
+      "auth": "hmac"
+    }
   },
   "request": {
     "key": "string",
@@ -20,7 +36,12 @@
   "commandNormalization": "remove underscores and lowercase",
   "auth": {
     "scheme": "hmac-sha256",
-    "headers": ["X-Cms-Key", "X-Cms-Timestamp", "X-Cms-Nonce", "X-Cms-Signature"],
+    "headers": [
+      "X-Cms-Key",
+      "X-Cms-Timestamp",
+      "X-Cms-Nonce",
+      "X-Cms-Signature"
+    ],
     "signingString": "keyId + \"\\n\" + timestamp + \"\\n\" + nonce + \"\\n\" + rawBody",
     "signatureEncoding": "lowercase-hex",
     "timestampSkewSeconds": 300,
@@ -50,7 +71,11 @@
     "rateLimited": 429,
     "payloadTooLarge": 413
   },
-  "alwaysDenied": ["stressstart", "stressstatus", "stressstop"],
+  "alwaysDenied": [
+    "stressstart",
+    "stressstatus",
+    "stressstop"
+  ],
   "commands": [
     "alertuser",
     "disconnect",
@@ -67,6 +92,11 @@
     "updatewheel",
     "updatesoundboard",
     "updatecatalog",
+    "updateconfig",
+    "updatetexts",
+    "updatechatbubbles",
+    "updatepermissions",
+    "tilestate",
     "executecommand",
     "progressachievement",
     "updateuser",
@@ -78,6 +108,8 @@
     "modticket",
     "talkuser",
     "changeroomowner",
+    "importxabboroomwired",
+    "sethomeroom",
     "muteuser",
     "giverespect",
     "ignoreuser",

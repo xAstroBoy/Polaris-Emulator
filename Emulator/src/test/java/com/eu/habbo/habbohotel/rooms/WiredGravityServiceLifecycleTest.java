@@ -75,6 +75,9 @@ class WiredGravityServiceLifecycleTest {
         when(room.getRoomUnits(tile)).thenReturn(Set.of());
         when(layout.getTile((short) 2, (short) 3)).thenReturn(tile);
         when(layout.getTilesAt(tile, 1, 1, 0)).thenReturn(Set.of(tile));
+        // The service asks for the footprint by item, not by width/length/rotation.
+        when(layout.getTilesAt(eq(tile), any(com.eu.habbo.habbohotel.users.HabboItem.class)))
+                .thenReturn(Set.of(tile));
         when(layout.getHeightAtSquare((short) 2, (short) 3)).thenReturn((short) 0);
         doAnswer(invocation -> {
                     when(item.getZ()).thenReturn(invocation.getArgument(3));
@@ -114,6 +117,9 @@ class WiredGravityServiceLifecycleTest {
         when(room.getHabboItem(7401)).thenReturn(replacement);
         when(layout.getTile((short) 4, (short) 4)).thenReturn(tile);
         when(layout.getTilesAt(tile, 1, 1, 0)).thenReturn(Set.of(tile));
+        // The service asks for the footprint by item, not by width/length/rotation.
+        when(layout.getTilesAt(eq(tile), any(com.eu.habbo.habbohotel.users.HabboItem.class)))
+                .thenReturn(Set.of(tile));
         when(layout.getHeightAtSquare((short) 4, (short) 4)).thenReturn((short) 0);
         FakeScheduler scheduler = new FakeScheduler();
         WiredGravityService service = service(room, scheduler, new AtomicLong(3_000));
@@ -141,6 +147,9 @@ class WiredGravityServiceLifecycleTest {
         when(room.getHabboItem(7501)).thenReturn(item);
         when(layout.getTile((short) 1, (short) 1)).thenReturn(tile);
         when(layout.getTilesAt(tile, 1, 1, 0)).thenReturn(Set.of(tile));
+        // The service asks for the footprint by item, not by width/length/rotation.
+        when(layout.getTilesAt(eq(tile), any(com.eu.habbo.habbohotel.users.HabboItem.class)))
+                .thenReturn(Set.of(tile));
         when(layout.getHeightAtSquare((short) 1, (short) 1)).thenReturn((short) 0);
 
         service.setEnabled(item, true);
@@ -169,6 +178,9 @@ class WiredGravityServiceLifecycleTest {
         when(room.getTopItemAt(6, 7)).thenReturn(item);
         when(layout.getTile((short) 6, (short) 7)).thenReturn(tile);
         when(layout.getTilesAt(tile, 1, 1, 0)).thenReturn(Set.of(tile));
+        // The service asks for the footprint by item, not by width/length/rotation.
+        when(layout.getTilesAt(eq(tile), any(com.eu.habbo.habbohotel.users.HabboItem.class)))
+                .thenReturn(Set.of(tile));
         when(layout.getHeightAtSquare((short) 6, (short) 7)).thenReturn((short) 0);
         doAnswer(invocation -> {
                     when(item.getZ()).thenReturn(invocation.getArgument(3));

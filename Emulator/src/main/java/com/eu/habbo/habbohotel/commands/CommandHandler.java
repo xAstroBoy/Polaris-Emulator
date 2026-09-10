@@ -10,7 +10,7 @@ import com.eu.habbo.habbohotel.pets.PetCommand;
 import com.eu.habbo.habbohotel.pets.PetVocalsType;
 import com.eu.habbo.habbohotel.pets.RideablePet;
 import com.eu.habbo.habbohotel.rooms.Room;
-import com.eu.habbo.habbohotel.rooms.RoomRightLevels;
+import com.eu.habbo.habbohotel.users.Habbo;
 import com.eu.habbo.habbohotel.rooms.RoomState;
 import com.eu.habbo.messages.outgoing.rooms.users.RoomUserTypingComposer;
 import com.eu.habbo.plugin.events.users.UserCommandEvent;
@@ -61,6 +61,32 @@ public class CommandHandler {
         }
     }
 
+    /**
+     * Whether the caller owns the room they are standing in, for the permissions whose setting is
+     * ROOM_OWNER.
+     *
+     * <p>This used to answer yes for anyone holding rights in the room, for anyone with
+     * {@code acc_placefurni} anywhere at all, and for any group member at GUILD_RIGHTS. None of
+     * those is ownership: a rights-holder is somebody the owner let move furni, and acc_placefurni
+     * is a staff furni permission that has nothing to do with the room underfoot. Every permission
+     * set to ROOM_OWNER was therefore reachable by all of them - which is how the room event
+     * commands were open to every rights-holder before they were put back behind staff.
+     *
+     * <p>Staff who are meant to act as the owner of any room have {@code acc_anyroomowner}, and that
+     * is the only override kept.
+     */
+    static boolean isRoomOwner(GameClient gameClient) {
+        Habbo habbo = gameClient.getHabbo();
+
+        if (habbo == null) return false;
+
+        if (habbo.hasPermission(Permission.ACC_ANYROOMOWNER)) return true;
+
+        Room room = habbo.getHabboInfo().getCurrentRoom();
+
+        return room != null && room.isOwner(habbo);
+    }
+
     public static boolean handleCommand(GameClient gameClient, String commandLine) {
         if (gameClient != null && commandLine != null) {
             if (commandLine.startsWith(":")) {
@@ -76,41 +102,7 @@ public class CommandHandler {
                                 if (command.permission == null
                                         || gameClient
                                                 .getHabbo()
-                                                .hasPermission(
-                                                        command.permission,
-                                                        gameClient
-                                                                                        .getHabbo()
-                                                                                        .getHabboInfo()
-                                                                                        .getCurrentRoom()
-                                                                                != null
-                                                                        && (gameClient
-                                                                                .getHabbo()
-                                                                                .getHabboInfo()
-                                                                                .getCurrentRoom()
-                                                                                .hasRights(gameClient.getHabbo()))
-                                                                || gameClient
-                                                                        .getHabbo()
-                                                                        .hasPermission(Permission.ACC_PLACEFURNI)
-                                                                || (gameClient
-                                                                                        .getHabbo()
-                                                                                        .getHabboInfo()
-                                                                                        .getCurrentRoom()
-                                                                                != null
-                                                                        && gameClient
-                                                                                        .getHabbo()
-                                                                                        .getHabboInfo()
-                                                                                        .getCurrentRoom()
-                                                                                        .getGuildId()
-                                                                                > 0
-                                                                        && gameClient
-                                                                                .getHabbo()
-                                                                                .getHabboInfo()
-                                                                                .getCurrentRoom()
-                                                                                .getGuildRightLevel(
-                                                                                        gameClient.getHabbo())
-                                                                                .isEqualOrGreaterThan(
-                                                                                        RoomRightLevels
-                                                                                                .GUILD_RIGHTS)))) {
+                                                .hasPermission(command.permission, isRoomOwner(gameClient))) {
                                     try {
                                         UserExecuteCommandEvent userExecuteCommandEvent =
                                                 new UserExecuteCommandEvent(gameClient.getHabbo(), command, parts);
