@@ -6,7 +6,7 @@
 
     <groupId>com.eu.habbo</groupId>
     <artifactId>Polaris</artifactId>
-    <!-- Fork counter, ahead of upstream's 4.2.85. 4.2.169 and 4.2.170 are already deployed, so the
+    <!-- Fork counter, ahead of upstream's 4.2.86. 4.2.169 through 4.2.173 are already deployed, so the
          first build after this merge has to land above them: the launcher picks the newest jar. -->
     <version>4.2.173</version>
     <name>Polaris</name>
@@ -20,7 +20,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.outputTimestamp>2026-09-10T07:12:34Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-09-10T11:59:06Z</project.build.outputTimestamp>
         <maven.compiler.release>25</maven.compiler.release>
         <maven.build.java.version>[25,27)</maven.build.java.version>
 

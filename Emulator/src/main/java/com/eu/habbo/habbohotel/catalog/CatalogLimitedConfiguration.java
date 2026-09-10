@@ -226,6 +226,10 @@ public class CatalogLimitedConfiguration implements Runnable {
 
             if (!this.limitedNumbers.contains(number)) this.limitedNumbers.push(number);
 
+            // Upstream added a second UPDATE here that also clears item_id, with no "item_id = 0"
+            // guard - that hands a sold rare's number back to the pool and unlinks it from the piece
+            // somebody owns. The release above already refuses to touch a completed sale, so this keeps
+            // the fork's version: put the item back on the page it came from, and nothing else.
             if (this.soldOutFromPageId > 0) {
                 CatalogItem catalogItem =
                         Emulator.getGameEnvironment().getCatalogManager().getCatalogItem(this.itemId);
@@ -247,7 +251,6 @@ public class CatalogLimitedConfiguration implements Runnable {
         synchronized (this.limitedNumbers) {
             try (Connection connection = Emulator.getDatabase().getDataSource().getConnection()) {
                 this.limitedSold(connection, catalogItemId, habbo, item);
-                this.markSoldOutIfEmpty();
             } catch (SQLException e) {
                 LOGGER.error("Caught SQL exception", e);
             }
