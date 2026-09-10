@@ -305,8 +305,21 @@ public class RoomItemManager {
      * Gets the top walkable item at a position, considering underpass.
      * If the topmost item is elevated enough to walk under, returns the highest item at walk surface level instead.
      */
+    /**
+     * Hidden wired is not there as far as heights and collision are concerned.
+     *
+     * <p>The same rule {@code RoomTileManager} applies when it works out a tile's state and stack
+     * height. It has to hold here too: this is the lookup a walking unit uses to decide how high it
+     * stands, and while it went unfiltered a tile reported floor height while the avatar walked up onto
+     * boxes nobody could see - two answers for the same tile, from two paths, one of which had the
+     * filter and one of which did not.
+     */
+    private boolean isHiddenWired(HabboItem item) {
+        return this.room.isWiredHidden() && item instanceof InteractionWired;
+    }
+
     public HabboItem getWalkableItemAt(int x, int y) {
-        HabboItem topItem = this.getTopItemAt(x, y);
+        HabboItem topItem = this.getTopItemAt(x, y, null, this::isHiddenWired);
         if (topItem == null) {
             return null;
         }
@@ -330,6 +343,10 @@ public class RoomItemManager {
         HabboItem walkSurfaceItem = null;
 
         for (HabboItem item : this.getItemsAt(x, y)) {
+            if (this.isHiddenWired(item)) {
+                continue;
+            }
+
             if (item.isWalkable()
                     || item.getBaseItem().allowWalk()
                     || item.getBaseItem().allowSit()
@@ -383,7 +400,9 @@ public class RoomItemManager {
      * Gets the top height at a position including items.
      */
     public double getTopHeightAt(int x, int y) {
-        HabboItem item = this.getTopItemAt(x, y);
+        // Same filter as getWalkableItemAt: this decides where a bot stands, and a bot perched on an
+        // invisible wired box looks exactly as wrong as a player doing it.
+        HabboItem item = this.getTopItemAt(x, y, null, this::isHiddenWired);
 
         if (item != null) {
             return (item.getZ()

@@ -2,6 +2,7 @@ package com.eu.habbo.habbohotel.commands;
 
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.gameclients.GameClient;
+import com.eu.habbo.habbohotel.items.interactions.InteractionWired;
 import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomChatMessageBubbles;
 import com.eu.habbo.habbohotel.rooms.RoomTile;
@@ -161,6 +162,11 @@ public class DebugViewCollisionsCommand extends Command {
     private static String signature(Room room) {
         StringBuilder builder = new StringBuilder();
 
+        // Whether wired is hidden decides which furni the overlay draws at all, so toggling ":hidewired"
+        // has to read as a change. Without this the signature stayed identical - nothing moved, after all -
+        // and watchers kept the overlay they already had until some furni happened to be nudged.
+        builder.append(room.isWiredHidden() ? "wh1;" : "wh0;");
+
         for (HabboItem item : room.getFloorItems()) {
             if (item == null) continue;
 
@@ -180,11 +186,22 @@ public class DebugViewCollisionsCommand extends Command {
     }
 
     /** Every floor furni in the room mapped to the tiles the engine says it occupies. */
+    /**
+     * Hidden wired is transparent to the tile maths, so it must be transparent here too.
+     *
+     * <p>The overlay is meant to show what the movement checks actually walk. With ":hidewired" on, a
+     * wired box neither blocks its tile nor lifts anyone, yet the overlay kept drawing its collision -
+     * markers over a floor that is, as far as walking is concerned, empty.
+     */
+    private static boolean isHiddenWired(Room room, HabboItem item) {
+        return room.isWiredHidden() && item instanceof InteractionWired;
+    }
+
     public static Map<HabboItem, Set<RoomTile>> collect(Room room) {
         Map<HabboItem, Set<RoomTile>> tiles = new HashMap<>();
 
         for (HabboItem item : room.getFloorItems()) {
-            if (item == null || item.getBaseItem() == null) {
+            if (item == null || item.getBaseItem() == null || isHiddenWired(room, item)) {
                 continue;
             }
 

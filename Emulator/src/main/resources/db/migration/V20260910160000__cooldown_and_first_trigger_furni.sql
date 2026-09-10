@@ -23,17 +23,17 @@ ON DUPLICATE KEY UPDATE
 INSERT INTO `catalog_items`
     (`page_id`, `item_ids`, `catalog_name`, `cost_credits`, `cost_points`, `points_type`, `amount`,
      `song_id`, `order_number`)
-SELECT ci.`page_id`, 884062940, 'wf_cnd_user_cooldown', ci.`cost_credits`, ci.`cost_points`,
+SELECT ci.`page_id`, '884062940', 'wf_cnd_user_cooldown', ci.`cost_credits`, ci.`cost_points`,
        ci.`points_type`, 1, 0, ci.`order_number`
 FROM `catalog_items` ci
-WHERE ci.`item_ids` = 884062939
+WHERE ci.`item_ids` = '884062939'
 LIMIT 1;
 
 INSERT INTO `catalog_items`
     (`page_id`, `item_ids`, `catalog_name`, `cost_credits`, `cost_points`, `points_type`, `amount`,
      `song_id`, `order_number`)
-SELECT ci.`page_id`, 884062941, 'wf_cnd_first_trg', ci.`cost_credits`, ci.`cost_points`,
+SELECT ci.`page_id`, '884062941', 'wf_cnd_first_trg', ci.`cost_credits`, ci.`cost_points`,
        ci.`points_type`, 1, 0, ci.`order_number`
 FROM `catalog_items` ci
-WHERE ci.`item_ids` = 884062939
+WHERE ci.`item_ids` = '884062939'
 LIMIT 1;

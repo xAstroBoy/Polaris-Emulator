@@ -2,6 +2,8 @@ package com.eu.habbo.habbohotel.rooms;
 
 import com.eu.habbo.Emulator;
 import com.eu.habbo.habbohotel.commands.BssCommandPreferences;
+import com.eu.habbo.habbohotel.commands.DebugViewCollisionsCommand;
+import com.eu.habbo.messages.outgoing.rooms.items.FurniCollisionOverlayComposer;
 import com.eu.habbo.habbohotel.bots.Bot;
 import com.eu.habbo.habbohotel.bots.VisitorBot;
 import com.eu.habbo.habbohotel.items.Item;
@@ -190,6 +192,17 @@ public class RoomUnitManager {
 
         // :tc only holds for the room it was used in.
         BssCommandPreferences.resetRoomScoped(habbo.getHabboInfo().getId());
+
+        // So does :collisioni. The watcher set is hotel-wide, so without this the overlay followed you
+        // into the next room and drew that room's collisions unasked - and there was no way to be rid of
+        // it short of running the command again.
+        if (DebugViewCollisionsCommand.isWatching(habbo.getHabboInfo().getId())) {
+            DebugViewCollisionsCommand.stopWatching(habbo.getHabboInfo().getId());
+
+            if (habbo.getClient() != null) {
+                habbo.getClient().sendResponse(FurniCollisionOverlayComposer.cleared());
+            }
+        }
 
         if (habbo.getRoomUnit() != null && habbo.getRoomUnit().getCurrentLocation() != null) {
             habbo.getRoomUnit().getCurrentLocation().removeUnit(habbo.getRoomUnit());

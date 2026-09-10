@@ -69,13 +69,34 @@ public class AdjacentTileFinder {
     }
   }
 
+  /**
+   * The corner rule: a diagonal step is refused only when it would squeeze between two solid furni.
+   *
+   * <p>It used to ask {@link RoomTile#isWalkable()}, true only for {@link RoomTileState#OPEN}, and to
+   * refuse the step outright when a corner tile was missing. Both readings turned "there is nothing
+   * there" into "there is a wall there", and that is what broke diagonal walking:
+   *
+   * <ul>
+   *   <li>a seat counted as a wall, so a floor made of seats had no diagonals anywhere - 239 poufs
+   *       with a pouf at every corner;
+   *   <li>a hole in the room model counted as a wall, so two tiles joined only corner-to-corner - a
+   *       diagonal bridge, which is an ordinary way to shape a room - could never be crossed, on an
+   *       empty floor with no furniture in sight.
+   * </ul>
+   *
+   * <p>A hole is absent, not solid, and a seat is something a unit stands on. Neither is a corner to
+   * squeeze past. Two solid furni still pin the diagonal shut, which is the whole point of the rule,
+   * and the destination tile is validated separately - so nothing here lets a unit leave the room.
+   */
   public static boolean isBlockedDiagonal(PathfinderContext context, short x, short y, short newX,
       short newY) {
 
-    RoomTile offX = findTile(context, newX, y);
-    RoomTile offY = findTile(context, x, newY);
+    return blocksCorner(findTile(context, newX, y)) && blocksCorner(findTile(context, x, newY));
+  }
 
-    return offX == null || offY == null || (!offX.isWalkable() && !offY.isWalkable());
+  /** Solid furniture, the only thing a unit can neither enter nor pass beside. */
+  private static boolean blocksCorner(RoomTile tile) {
+    return tile != null && tile.getState() == RoomTileState.BLOCKED;
   }
 
   private static void addAdjacent(RoomTile node, RoomTile nextTile, RoomUnit unit, RoomTile temp,

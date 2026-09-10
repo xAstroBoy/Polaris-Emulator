@@ -33,6 +33,17 @@ final class RoomItemOperations {
             if (RoomAreaHideSupport.isControllerItem(item)) {
                 RoomAreaHideSupport.sendState(this.room, item);
             }
+
+            // Whether wired is hidden is cached on the room, because the tile maths asks once per tile and
+            // resolving it walks every floor item. The answer depends on a conf_hidewired controller's
+            // extradata, and that flips from places that never told the room: a wired toggle, or a
+            // controller furni that resolved to a plain switch instead of InteractionHideWiredControl.
+            // The room then hid the boxes on entry - that check is live - while the cache still said
+            // "visible", so the tiles kept colliding with furni nobody could see.
+            if (RoomHideWiredSupport.isControllerItem(item)) {
+                this.room.refreshWiredHidden();
+            }
+
             this.room.onFurnitureTopologyChanged();
         } else if (item.getBaseItem().getType() == FurnitureType.WALL) {
             this.room.sendComposer(new WallItemUpdateComposer(item).compose());
@@ -49,6 +60,12 @@ final class RoomItemOperations {
         if (RoomAreaHideSupport.isControllerItem(item)) {
             this.updateItem(item);
             return;
+        }
+
+        // Same reason as in updateItem: a controller whose state just changed has to refresh the cache,
+        // and this is the path a state toggle takes.
+        if (RoomHideWiredSupport.isControllerItem(item)) {
+            this.room.refreshWiredHidden();
         }
 
         if (!item.isLimited()) {

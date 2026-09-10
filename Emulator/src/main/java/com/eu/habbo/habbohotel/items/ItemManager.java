@@ -513,11 +513,14 @@ public class ItemManager {
             Map.entry("wf_act_give_daily_task_progress", "default"),
             Map.entry("wf_act_disable_click_through", "default"),
             Map.entry("wf_act_enable_click_through", "default"),
-            Map.entry("wf_cnd_x_points_leaderboard", "default"),
-            Map.entry("wf_cnd_not_x_points_leaderboard", "default"),
-            Map.entry("wf_cnd_furni_opacity_is", "default"),
-            Map.entry("wf_cnd_not_furni_opacity_is", "default"),
             Map.entry("wf_xtra_exec_delay", "default"),
+            // wf_cnd_x_points_leaderboard, wf_cnd_not_x_points_leaderboard, wf_cnd_furni_opacity_is and
+            // wf_cnd_not_furni_opacity_is were parked here by the same audit, and then upstream shipped real
+            // handlers for all four. An alias wins over the configured type in resolveItemInteraction, so the
+            // stale entries kept forcing those four conditions to an inert default: the furni loaded, sat in
+            // the room and never evaluated. They resolve to their own handlers now, which is why they are gone
+            // rather than remapped. See InteractionAliasContractTest, which fails if an alias buries a handler
+            // like this again.
             // 2026-09-01 wired audit: BSS/custom classnames whose DB type is "default" → existing handlers
             Map.entry("wf_act_endgame_team", "wf_act_game_end"),
             Map.entry("wf_act_game_mode_on", "wf_act_game_start"),
