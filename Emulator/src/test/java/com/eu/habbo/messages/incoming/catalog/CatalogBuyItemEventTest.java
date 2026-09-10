@@ -52,6 +52,10 @@ class CatalogBuyItemEventTest {
             when(environment.getCatalogManager()).thenReturn(catalog);
             emulator.when(Emulator::getIntUnixTimestamp).thenReturn(10);
             emulator.when(Emulator::getGameEnvironment).thenReturn(environment);
+            // The purchase moved into CatalogPurchaseApplicationService, which is handed the texts
+            // and the thread pool; without them the failure response never gets built.
+            emulator.when(Emulator::getTexts).thenReturn(mock(com.eu.habbo.core.TextsManager.class));
+            emulator.when(Emulator::getThreading).thenReturn(mock(com.eu.habbo.threading.ThreadPooling.class));
 
             CatalogBuyItemEvent event = new CatalogBuyItemEvent();
             event.client = client;

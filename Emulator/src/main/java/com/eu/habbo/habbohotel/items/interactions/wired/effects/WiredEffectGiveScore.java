@@ -22,8 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WiredEffectGiveScore extends InteractionWiredEffect {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WiredEffectGiveScore.class);
     private static final int OPERATION_ADD = 0;
     private static final int OPERATION_REMOVE = 1;
     public static final WiredEffectType type = WiredEffectType.GIVE_SCORE;
@@ -79,7 +82,10 @@ public class WiredEffectGiveScore extends InteractionWiredEffect {
                                 .replace("%points%", String.valueOf(Math.abs(applied)))
                                 .replace("%total%", String.valueOf(player.getScore())),
                         com.eu.habbo.habbohotel.rooms.RoomChatMessageBubbles.ALERT);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                // The score is already applied; failing to announce it must not undo that, but a
+                // silent swallow left no way to tell a missing text from a broken whisper.
+                LOGGER.debug("Could not tell the player about their score change", e);
             }
 
             if (wiredGame != null) {

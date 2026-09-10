@@ -45,6 +45,7 @@ Unknown keys remain allowed for plugins. Database-backed hotel settings are docu
 | `game.host` | string | `` | `EMU_HOST` | yes | no | Game listener setting. |
 | `game.port` | integer | `0` | `EMU_PORT` | yes | no | Game listener setting. |
 | `habbo.console.style` | string | `` | — | yes | no | Polaris startup setting. |
+| `hotel.wired.furni.selection.count` | integer | `50` | — | yes | no | How many furni one wired box may hold in its selection. |
 | `http.blocking.pool.size` | integer | `8` | — | yes | no | Blocking HTTP worker setting. |
 | `http.blocking.queue.capacity` | integer | `128` | — | yes | no | Blocking HTTP worker setting. |
 | `io.netty.unwritable.timeout.seconds` | integer | `10` | — | yes | no | Netty channel flow-control setting. |

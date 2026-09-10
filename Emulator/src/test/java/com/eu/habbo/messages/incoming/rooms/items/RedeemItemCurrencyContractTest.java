@@ -20,7 +20,8 @@ class RedeemItemCurrencyContractTest {
         int transaction = source.indexOf("RedeemItemTransaction.commit(", diamondType);
         int transactionType = source.indexOf("currencyGrant.currencyType()", transaction);
         int apply = source.indexOf("LedgerWalletMutation.applyCommitted(", transactionType);
-        int committedBalance = source.indexOf("mutation.balanceAfter()", apply);
+        // balanceAfterLong: wallets are long-valued, so the committed balance is read as one.
+        int committedBalance = source.indexOf("mutation.balanceAfterLong()", apply);
         int publish = source.indexOf("publishCurrencyGrant(currencyGrant)", committedBalance);
 
         assertTrue(

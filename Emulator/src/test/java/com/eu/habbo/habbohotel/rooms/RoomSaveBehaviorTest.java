@@ -28,7 +28,7 @@ class RoomSaveBehaviorTest {
                     "UPDATE rooms SET name = ?, description = ?, password = ?"));
             assertTrue(call.sql().endsWith(
                     "idle_autokick_timeout_seconds = ? WHERE id = ?"));
-            assertEquals(50, call.parameters().size());
+            assertEquals(52, call.parameters().size());
             assertSavedValues(call.parameters());
         }
     }
@@ -164,21 +164,25 @@ class RoomSaveBehaviorTest {
         assertEquals("1", values.get(32));
         assertEquals("1", values.get(33));
         assertEquals(2, values.get(34));
-        assertEquals("1", values.get(35));
-        assertEquals(7, values.get(36));
-        assertEquals("owner", values.get(37));
-        assertEquals("1", values.get(38));
-        assertEquals("1", values.get(39));
+        // Pull and push stay off until the room owner turns them on, so the fixture saves them as 0.
+        assertEquals("0", values.get(35));
+        assertEquals("0", values.get(36));
+        assertEquals("1", values.get(37));
+        // The owner pair was added to the statement here, so everything after it moved down two.
+        assertEquals(7, values.get(38));
+        assertEquals("owner", values.get(39));
         assertEquals("1", values.get(40));
         assertEquals("1", values.get(41));
         assertEquals("1", values.get(42));
-        assertEquals("locked", values.get(43));
+        assertEquals("1", values.get(43));
         assertEquals("1", values.get(44));
-        assertEquals("1", values.get(45));
+        assertEquals("locked", values.get(45));
         assertEquals("1", values.get(46));
-        assertEquals(120, values.get(47));
+        assertEquals("1", values.get(47));
         assertEquals("1", values.get(48));
-        assertEquals(600, values.get(49));
-        assertEquals(41, values.get(50));
+        assertEquals(120, values.get(49));
+        assertEquals("1", values.get(50));
+        assertEquals(600, values.get(51));
+        assertEquals(41, values.get(52));
     }
 }

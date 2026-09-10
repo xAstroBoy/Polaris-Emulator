@@ -27,7 +27,10 @@ class RoomLoaderTest {
                 "rights",
                 "word-filter",
                 "bots",
+                // Wired visibility is settled before the heightmap, so hidden furni are already
+                // out of the way when the tiles are measured.
                 "pets",
+                "wired-visibility",
                 "heightmap",
                 "wired",
                 "reset-idle",
@@ -65,6 +68,7 @@ class RoomLoaderTest {
                 "bots",
                 "pets",
                 "failure:Error waiting for items to load",
+                "wired-visibility",
                 "heightmap",
                 "wired",
                 "reset-idle",

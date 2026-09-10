@@ -158,6 +158,9 @@ public final class ConfigRegistry {
         keys.add(definition("runtime.resilience.circuit.minimum_calls", ConfigKey.ValueType.INTEGER, "10", true));
         keys.add(definition("runtime.resilience.circuit.open_ms", ConfigKey.ValueType.INTEGER, "30000", true));
         keys.add(definition("runtime.resilience.circuit.half_open_calls", ConfigKey.ValueType.INTEGER, "3", true));
+        // How many furni one wired box may hold in its selection. Both shipped config templates
+        // carry it and a dozen wired conditions read it, but it was never typed here.
+        keys.add(definition("hotel.wired.furni.selection.count", ConfigKey.ValueType.INTEGER, "50", true));
         keys.add(definition("stress.max_bots", ConfigKey.ValueType.INTEGER, "5000", true));
         keys.add(definition("stress.max_items", ConfigKey.ValueType.INTEGER, "100000", true));
         keys.add(definition("stress.max_rollers", ConfigKey.ValueType.INTEGER, "50000", true));
@@ -259,6 +262,9 @@ public final class ConfigRegistry {
     }
 
     private static String description(String name) {
+        if (name.equals("hotel.wired.furni.selection.count")) {
+            return "How many furni one wired box may hold in its selection.";
+        }
         if (name.startsWith("db.pool.")) {
             return "Database connection-pool setting.";
         }

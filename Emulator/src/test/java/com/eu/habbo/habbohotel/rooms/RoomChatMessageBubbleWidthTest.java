@@ -50,10 +50,15 @@ class RoomChatMessageBubbleWidthTest {
         return new RoomChatMessage("hello", unit, RoomChatMessageBubbles.NORMAL);
     }
 
+    /**
+     * The bubble width is the second-to-last int: this hotel appends the live message id after it,
+     * so the speaker can edit or delete the bubble. Both are optional tail fields, read in the order
+     * they are written.
+     */
     private static int trailingInt(RoomChatMessage message) {
         ByteBuf packet = new RoomUserTalkComposer(message).compose().get();
         try {
-            return packet.getInt(packet.writerIndex() - 4);
+            return packet.getInt(packet.writerIndex() - 8);
         } finally {
             packet.release();
         }

@@ -24,12 +24,26 @@ class CommandTextLookupContractTest {
 
     @Test
     void commandListsUseQuietDescriptionLookups() throws IOException {
-        String commandsCommand = Files.readString(COMMANDS_COMMAND);
-        String availableCommandsComposer = Files.readString(AVAILABLE_COMMANDS_COMPOSER);
+        String commandsCommand = collapsed(COMMANDS_COMMAND);
+        String availableCommandsComposer = collapsed(AVAILABLE_COMMANDS_COMPOSER);
 
-        assertTrue(commandsCommand.contains("getValueQuietly(textKey, \"\")"),
+        assertTrue(commandsCommand.contains(withoutSpace("getValueQuietly(textKey, \"\")")),
                 ":commands should not log an error when an optional command description is missing");
-        assertTrue(availableCommandsComposer.contains("getValueQuietly(\"commands.description.\" + cmd.permission, cmd.permission)"),
+        assertTrue(
+                availableCommandsComposer.contains(
+                        withoutSpace("getValueQuietly(\"commands.description.\" + cmd.permission, cmd.permission)")),
                 "available commands composer should not log an error when an optional command description is missing");
+    }
+
+    /**
+     * Reads a source file with all whitespace removed, and the same is done to the call being looked
+     * for: the check is about which lookup is used, not about where the formatter wrapped the line.
+     */
+    private static String collapsed(Path source) throws IOException {
+        return withoutSpace(Files.readString(source));
+    }
+
+    private static String withoutSpace(String text) {
+        return text.replaceAll("\\s+", "");
     }
 }

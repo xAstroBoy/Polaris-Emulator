@@ -83,7 +83,10 @@ class RoomOwnerCommandsContractTest {
         assertTrue(source.contains("MAX_TORNADO_FURNI = 40"));
         assertTrue(source.contains("new RoomUnitOnRollerComposer"));
         assertTrue(source.contains("new FloorItemOnRollerComposer"));
-        assertTrue(source.contains("new FloorItemUpdateComposer"));
+        // The furni go back with a remove followed by an add, which redraws them from their real
+        // stored position - nothing about the flight is written to the database.
+        assertTrue(source.contains("new RemoveFloorItemComposer"));
+        assertTrue(source.contains("new AddFloorItemComposer"));
         assertTrue(source.contains("unit.setCanWalk(false)"));
         assertTrue(source.contains("unit.setCanWalk(userState.couldWalk())"));
         assertTrue(!source.contains("room.updateItem(captured.item())"));

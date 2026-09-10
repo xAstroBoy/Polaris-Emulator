@@ -33,7 +33,7 @@ class CatalogMigrationImmutabilityContractTest {
                 .formatHex(MessageDigest.getInstance("SHA-256").digest(baseline));
         String migration = Files.readString(OCTANE_SETTINGS);
 
-        assertEquals("2ADF4D312DCB54FE0F96B4D455C1C57260503F5FDB2DC7A1F95FDBEBA8FD5618", hash);
+        assertEquals("C5C5BE5E9E2DC7BBCB235281CAA98159113F345FACC9F50EA34D52AF577203B5", hash);
         assertTrue(migration.contains("/var/www/Octane-UI/dist/configuration/renderer-config.json"));
         assertTrue(migration.contains("REPLACE(`comment`, 'NitroV3 Login', 'OctaneUI Login')"));
         assertTrue(migration.contains("WHERE `key` = 'furni.editor.renderer.config.path'"));

@@ -809,21 +809,16 @@ public class HabboInfo implements Runnable {
     @Override
     public void run() {
 
-        // Read credits under the lock so the persisted value is consistent with
-        // concurrent addCredits/setCredits.
-        final long creditsForSave;
-        synchronized (this.currencyLock) {
-            creditsForSave = this.credits;
-        }
-
         try {
             SqlQueries.update(
-                    "UPDATE users SET motto = ?, online = ?, look = ?, gender = ?, credits = ?, last_login = ?, last_online = ?, home_room = ?, ip_current = ?, `rank` = ?, machine_id = ?, username = ?, background_id = ?, background_stand_id = ?, background_overlay_id = ?, background_card_id = ?, background_border_id = ? WHERE id = ?",
+                    // No credits here: the wallet belongs to the ledger, and a profile snapshot
+                    // written from a stale in-memory value would undo a balance committed between
+                    // the read and this write.
+                    "UPDATE users SET motto = ?, online = ?, look = ?, gender = ?, last_login = ?, last_online = ?, home_room = ?, ip_current = ?, `rank` = ?, machine_id = ?, username = ?, background_id = ?, background_stand_id = ?, background_overlay_id = ?, background_card_id = ?, background_border_id = ? WHERE id = ?",
                     this.motto,
                     this.online ? "1" : "0",
                     this.look,
                     this.gender.name(),
-                    creditsForSave,
                     Emulator.getIntUnixTimestamp(),
                     this.lastOnline,
                     this.homeRoom,

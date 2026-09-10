@@ -8,14 +8,25 @@ import org.junit.jupiter.api.Test;
 
 class CatalogPageLayoutsSchemaTest {
 
+    /**
+     * Every layout the code can produce must exist in the database enum. A layout added after the
+     * alignment migration gets its own migration, so all of them are searched rather than that one.
+     */
     @Test
     void migrationContainsEverySupportedCatalogPageLayout() throws Exception {
-        String migration = Files.readString(
-                Path.of("src/main/resources/db/migration/V20260801110000__catalog_page_layout_alignment.sql"));
+        StringBuilder migrations = new StringBuilder();
+
+        try (var files = Files.list(Path.of("src/main/resources/db/migration"))) {
+            for (Path file : files.filter(path -> path.toString().endsWith(".sql")).toList()) {
+                migrations.append(Files.readString(file)).append('\n');
+            }
+        }
+
+        String schema = migrations.toString();
 
         for (CatalogPageLayouts layout : CatalogPageLayouts.values()) {
             assertTrue(
-                    migration.contains("'" + layout.name() + "'"),
+                    schema.contains("'" + layout.name() + "'"),
                     () -> "Missing database enum value for " + layout.name());
         }
     }

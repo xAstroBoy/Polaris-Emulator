@@ -15878,113 +15878,6 @@
       ]
     },
     {
-      "name": "UNIT_INFO",
-      "direction": "server_to_client",
-      "header": 3920,
-      "java": {
-        "symbol": "RoomUserDataComposer",
-        "className": "RoomUserDataComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/users/RoomUserDataComposer.java"
-      },
-      "typescript": {
-        "symbol": "UNIT_INFO",
-        "className": "RoomUnitInfoParser",
-        "path": "packages/communication/src/messages/parser/room/unit/RoomUnitInfoParser.ts"
-      },
-      "fields": [
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": ""
-        },
-        {
-          "kind": "scalar",
-          "type": "string",
-          "name": "nameColor"
-        },
-        {
-          "kind": "scalar",
-          "type": "int",
-          "name": ""
-        }
-      ]
-    },
-    {
       "name": "COMPETITION_SECONDS_UNTIL",
       "direction": "server_to_client",
       "header": 3926,
@@ -17875,158 +17768,6 @@
   "unpaired": [
     {
       "direction": "client_to_server",
-      "side": "java",
-      "header": 295,
-      "symbol": "PingEvent",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/handshake/PingEvent.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "client_to_server",
-      "side": "java",
-      "header": 1523,
-      "symbol": "RequestFriendsEvent",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/friends/RequestFriendsEvent.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "client_to_server",
-      "side": "java",
-      "header": 2313,
-      "symbol": "UpdateUIFlagsEvent",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/UpdateUIFlagsEvent.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "client_to_server",
-      "side": "java",
-      "header": 2318,
-      "symbol": "HotelViewRequestBadgeRewardEvent",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/hotelview/HotelViewRequestBadgeRewardEvent.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "client_to_server",
-      "side": "java",
-      "header": 3457,
-      "symbol": "UserActivityEvent",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/UserActivityEvent.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 10,
-      "symbol": "PongComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/handshake/PongComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 265,
-      "symbol": "GuildMemberUpdateComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/guilds/GuildMemberUpdateComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 634,
-      "symbol": "PetBreedingResultComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingResultComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 690,
-      "symbol": "HotelViewCatalogPageExpiringComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/hotelview/HotelViewCatalogPageExpiringComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 1488,
-      "symbol": "MachineIDComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/handshake/MachineIDComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 1625,
-      "symbol": "PetBreedingFailedComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingFailedComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 1746,
-      "symbol": "PetBreedingStartComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingStartComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 2208,
-      "symbol": "RoomQueueStatusMessage",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/RoomQueueStatusMessage.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 2278,
-      "symbol": "VipTutorialsStartComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/unknown/VipTutorialsStartComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 2445,
-      "symbol": "GuildRefreshMembersListComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/guilds/GuildRefreshMembersListComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 2527,
-      "symbol": "PetBreedingCompleted",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingCompleted.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 2621,
-      "symbol": "PetBreedingStartFailedComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingStartFailedComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 3379,
-      "symbol": "HabboWayQuizComposer1",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/habboway/HabboWayQuizComposer1.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "server_to_client",
-      "side": "java",
-      "header": 3786,
-      "symbol": "RoomFloorThicknessUpdatedComposer",
-      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/RoomFloorThicknessUpdatedComposer.java",
-      "reason": "Header is registered only by the Polaris Emulator packet registry"
-    },
-    {
-      "direction": "client_to_server",
       "side": "typescript",
       "header": 10,
       "symbol": "FORWARD_TO_RANDOM_PROMOTED_ROOM",
@@ -18072,6 +17813,14 @@
       "symbol": "FORWARD_TO_A_COMPETITION_ROOM",
       "path": "packages/communication/src/messages/outgoing/competition/ForwardToACompetitionRoomMessageComposer.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 295,
+      "symbol": "PingEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/handshake/PingEvent.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
       "direction": "client_to_server",
@@ -18323,6 +18072,14 @@
     },
     {
       "direction": "client_to_server",
+      "side": "java",
+      "header": 1523,
+      "symbol": "RequestFriendsEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/friends/RequestFriendsEvent.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "client_to_server",
       "side": "typescript",
       "header": 1598,
       "symbol": "GAME2REQUESTFULLSTATUSUPDATEMESSAGE",
@@ -18416,6 +18173,22 @@
       "symbol": "USER_CLASSIFICATION",
       "path": "packages/communication/src/messages/outgoing/userclassification/RoomUsersClassificationMessageComposer.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 2313,
+      "symbol": "UpdateUIFlagsEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/UpdateUIFlagsEvent.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 2318,
+      "symbol": "HotelViewRequestBadgeRewardEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/hotelview/HotelViewRequestBadgeRewardEvent.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
       "direction": "client_to_server",
@@ -18723,6 +18496,14 @@
     },
     {
       "direction": "client_to_server",
+      "side": "java",
+      "header": 3457,
+      "symbol": "UserActivityEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/UserActivityEvent.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "client_to_server",
       "side": "typescript",
       "header": 3483,
       "symbol": "SHOP_TARGETED_OFFER_VIEWED",
@@ -18843,11 +18624,219 @@
     },
     {
       "direction": "client_to_server",
+      "side": "java",
+      "header": 9312,
+      "symbol": "RequestAvailableCommandsEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/commands/RequestAvailableCommandsEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
       "side": "typescript",
       "header": 9351,
       "symbol": "SET_BUILD_HEIGHT",
       "path": "packages/communication/src/messages/outgoing/room/furniture/buildheight/SetBuildHeightComposer.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10104,
+      "symbol": "UserLookRequestEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/UserLookRequestEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10105,
+      "symbol": "SetUserLookEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/SetUserLookEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10106,
+      "symbol": "RoomChatEditEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/rooms/users/RoomChatEditEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10108,
+      "symbol": "MessengerChatEditEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/friends/MessengerChatEditEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10112,
+      "symbol": "SentFriendRequestsRequestEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/friends/SentFriendRequestsRequestEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10113,
+      "symbol": "CancelFriendRequestEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/friends/CancelFriendRequestEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10115,
+      "symbol": "LoginRewardRequestEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/LoginRewardRequestEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10116,
+      "symbol": "LoginRewardClaimEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/LoginRewardClaimEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10117,
+      "symbol": "LoginRewardSaveEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/LoginRewardSaveEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10118,
+      "symbol": "LoginRewardDeleteEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/LoginRewardDeleteEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10119,
+      "symbol": "TutorialStatusRequestEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/TutorialStatusRequestEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10121,
+      "symbol": "TutorialCompleteEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/TutorialCompleteEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10123,
+      "symbol": "VideoCurtainSetEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/rooms/VideoCurtainSetEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10124,
+      "symbol": "VideoCurtainPlaybackEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/rooms/VideoCurtainPlaybackEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10125,
+      "symbol": "VideoCurtainStateRequestEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/rooms/VideoCurtainStateRequestEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10126,
+      "symbol": "UserUiThemeSaveEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/UserUiThemeSaveEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10127,
+      "symbol": "UserUiThemeRequestEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/UserUiThemeRequestEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10129,
+      "symbol": "BattlePassRequestEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/BattlePassRequestEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10131,
+      "symbol": "BattlePassClaimEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/BattlePassClaimEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10132,
+      "symbol": "BattlePassBuyPremiumEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/BattlePassBuyPremiumEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10133,
+      "symbol": "BattlePassAdminSaveEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/BattlePassAdminSaveEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10134,
+      "symbol": "CallStartEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/friends/CallStartEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10137,
+      "symbol": "CallAnswerEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/friends/CallAnswerEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "client_to_server",
+      "side": "java",
+      "header": 10138,
+      "symbol": "CallEndEvent",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/friends/CallEndEvent.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10,
+      "symbol": "PongComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/handshake/PongComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
       "direction": "server_to_client",
@@ -18867,6 +18856,14 @@
     },
     {
       "direction": "server_to_client",
+      "side": "java",
+      "header": 265,
+      "symbol": "GuildMemberUpdateComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/guilds/GuildMemberUpdateComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "server_to_client",
       "side": "typescript",
       "header": 463,
       "symbol": "CAMERA_SNAPSHOT",
@@ -18880,6 +18877,22 @@
       "symbol": "AVAILABILITY_TIME",
       "path": "packages/communication/src/messages/parser/availability/AvailabilityTimeMessageParser.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 634,
+      "symbol": "PetBreedingResultComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingResultComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 690,
+      "symbol": "HotelViewCatalogPageExpiringComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/hotelview/HotelViewCatalogPageExpiringComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
       "direction": "server_to_client",
@@ -18915,11 +18928,27 @@
     },
     {
       "direction": "server_to_client",
+      "side": "java",
+      "header": 1488,
+      "symbol": "MachineIDComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/handshake/MachineIDComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "server_to_client",
       "side": "typescript",
       "header": 1553,
       "symbol": "PET_BREEDING_RESULT",
       "path": "packages/communication/src/messages/parser/room/pet/PetBreedingResultParser.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 1625,
+      "symbol": "PetBreedingFailedComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingFailedComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
       "direction": "server_to_client",
@@ -18947,6 +18976,14 @@
     },
     {
       "direction": "server_to_client",
+      "side": "java",
+      "header": 1746,
+      "symbol": "PetBreedingStartComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingStartComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "server_to_client",
       "side": "typescript",
       "header": 1927,
       "symbol": "THUMBNAIL_UPDATE_RESULT",
@@ -18968,6 +19005,14 @@
       "symbol": "WEEKLY_GAME2_LEADERBOARD",
       "path": "packages/communication/src/messages/parser/game/score/Game2WeeklyLeaderboardParser.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 2208,
+      "symbol": "RoomQueueStatusMessage",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/RoomQueueStatusMessage.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
       "direction": "server_to_client",
@@ -18995,11 +19040,43 @@
     },
     {
       "direction": "server_to_client",
+      "side": "java",
+      "header": 2278,
+      "symbol": "VipTutorialsStartComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/unknown/VipTutorialsStartComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "server_to_client",
       "side": "typescript",
       "header": 2335,
       "symbol": "MODERATOR_ACTION_RESULT",
       "path": "packages/communication/src/messages/parser/moderation/ModeratorActionResultMessageParser.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 2445,
+      "symbol": "GuildRefreshMembersListComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/guilds/GuildRefreshMembersListComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 2527,
+      "symbol": "PetBreedingCompleted",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingCompleted.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 2621,
+      "symbol": "PetBreedingStartFailedComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/pets/breeding/PetBreedingStartFailedComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
       "direction": "server_to_client",
@@ -19075,6 +19152,14 @@
     },
     {
       "direction": "server_to_client",
+      "side": "java",
+      "header": 3379,
+      "symbol": "HabboWayQuizComposer1",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/habboway/HabboWayQuizComposer1.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
+    },
+    {
+      "direction": "server_to_client",
       "side": "typescript",
       "header": 3512,
       "symbol": "WEEKLY_COMPETITIVE_LEADERBOARD",
@@ -19096,6 +19181,14 @@
       "symbol": "BOT_RECEIVED",
       "path": "packages/communication/src/messages/parser/bots/BotReceivedMessageParser.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 3786,
+      "symbol": "RoomFloorThicknessUpdatedComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/RoomFloorThicknessUpdatedComposer.java",
+      "reason": "Header is registered only by the Polaris Emulator packet registry"
     },
     {
       "direction": "server_to_client",
@@ -19184,6 +19277,102 @@
       "symbol": "BUILD_HEIGHT_AVAILABLE",
       "path": "packages/communication/src/messages/parser/room/furniture/BuildHeightAvailableParser.ts",
       "reason": "Header is registered only by the Octane Renderer packet registry"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10103,
+      "symbol": "UserLookCatalogComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/users/UserLookCatalogComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10107,
+      "symbol": "RoomChatEditedComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/users/RoomChatEditedComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10109,
+      "symbol": "MessengerMessageIdComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/friends/MessengerMessageIdComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10110,
+      "symbol": "MessengerChatEditedComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/friends/MessengerChatEditedComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10111,
+      "symbol": "SentFriendRequestsComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/friends/SentFriendRequestsComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10114,
+      "symbol": "LoginRewardDataComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/users/LoginRewardDataComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10120,
+      "symbol": "TutorialStatusComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/users/TutorialStatusComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10122,
+      "symbol": "VideoCurtainStateComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/VideoCurtainStateComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10128,
+      "symbol": "UserUiThemeComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/users/UserUiThemeComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10130,
+      "symbol": "BattlePassDataComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/users/BattlePassDataComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10135,
+      "symbol": "CallIncomingComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/friends/CallIncomingComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "direction": "server_to_client",
+      "side": "java",
+      "header": 10136,
+      "symbol": "CallStateComposer",
+      "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/friends/CallStateComposer.java",
+      "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
     }
   ],
   "exemptions": [
@@ -19332,6 +19521,22 @@
       "reason": "Java analyzer: Data-dependent packet operations in IfStmt inside handle"
     },
     {
+      "name": "USER_SETTINGS_ONLINE_INDICATOR",
+      "direction": "client_to_server",
+      "header": 818,
+      "java": {
+        "symbol": "SaveOnlineIndicatorPreferenceEvent",
+        "className": "SaveOnlineIndicatorPreferenceEvent",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/SaveOnlineIndicatorPreferenceEvent.java"
+      },
+      "typescript": {
+        "symbol": "USER_SETTINGS_ONLINE_INDICATOR",
+        "className": "UserSettingsOnlineIndicatorComposer",
+        "path": "packages/communication/src/messages/outgoing/user/settings/UserSettingsOnlineIndicatorComposer.ts"
+      },
+      "reason": "Java analyzer: Packet fields delegated to external reader in UserPreferencePackets inside handle"
+    },
+    {
       "name": "ROOM_MODEL_SAVE",
       "direction": "client_to_server",
       "header": 875,
@@ -19362,6 +19567,22 @@
         "path": "packages/communication/src/messages/outgoing/user/data/IgnoreUserComposer.ts"
       },
       "reason": "Java analyzer: Data-dependent packet operations in IfStmt inside handle"
+    },
+    {
+      "name": "WIRED_MENU_SETTINGS_SAVE",
+      "direction": "client_to_server",
+      "header": 1226,
+      "java": {
+        "symbol": "SaveWiredMenuSettingsEvent",
+        "className": "SaveWiredMenuSettingsEvent",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/SaveWiredMenuSettingsEvent.java"
+      },
+      "typescript": {
+        "symbol": "WIRED_MENU_SETTINGS_SAVE",
+        "className": "WiredMenuSettingsComposer",
+        "path": "packages/communication/src/messages/outgoing/roomevents/WiredMenuSettingsComposer.ts"
+      },
+      "reason": "Java analyzer: Packet fields delegated to external reader in UserPreferencePackets inside handle"
     },
     {
       "name": "CRAFT_SECRET",
@@ -19954,6 +20175,22 @@
         "path": "packages/communication/src/messages/outgoing/help/CallForHelpFromPhotoMessageComposer.ts"
       },
       "reason": "Java analyzer: Data-dependent packet operations in IfStmt inside handle"
+    },
+    {
+      "name": "USER_SETTINGS_CHAT_PREFERENCES",
+      "direction": "client_to_server",
+      "header": 2506,
+      "java": {
+        "symbol": "SaveChatPreferencesEvent",
+        "className": "SaveChatPreferencesEvent",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/SaveChatPreferencesEvent.java"
+      },
+      "typescript": {
+        "symbol": "USER_SETTINGS_CHAT_PREFERENCES",
+        "className": "UserSettingsChatPreferencesComposer",
+        "path": "packages/communication/src/messages/outgoing/user/settings/UserSettingsChatPreferencesComposer.ts"
+      },
+      "reason": "Java analyzer: Packet fields delegated to external reader in UserPreferencePackets inside handle"
     },
     {
       "name": "MODTOOL_SANCTION_KICK",
@@ -21924,6 +22161,22 @@
       "reason": "Java analyzer: Packet fields delegated to external serializer serialize inside composeInternal; TypeScript analyzer: Packet fields delegated to external constructor CatalogPageMessageProductData inside parse"
     },
     {
+      "name": "DAILY_TASKS_ADDED",
+      "direction": "server_to_client",
+      "header": 670,
+      "java": {
+        "symbol": "DailyTasksAddedComposer",
+        "className": "DailyTasksAddedComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/DailyTasksAddedComposer.java"
+      },
+      "typescript": {
+        "symbol": "DAILY_TASKS_ADDED",
+        "className": "ActiveDailyTasksMessageParser",
+        "path": "packages/communication/src/messages/parser/quest/ActiveDailyTasksMessageParser.ts"
+      },
+      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
+    },
+    {
       "name": "MARKETPLACE_ITEMS_SEARCHED",
       "direction": "server_to_client",
       "header": 680,
@@ -22304,6 +22557,22 @@
         "symbol": "CFH_PENDING_CALLS",
         "className": "CallForHelpPendingCallsMessageParser",
         "path": "packages/communication/src/messages/parser/help/CallForHelpPendingCallsMessageParser.ts"
+      },
+      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
+    },
+    {
+      "name": "SEASONAL_QUESTS",
+      "direction": "server_to_client",
+      "header": 1122,
+      "java": {
+        "symbol": "SeasonalQuestsComposer",
+        "className": "SeasonalQuestsComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/SeasonalQuestsComposer.java"
+      },
+      "typescript": {
+        "symbol": "SEASONAL_QUESTS",
+        "className": "SeasonalQuestsParser",
+        "path": "packages/communication/src/messages/parser/quest/SeasonalQuestsParser.ts"
       },
       "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
     },
@@ -22836,6 +23105,22 @@
       "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Packet fields delegated to external constructor BannedUserData inside parse"
     },
     {
+      "name": "QUEST_DAILY",
+      "direction": "server_to_client",
+      "header": 1878,
+      "java": {
+        "symbol": "DailyQuestComposer",
+        "className": "DailyQuestComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/DailyQuestComposer.java"
+      },
+      "typescript": {
+        "symbol": "QUEST_DAILY",
+        "className": "QuestDailyMessageParser",
+        "path": "packages/communication/src/messages/parser/quest/QuestDailyMessageParser.ts"
+      },
+      "reason": "Java analyzer: Packet fields delegated to external serializer serialize inside composeInternal; TypeScript analyzer: Packet fields delegated to external constructor QuestMessageData inside parse"
+    },
+    {
       "name": "SEASONAL_CALENDAR_OFFER",
       "direction": "server_to_client",
       "header": 1889,
@@ -23186,6 +23471,22 @@
         "path": "packages/communication/src/messages/parser/group/GroupBadgePartsParser.ts"
       },
       "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in WhileStatement inside parse"
+    },
+    {
+      "name": "REWARD_TRACKS",
+      "direction": "server_to_client",
+      "header": 2327,
+      "java": {
+        "symbol": "RewardTracksComposer",
+        "className": "RewardTracksComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/RewardTracksComposer.java"
+      },
+      "typescript": {
+        "symbol": "REWARD_TRACKS",
+        "className": "RewardTracksMessageParser",
+        "path": "packages/communication/src/messages/parser/quest/RewardTracksMessageParser.ts"
+      },
+      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
     },
     {
       "name": "BUNDLE_DISCOUNT_RULESET",
@@ -23604,6 +23905,22 @@
       "reason": "Java analyzer: Data-dependent packet operations in IfStmt inside composeInternal; TypeScript analyzer: Packet fields delegated to external constructor ModeratorUserInfoData inside parse"
     },
     {
+      "name": "ACTIVE_DAILY_TASKS",
+      "direction": "server_to_client",
+      "header": 2900,
+      "java": {
+        "symbol": "ActiveDailyTasksComposer",
+        "className": "ActiveDailyTasksComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/ActiveDailyTasksComposer.java"
+      },
+      "typescript": {
+        "symbol": "ACTIVE_DAILY_TASKS",
+        "className": "ActiveDailyTasksMessageParser",
+        "path": "packages/communication/src/messages/parser/quest/ActiveDailyTasksMessageParser.ts"
+      },
+      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
+    },
+    {
       "name": "PET_INFO",
       "direction": "server_to_client",
       "header": 2901,
@@ -23714,6 +24031,22 @@
         "path": "packages/communication/src/messages/parser/groupforums/ForumDataMessageParser.ts"
       },
       "reason": "Java analyzer: Data-dependent packet operations in IfStmt inside composeInternal"
+    },
+    {
+      "name": "QUEST_CANCELLED",
+      "direction": "server_to_client",
+      "header": 3027,
+      "java": {
+        "symbol": "QuestExpiredComposer",
+        "className": "QuestExpiredComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/QuestExpiredComposer.java"
+      },
+      "typescript": {
+        "symbol": "QUEST_CANCELLED",
+        "className": "QuestCancelledMessageParser",
+        "path": "packages/communication/src/messages/parser/quest/QuestCancelledMessageParser.ts"
+      },
+      "reason": "Java analyzer: Packet fields delegated to external serializer serialize inside composeInternal; TypeScript analyzer: Packet fields delegated to external constructor QuestMessageData inside parse"
     },
     {
       "name": "NAVIGATOR_METADATA",
@@ -24226,6 +24559,22 @@
         "path": "packages/communication/src/messages/parser/catalog/NotEnoughBalanceMessageParser.ts"
       },
       "reason": "TypeScript analyzer: Data-dependent packet operations in IfStatement inside parse"
+    },
+    {
+      "name": "UNIT_INFO",
+      "direction": "server_to_client",
+      "header": 3920,
+      "java": {
+        "symbol": "RoomUserDataComposer",
+        "className": "RoomUserDataComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/rooms/users/RoomUserDataComposer.java"
+      },
+      "typescript": {
+        "symbol": "UNIT_INFO",
+        "className": "RoomUnitInfoParser",
+        "path": "packages/communication/src/messages/parser/room/unit/RoomUnitInfoParser.ts"
+      },
+      "reason": "Astro Hotel custom packet: the look extras this hotel appends are written by appendLookExtras, so the field list cannot be read off composeInternal"
     },
     {
       "name": "CLUB_EXTENDED_OFFER",
@@ -24948,6 +25297,22 @@
       "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
     },
     {
+      "name": "HOT_LOOKS",
+      "direction": "server_to_client",
+      "header": 9360,
+      "java": {
+        "symbol": "HotLooksComposer",
+        "className": "HotLooksComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/hotlooks/HotLooksComposer.java"
+      },
+      "typescript": {
+        "symbol": "HOT_LOOKS",
+        "className": "HotLooksParser",
+        "path": "packages/communication/src/messages/parser/hotlooks/HotLooksParser.ts"
+      },
+      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
+    },
+    {
       "name": "RARE_VALUES",
       "direction": "server_to_client",
       "header": 9400,
@@ -25154,6 +25519,22 @@
         "path": "packages/communication/src/messages/incoming/soundboard/SoundboardSettingsEvent.ts"
       },
       "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
+    },
+    {
+      "name": "DAILY_TASK_UPDATED",
+      "direction": "server_to_client",
+      "header": 9450,
+      "java": {
+        "symbol": "DailyTaskUpdatedComposer",
+        "className": "DailyTaskUpdatedComposer",
+        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/DailyTaskUpdatedComposer.java"
+      },
+      "typescript": {
+        "symbol": "DAILY_TASK_UPDATED",
+        "className": "DailyTaskUpdatedMessageParser",
+        "path": "packages/communication/src/messages/parser/quest/DailyTaskUpdatedMessageParser.ts"
+      },
+      "reason": "TypeScript analyzer: the 64-bit task id is read through the external helper DailyTaskData.readLong inside parse; the Java side writes it as two ints"
     },
     {
       "name": "FURNI_EDITOR_SEARCH_RESULT",
@@ -25474,182 +25855,6 @@
         "path": "packages/communication/src/messages/incoming/texts/ClientRenderSettingsEvent.ts"
       },
       "reason": "Astro Hotel custom packet: its wire schema is owned by the hotel and has not been authored as a shared contract"
-    },
-    {
-      "name": "USER_SETTINGS_CHAT_PREFERENCES",
-      "direction": "client_to_server",
-      "header": 2506,
-      "java": {
-        "symbol": "SaveChatPreferencesEvent",
-        "className": "SaveChatPreferencesEvent",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/SaveChatPreferencesEvent.java"
-      },
-      "typescript": {
-        "symbol": "USER_SETTINGS_CHAT_PREFERENCES",
-        "className": "UserSettingsChatPreferencesComposer",
-        "path": "packages/communication/src/messages/outgoing/user/settings/UserSettingsChatPreferencesComposer.ts"
-      },
-      "reason": "Java analyzer: Packet fields delegated to external reader in UserPreferencePackets inside handle"
-    },
-    {
-      "name": "USER_SETTINGS_ONLINE_INDICATOR",
-      "direction": "client_to_server",
-      "header": 818,
-      "java": {
-        "symbol": "SaveOnlineIndicatorPreferenceEvent",
-        "className": "SaveOnlineIndicatorPreferenceEvent",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/SaveOnlineIndicatorPreferenceEvent.java"
-      },
-      "typescript": {
-        "symbol": "USER_SETTINGS_ONLINE_INDICATOR",
-        "className": "UserSettingsOnlineIndicatorComposer",
-        "path": "packages/communication/src/messages/outgoing/user/settings/UserSettingsOnlineIndicatorComposer.ts"
-      },
-      "reason": "Java analyzer: Packet fields delegated to external reader in UserPreferencePackets inside handle"
-    },
-    {
-      "name": "WIRED_MENU_SETTINGS_SAVE",
-      "direction": "client_to_server",
-      "header": 1226,
-      "java": {
-        "symbol": "SaveWiredMenuSettingsEvent",
-        "className": "SaveWiredMenuSettingsEvent",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/incoming/users/SaveWiredMenuSettingsEvent.java"
-      },
-      "typescript": {
-        "symbol": "WIRED_MENU_SETTINGS_SAVE",
-        "className": "WiredMenuSettingsComposer",
-        "path": "packages/communication/src/messages/outgoing/roomevents/WiredMenuSettingsComposer.ts"
-      },
-      "reason": "Java analyzer: Packet fields delegated to external reader in UserPreferencePackets inside handle"
-    },
-    {
-      "name": "HOT_LOOKS",
-      "direction": "server_to_client",
-      "header": 9360,
-      "java": {
-        "symbol": "HotLooksComposer",
-        "className": "HotLooksComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/hotlooks/HotLooksComposer.java"
-      },
-      "typescript": {
-        "symbol": "HOT_LOOKS",
-        "className": "HotLooksParser",
-        "path": "packages/communication/src/messages/parser/hotlooks/HotLooksParser.ts"
-      },
-      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
-    },
-    {
-      "name": "QUEST_CANCELLED",
-      "direction": "server_to_client",
-      "header": 3027,
-      "java": {
-        "symbol": "QuestExpiredComposer",
-        "className": "QuestExpiredComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/QuestExpiredComposer.java"
-      },
-      "typescript": {
-        "symbol": "QUEST_CANCELLED",
-        "className": "QuestCancelledMessageParser",
-        "path": "packages/communication/src/messages/parser/quest/QuestCancelledMessageParser.ts"
-      },
-      "reason": "Java analyzer: Packet fields delegated to external serializer serialize inside composeInternal; TypeScript analyzer: Packet fields delegated to external constructor QuestMessageData inside parse"
-    },
-    {
-      "name": "SEASONAL_QUESTS",
-      "direction": "server_to_client",
-      "header": 1122,
-      "java": {
-        "symbol": "SeasonalQuestsComposer",
-        "className": "SeasonalQuestsComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/SeasonalQuestsComposer.java"
-      },
-      "typescript": {
-        "symbol": "SEASONAL_QUESTS",
-        "className": "SeasonalQuestsParser",
-        "path": "packages/communication/src/messages/parser/quest/SeasonalQuestsParser.ts"
-      },
-      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
-    },
-    {
-      "name": "QUEST_DAILY",
-      "direction": "server_to_client",
-      "header": 1878,
-      "java": {
-        "symbol": "DailyQuestComposer",
-        "className": "DailyQuestComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/DailyQuestComposer.java"
-      },
-      "typescript": {
-        "symbol": "QUEST_DAILY",
-        "className": "QuestDailyMessageParser",
-        "path": "packages/communication/src/messages/parser/quest/QuestDailyMessageParser.ts"
-      },
-      "reason": "Java analyzer: Packet fields delegated to external serializer serialize inside composeInternal; TypeScript analyzer: Packet fields delegated to external constructor QuestMessageData inside parse"
-    },
-    {
-      "name": "ACTIVE_DAILY_TASKS",
-      "direction": "server_to_client",
-      "header": 2900,
-      "java": {
-        "symbol": "ActiveDailyTasksComposer",
-        "className": "ActiveDailyTasksComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/ActiveDailyTasksComposer.java"
-      },
-      "typescript": {
-        "symbol": "ACTIVE_DAILY_TASKS",
-        "className": "ActiveDailyTasksMessageParser",
-        "path": "packages/communication/src/messages/parser/quest/ActiveDailyTasksMessageParser.ts"
-      },
-      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
-    },
-    {
-      "name": "DAILY_TASKS_ADDED",
-      "direction": "server_to_client",
-      "header": 670,
-      "java": {
-        "symbol": "DailyTasksAddedComposer",
-        "className": "DailyTasksAddedComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/DailyTasksAddedComposer.java"
-      },
-      "typescript": {
-        "symbol": "DAILY_TASKS_ADDED",
-        "className": "ActiveDailyTasksMessageParser",
-        "path": "packages/communication/src/messages/parser/quest/ActiveDailyTasksMessageParser.ts"
-      },
-      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
-    },
-    {
-      "name": "DAILY_TASK_UPDATED",
-      "direction": "server_to_client",
-      "header": 9450,
-      "java": {
-        "symbol": "DailyTaskUpdatedComposer",
-        "className": "DailyTaskUpdatedComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/DailyTaskUpdatedComposer.java"
-      },
-      "typescript": {
-        "symbol": "DAILY_TASK_UPDATED",
-        "className": "DailyTaskUpdatedMessageParser",
-        "path": "packages/communication/src/messages/parser/quest/DailyTaskUpdatedMessageParser.ts"
-      },
-      "reason": "TypeScript analyzer: the 64-bit task id is read through the external helper DailyTaskData.readLong inside parse; the Java side writes it as two ints"
-    },
-    {
-      "name": "REWARD_TRACKS",
-      "direction": "server_to_client",
-      "header": 2327,
-      "java": {
-        "symbol": "RewardTracksComposer",
-        "className": "RewardTracksComposer",
-        "path": "Emulator/src/main/java/com/eu/habbo/messages/outgoing/quests/RewardTracksComposer.java"
-      },
-      "typescript": {
-        "symbol": "REWARD_TRACKS",
-        "className": "RewardTracksMessageParser",
-        "path": "packages/communication/src/messages/parser/quest/RewardTracksMessageParser.ts"
-      },
-      "reason": "Java analyzer: Data-dependent packet operations in ForEachStmt inside composeInternal; TypeScript analyzer: Data-dependent packet operations in ForStatement inside parse"
     }
   ]
 }

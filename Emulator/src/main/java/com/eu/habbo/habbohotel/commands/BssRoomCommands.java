@@ -148,7 +148,9 @@ final class BssReloadCreditsCommand extends Command {
         long before = habbo.getHabboInfo().getCreditsLong();
         if (before <= 0) {
             int amount = Math.max(0, Emulator.getConfig().getInt("bss.commands.reload_credits.amount", 5000));
-            habbo.getHabboInfo().setCredits(amount);
+            // Through the ledger rather than straight onto the wallet: every first-party credit
+            // change has to leave an audit entry behind it.
+            habbo.giveCredits(amount, "commands.bss.reload_credits", null, habbo.getHabboInfo().getId());
             gameClient.sendResponse(new UserCreditsComposer(habbo));
         }
         habbo.whisper(

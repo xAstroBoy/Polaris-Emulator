@@ -1,6 +1,7 @@
 package com.eu.habbo.habbohotel.wired.core;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.GameEnvironment;
 import com.eu.habbo.habbohotel.bots.Bot;
 import com.eu.habbo.habbohotel.games.Game;
 import com.eu.habbo.habbohotel.games.GamePlayer;
@@ -31,6 +32,15 @@ public final class WiredTextPlaceholderUtil {
 
     private WiredTextPlaceholderUtil() {}
 
+    /** Zero when there is no running emulator behind the call, so a message still renders. */
+    private static String onlineCount() {
+        GameEnvironment environment = Emulator.getGameEnvironment();
+
+        if (environment == null || environment.getHabboManager() == null) return "0";
+
+        return String.valueOf(environment.getHabboManager().getOnlineCount());
+    }
+
     public static String applyUsernamePlaceholders(WiredContext ctx, String text) {
         if (ctx == null || text == null || text.isEmpty()) {
             return text;
@@ -39,8 +49,11 @@ public final class WiredTextPlaceholderUtil {
         // This hotel-wide value is intentionally available without an Extra
         // on the WIRED tile. All other placeholders still retain their
         // existing Extra-based requirements below.
-        String resolvedText = text.replace("%online_count%", String.valueOf(
-                Emulator.getGameEnvironment().getHabboManager().getOnlineCount()));
+        //
+        // Only looked up when the text actually asks for it: every wired message went through the
+        // habbo manager whether or not it mentioned the count, which cost a lookup per message and
+        // made the effect impossible to exercise without a whole running emulator behind it.
+        String resolvedText = text.contains("%online_count%") ? text.replace("%online_count%", onlineCount()) : text;
 
         Room room = ctx.room();
         HabboItem triggerItem = ctx.triggerItem();

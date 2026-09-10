@@ -70,7 +70,7 @@ class CatalogStudioPacketContractTest {
         assertEquals(11, payload.readInt());
         assertEquals("Summer catalog", readString(payload));
         assertEquals("2026-08-02T10:00:00Z", readString(payload));
-        assertEquals("GZIP_BASE64_JSON", readString(payload));
+        assertEquals(CatalogStudioSessionComposer.SNAPSHOT_ENCODING, readString(payload));
         assertEquals(0, payload.readInt());
         assertFalse(payload.isReadable());
     }
@@ -104,7 +104,7 @@ class CatalogStudioPacketContractTest {
 
         assertHeader(payload, Outgoing.CatalogStudioSessionComposer);
         skipSessionMetadata(payload);
-        assertEquals("GZIP_BASE64_JSON", readString(payload));
+        assertEquals(CatalogStudioSessionComposer.SNAPSHOT_ENCODING, readString(payload));
         int chunkCount = payload.readInt();
         assertTrue(chunkCount > 1);
 

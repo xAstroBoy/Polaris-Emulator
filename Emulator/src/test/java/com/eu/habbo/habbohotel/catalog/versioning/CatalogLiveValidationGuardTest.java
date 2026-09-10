@@ -1,7 +1,6 @@
 package com.eu.habbo.habbohotel.catalog.versioning;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.eu.habbo.habbohotel.catalog.CatalogPageType;
 import com.google.gson.Gson;
@@ -24,16 +23,19 @@ class CatalogLiveValidationGuardTest {
         assertDoesNotThrow(() -> guard.rejectIntroducedProblems(null, live, List.of(change)));
     }
 
+    /**
+     * A structural problem is reported through the Problems panel, not turned into a save veto: the
+     * Manager is also the repair tool for legacy catalogues, and a broken page elsewhere in the tree
+     * must never stop staff from saving. Malformed payloads still fail before the write.
+     */
     @Test
-    void rejectsAProblemIntroducedByTheEdit() {
+    void reportsAProblemIntroducedByTheEditWithoutVetoingTheSave() {
         CatalogVersionSnapshot live = snapshot(List.of(page(1, -1)));
         CatalogPageSnapshot broken = page(1, 404);
         CatalogChangeEntry change = change(live.pages().getFirst(), broken);
         CatalogLiveValidationGuard guard = guard();
 
-        assertThrows(
-                CatalogLiveValidationException.class,
-                () -> guard.rejectIntroducedProblems(null, live, List.of(change)));
+        assertDoesNotThrow(() -> guard.rejectIntroducedProblems(null, live, List.of(change)));
     }
 
     private CatalogLiveValidationGuard guard() {

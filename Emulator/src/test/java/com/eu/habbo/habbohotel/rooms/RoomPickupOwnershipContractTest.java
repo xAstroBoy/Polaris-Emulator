@@ -79,7 +79,9 @@ class RoomPickupOwnershipContractTest {
         verify(item).needsUpdate(true);
         verify(items).addItem(item);
         verify(client).sendResponse(any(com.eu.habbo.messages.outgoing.inventory.AddHabboItemComposer.class));
-        verify(client).sendResponse(any(com.eu.habbo.messages.outgoing.inventory.InventoryRefreshComposer.class));
+        // The picked-up furni is pushed as a single update rather than asking the client to fetch
+        // the whole inventory again.
+        verify(client).sendResponse(any(com.eu.habbo.messages.outgoing.inventory.InventoryUpdateItemComposer.class));
         verify(threading).run(item);
     }
 

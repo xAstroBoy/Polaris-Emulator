@@ -48,11 +48,11 @@ public class KissCommand extends Command {
         room.giveEffect(target, 9, 3);
         room.sendComposer(new RoomUserTalkComposer(new RoomChatMessage(
                         Emulator.getTexts().getValue("commands.action.kiss.sender").replace("%target%", receiver),
-                        gameClient.getHabbo(), gameClient.getHabbo(), RoomChatMessageBubbles.RED))
+                        gameClient.getHabbo(), gameClient.getHabbo(), RoomChatMessageBubbles.HEARTS))
                 .compose());
         room.sendComposer(new RoomUserTalkComposer(new RoomChatMessage(
                         Emulator.getTexts().getValue("commands.action.kiss.receiver").replace("%sender%", sender),
-                        target, target, RoomChatMessageBubbles.LIGHT_BLUE))
+                        target, target, RoomChatMessageBubbles.HEARTS))
                 .compose());
         return true;
     }

@@ -189,8 +189,11 @@ public class WiredEffectMatchFurni extends InteractionWiredEffect implements Int
             String[] data = wiredData.split(":");
 
             // A legacy row has six colon-separated fields; anything shorter keeps the defaults
-            // rather than failing the whole furni load on a missing index.
+            // rather than failing the whole furni load on a missing index. It carries no selection
+            // either, so like the full legacy path below it falls back to the triggering furni -
+            // the picker default would leave the box pointing at an empty selection.
             if (data.length < 6) {
+                this.furniSource = WiredSourceUtil.SOURCE_TRIGGER;
                 this.needsUpdate(true);
                 return;
             }

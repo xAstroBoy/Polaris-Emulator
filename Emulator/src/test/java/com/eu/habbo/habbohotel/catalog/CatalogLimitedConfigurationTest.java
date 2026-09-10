@@ -85,7 +85,9 @@ class CatalogLimitedConfigurationTest {
         String configuration = Files.readString(
                 Path.of("src/main/java/com/eu/habbo/habbohotel/catalog/CatalogLimitedConfiguration.java"));
 
-        assertTrue(manager.contains("limitedConfiguration.pollNumber()"));
+        // The purchase path reserves against the buyer rather than polling anonymously, so the
+        // claimed row records who took the number.
+        assertTrue(manager.contains("limitedConfiguration.reserveNumber(habbo.getHabboInfo().getId())"));
         assertTrue(manager.contains("limitedNumberReservation.isEmpty()"));
         assertFalse(manager.contains("limitedNumber = limitedConfiguration.getNumber()"));
         assertTrue(configuration.contains("this.limitedNumbers.pollFirst()"));

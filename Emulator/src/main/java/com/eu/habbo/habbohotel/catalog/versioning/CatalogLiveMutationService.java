@@ -202,7 +202,10 @@ public final class CatalogLiveMutationService {
             connection.setAutoCommit(false);
             try {
                 CatalogRuntimeState state = versions.lockRuntimeState(connection);
-                CatalogVersionSnapshot active = loadPhysicalLive(connection, state);
+                // Only the offers this batch can reach: reading the whole catalog to change one row
+                // meant locking six figures of offers on a live hotel.
+                CatalogVersionSnapshot active =
+                        loadPhysicalLive(connection, state, CatalogMutationScope.of(requests));
                 if (active.version().status() != CatalogVersionStatus.PUBLISHED) {
                     throw new IllegalStateException("Live catalog state is not available");
                 }
@@ -488,13 +491,25 @@ public final class CatalogLiveMutationService {
 
     private CatalogVersionSnapshot loadPhysicalLive(Connection connection, CatalogRuntimeState state)
             throws SQLException {
+        return loadPhysicalLive(connection, state, null);
+    }
+
+    /**
+     * The live catalog. With a scope only the offers that scope can reach are read and locked; with
+     * none the whole catalog is, which is what every reader outside a batch still wants.
+     */
+    private CatalogVersionSnapshot loadPhysicalLive(
+            Connection connection, CatalogRuntimeState state, CatalogMutationScope scope) throws SQLException {
         CatalogVersion version = versions.loadVersion(connection, state.activeVersionId());
         if (version.status() != CatalogVersionStatus.PUBLISHED) {
             throw new IllegalStateException("Live catalog state is not available");
         }
-        return liveSnapshots == null
-                ? versions.loadSnapshot(connection, state.activeVersionId())
-                : liveSnapshots.load(connection, version);
+        if (liveSnapshots == null) {
+            return versions.loadSnapshot(connection, state.activeVersionId());
+        }
+        return scope == null
+                ? liveSnapshots.load(connection, version)
+                : liveSnapshots.loadForMutation(connection, version, scope);
     }
 
     private String fingerprint(List<CatalogLiveMutationRequest> requests) {

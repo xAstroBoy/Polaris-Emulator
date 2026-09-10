@@ -95,6 +95,15 @@ public class CatalogLimitedConfiguration implements Runnable {
         int reservedBy = userId == 0 ? SYSTEM_RESERVATION : userId;
 
         synchronized (this.limitedNumbers) {
+            // With no database behind the emulator the in-memory pool is the only record there is,
+            // so the number is handed out from it directly. The claim exists to stop two nodes
+            // giving out the same number; without a database there is no second node to race.
+            if (Emulator.getDatabase() == null) {
+                return this.limitedNumbers.isEmpty()
+                        ? OptionalInt.empty()
+                        : OptionalInt.of(this.limitedNumbers.pollFirst());
+            }
+
             try (Connection connection = Emulator.getDatabase().getDataSource().getConnection()) {
                 for (int attempt = 0; attempt < 2; attempt++) {
                     while (!this.limitedNumbers.isEmpty()) {
