@@ -15,11 +15,20 @@ public class RoomUserSignEvent extends MessageHandler {
     // Nitro exposes the numeric signs plus the special signs 11-17.
     private static final int MAX_SIGN_ID = 17;
 
+    /**
+     * The sign id comes straight off the wire, so it is checked before it reaches the avatar status,
+     * the wired triggers or a vote counter - each of which would otherwise take whatever a crafted
+     * packet sent.
+     */
+    static boolean isValidSignId(int signId) {
+        return signId >= MIN_SIGN_ID && signId <= MAX_SIGN_ID;
+    }
+
     @Override
     public void handle() throws Exception {
         int signId = this.packet.readInt();
 
-        if (signId < MIN_SIGN_ID || signId > MAX_SIGN_ID)
+        if (!isValidSignId(signId))
             return;
 
         Room room = this.client.getHabbo().getHabboInfo().getCurrentRoom();

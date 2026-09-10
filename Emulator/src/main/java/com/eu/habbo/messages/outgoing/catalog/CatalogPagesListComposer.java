@@ -67,6 +67,24 @@ public class CatalogPagesListComposer extends MessageComposer {
         return null;
     }
 
+    /**
+     * The offer ids a catalog page publishes in the navigation packet: the page's own ids, in order,
+     * without the placeholders (anything not positive) and without repeats. The client indexes furni
+     * by these, so a duplicate makes one offer resolve to two pages and search jumps to the wrong one.
+     */
+    static int[] navigationOfferIds(CatalogPage category) {
+        IntList pageOfferIds = category.getOfferIds();
+        IntList offerIds = new IntArrayList(pageOfferIds.size());
+        IntOpenHashSet seenOfferIds = new IntOpenHashSet();
+
+        for (int idx = 0; idx < pageOfferIds.size(); idx++) {
+            int offerId = pageOfferIds.getInt(idx);
+            if (offerId > 0 && seenOfferIds.add(offerId)) offerIds.add(offerId);
+        }
+
+        return offerIds.toIntArray();
+    }
+
     private void append(CatalogPage category, int depth, CatalogPageType requestedType) {
         List<CatalogPage> pagesList = Emulator.getGameEnvironment()
                 .getCatalogManager()
@@ -79,26 +97,20 @@ public class CatalogPagesListComposer extends MessageComposer {
         this.response.appendString(category.getPageName());
         this.response.appendString(category.getCaption() + (this.hasPermission ? " (" + category.getId() + ")" : ""));
 
-        IntList pageOfferIds = category.getOfferIds();
-        IntList offerIds = new IntArrayList(pageOfferIds.size());
-        IntOpenHashSet seenOfferIds = new IntOpenHashSet();
-        for (int idx = 0; idx < pageOfferIds.size(); idx++) {
-            int offerId = pageOfferIds.getInt(idx);
-            if (offerId > 0 && seenOfferIds.add(offerId)) offerIds.add(offerId);
-        }
+        int[] offerIds = navigationOfferIds(category);
 
-        int offerCount = Math.min(offerIds.size(), MAX_OFFERS);
-        if (offerIds.size() > MAX_OFFERS) {
+        int offerCount = Math.min(offerIds.length, MAX_OFFERS);
+        if (offerIds.length > MAX_OFFERS) {
             LOGGER.warn(
                     "Catalog page {} has {} offers; limiting the index packet to {}",
                     category.getId(),
-                    offerIds.size(),
+                    offerIds.length,
                     MAX_OFFERS);
         }
 
         this.response.appendInt(offerCount);
         for (int idx = 0; idx < offerCount; idx++) {
-            this.response.appendInt(offerIds.getInt(idx));
+            this.response.appendInt(offerIds[idx]);
         }
 
         if (depth >= MAX_DEPTH) {

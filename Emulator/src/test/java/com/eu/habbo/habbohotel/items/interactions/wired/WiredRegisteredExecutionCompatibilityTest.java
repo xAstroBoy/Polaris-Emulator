@@ -66,8 +66,8 @@ class WiredRegisteredExecutionCompatibilityTest {
     @Test
     void executionMatrixCoversEveryRegisteredWiredClass() throws Exception {
         assertEquals(
-                // upstream's 267 plus this fork's own boxes, counted off the merged ratchet.
-                269,
+                // upstream's 267 plus this fork's own boxes, off the regenerated ratchet.
+                275,
                 WiredInteractionRegistryFixture.wiredTypes().size(),
                 "Review every added or removed registered wired execution type");
     }

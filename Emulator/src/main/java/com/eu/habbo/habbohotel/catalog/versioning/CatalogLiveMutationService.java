@@ -91,6 +91,38 @@ public final class CatalogLiveMutationService {
         this.gson = Objects.requireNonNull(gson, "gson");
     }
 
+    /**
+     * The live catalog and its validation in one read, for opening a Manager session.
+     *
+     * <p>Calling {@link #loadLive()} and {@link #validateLive()} separately reads the whole catalog
+     * twice and locks it both times, which on this hotel's catalog is seconds of work on the thread
+     * serving the operator's packet. Nothing is being written here, so this takes no lock at all:
+     * the runtime state is read, not locked, and the snapshot comes through
+     * {@link CatalogLiveSnapshotRepository#loadForRead}.</p>
+     */
+    public CatalogLiveSession openLiveSession() {
+        try (Connection connection = dataSource.getConnection()) {
+            CatalogRuntimeState state = versions.readRuntimeState(connection);
+            CatalogVersion version = versions.loadVersion(connection, state.activeVersionId());
+
+            if (version.status() != CatalogVersionStatus.PUBLISHED) {
+                throw new IllegalStateException("Live catalog state is not available");
+            }
+
+            CatalogVersionSnapshot live = liveSnapshots == null
+                    ? versions.loadSnapshot(connection, state.activeVersionId())
+                    : liveSnapshots.loadForRead(connection, version);
+
+            CatalogValidationReport report =
+                    validation == null ? new CatalogValidationReport(List.of()) : validation.report(connection, live);
+
+            return new CatalogLiveSession(
+                    live, new CatalogDraftValidationResult(live.version().revision(), report));
+        } catch (SQLException exception) {
+            throw new CatalogVersioningException("Live catalog session could not be opened", exception);
+        }
+    }
+
     public CatalogDraftValidationResult validateLive() {
         try (Connection connection = dataSource.getConnection()) {
             CatalogRuntimeState state = versions.lockRuntimeState(connection);

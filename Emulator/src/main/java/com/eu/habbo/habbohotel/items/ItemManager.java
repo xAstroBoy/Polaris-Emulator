@@ -1203,7 +1203,7 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("wf_act_tiles", WiredEffectFurniCollision.class));
         this.interactionsList.add(new ItemInteraction("wf_act_tilss", WiredEffectFurniCollision.class));
         this.interactionsList.add(new ItemInteraction("wf_act_execute_for_furni", WiredEffectFurniCollision.class));
-        this.interactionsList.add(new ItemInteraction("wf_act_roll_dice", WiredEffectRollDice.class));
+        // wf_act_roll_dice is registered above, on upstream's WiredEffectRollDice.
         this.interactionsList.add(new ItemInteraction("wf_act_hide_trg_item", WiredEffectHideFurni.class));
         this.interactionsList.add(new ItemInteraction("wf_act_unhide_items", WiredEffectUnhideFurni.class));
         this.interactionsList.add(new ItemInteraction("wf_act_remove_look", WiredEffectRemoveLook.class));

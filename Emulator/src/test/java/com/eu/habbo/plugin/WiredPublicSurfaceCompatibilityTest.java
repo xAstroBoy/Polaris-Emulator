@@ -39,7 +39,19 @@ import org.junit.jupiter.api.Test;
 class WiredPublicSurfaceCompatibilityTest {
 
     private static final String REGENERATE_PROPERTY = "polaris.wired.api.regenerate";
-    private static final Path CLASSES_DIR = Path.of("target", "classes");
+    /**
+     * The pom builds into target-build, not target. This used to read target/classes, which on a
+     * working copy that once built the default way is a tree of stale classes: the snapshot then
+     * described classes that had been deleted, and the test died on ClassNotFoundException.
+     */
+    private static final Path CLASSES_DIR = classesDirectory();
+
+    private static Path classesDirectory() {
+        Path built = Path.of("target-build", "classes");
+
+        return Files.isDirectory(built) ? built : Path.of("target", "classes");
+    }
+
     private static final Path CONTRACT =
             Path.of("src", "test", "resources", "wired-compatibility", "public-surface-v1.txt");
 

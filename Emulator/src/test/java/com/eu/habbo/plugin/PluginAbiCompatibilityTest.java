@@ -80,7 +80,10 @@ class PluginAbiCompatibilityTest {
                     "# only internal machinery never plausibly touched by plugins may appear here.",
                     "# Any incompatibility NOT listed here fails PluginAbiCompatibilityTest."));
 
-    private static final Path CLASSES_DIR = Path.of("target", "classes");
+    /** The pom builds into target-build; target/classes is a stale tree on older working copies. */
+    private static final Path CLASSES_DIR = Files.isDirectory(Path.of("target-build", "classes"))
+            ? Path.of("target-build", "classes")
+            : Path.of("target", "classes");
     private static final String REGENERATE_PROPERTY = "polaris.abi.regenerate";
 
     private Path currentJar;

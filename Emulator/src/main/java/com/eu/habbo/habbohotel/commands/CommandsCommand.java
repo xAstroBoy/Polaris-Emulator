@@ -25,6 +25,32 @@ public class CommandsCommand extends Command {
         return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
+    /**
+     * One command's block in the {@code :comandi} alert: a usage line, and under it a line of prose
+     * when there is any. A description that starts with a colon is itself the usage line - that is how
+     * the hotel writes the ones that take arguments - and in that case the help text is the prose. A
+     * description written as prose is the prose, and takes precedence over the help text, which is
+     * usually a whole page about a family of commands rather than a line about this one.
+     *
+     * <p>Lines end with a bare CR: the alert already treats it as a break, and a CRLF here doubled the
+     * spacing of a list that is long enough as it is.</p>
+     */
+    static String formatEntry(String command, String description, String helpText) {
+        String usage = description.startsWith(":") ? description : command;
+        String prose = description.startsWith(":") ? helpText : (description.isBlank() ? helpText : description);
+
+        StringBuilder entry = new StringBuilder();
+        entry.append(oneLine(usage)).append('\r');
+
+        if (!prose.isBlank()) entry.append(oneLine(prose)).append('\r');
+
+        return entry.toString();
+    }
+
+    private static String oneLine(String text) {
+        return text.replace("\r\n", " ").replace('\r', ' ').replace('\n', ' ').trim();
+    }
+
     @Override
     public boolean handle(GameClient gameClient, String[] params) throws Exception {
         List<Command> commands = new ArrayList<>(Emulator.getGameEnvironment().getCommandHandler()
@@ -67,18 +93,14 @@ public class CommandsCommand extends Command {
         int to = Math.min(from + COMMANDS_PER_PAGE, commands.size());
         for (Command c : commands.subList(from, to)) {
             String textKey = "commands.description." + c.permission;
-            String commandText = Emulator.getTexts().getValueQuietly(textKey, "");
-            String commandLine = ":" + c.keys[0];
+            String description = Emulator.getTexts().getValueQuietly(textKey, "");
+            String helpKey = "commands.help." + c.permission;
+            String helpText = Emulator.getTexts().getValueQuietly(helpKey, "");
 
-            if (commandText.startsWith(":")) {
-                commandLine = commandText;
-            } else if (!commandText.isBlank() && !commandText.equals(textKey)) {
-                commandLine += " - " + commandText;
-            }
+            if (description.equals(textKey)) description = "";
+            if (helpText.equals(helpKey)) helpText = "";
 
-            message.append("- ")
-                    .append(escapeHtml(commandLine.replace("\r", " ").replace("\n", " ")))
-                    .append("\r\n");
+            message.append(escapeHtml(formatEntry(":" + c.keys[0], description, helpText)));
         }
 
         if (pageCount > 1) {

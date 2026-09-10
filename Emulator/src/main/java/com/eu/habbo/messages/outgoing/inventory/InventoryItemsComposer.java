@@ -49,6 +49,14 @@ public class InventoryItemsComposer extends MessageComposer {
      * InventoryUpdateItemComposer (the single-item "add or update" the client applies without refetching): the two
      * used to be written separately and drifted, so a furni pushed one way could differ from the same furni listed.
      */
+    /**
+     * The name plugins were built against, before this became the shared serializer. Kept so an
+     * existing plugin jar keeps linking; it writes into this composer's own response, as it did.
+     */
+    public void addExtraDataToResponse(HabboItem habboItem) {
+        serializeInventoryItem(this.response, habboItem);
+    }
+
     static void serializeInventoryItem(ServerMessage response, HabboItem habboItem) {
         response.appendInt(habboItem.getGiftAdjustedId());
         response.appendString(habboItem.getBaseItem().getType().code);

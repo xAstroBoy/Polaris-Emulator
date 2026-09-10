@@ -9,6 +9,14 @@ public class RoomUserRespectComposer extends MessageComposer {
     private final Habbo habbo;
     private final Habbo giver;
 
+    /**
+     * The signature plugins were built against, before the sender could be named. Kept so an existing
+     * plugin jar keeps linking; it sends no sender, which is what the packet carried back then.
+     */
+    public RoomUserRespectComposer(Habbo habbo) {
+        this(habbo, null);
+    }
+
     public RoomUserRespectComposer(Habbo habbo, Habbo giver) {
         this.habbo = habbo;
         this.giver = giver;

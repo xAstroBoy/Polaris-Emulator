@@ -17,6 +17,14 @@ public class CameraPriceComposer extends MessageComposer {
     public final int pointsType;
     public final int publishPointsType;
 
+    /**
+     * The signature plugins were built against, before the activity-point types were added. Kept so
+     * an existing plugin jar keeps linking; it charges the default point type, as it always did.
+     */
+    public CameraPriceComposer(int credits, int points, int publishPoints) {
+        this(credits, points, publishPoints, 0, 0);
+    }
+
     public CameraPriceComposer(int credits, int points, int publishPoints, int pointsType, int publishPointsType) {
         this.credits = credits;
         this.points = points;
