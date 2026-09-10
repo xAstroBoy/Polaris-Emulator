@@ -103,7 +103,7 @@ public class DebugViewCollisionsCommand extends Command {
 
         Map<HabboItem, Set<RoomTile>> tiles = collect(room);
         LAST_SENT.put(room.getId(), signature(room));
-        gameClient.sendResponse(new FurniCollisionOverlayComposer(true, tiles));
+        gameClient.sendResponse(new FurniCollisionOverlayComposer(true, tiles, room));
 
         int markers = 0;
         for (Set<RoomTile> occupied : tiles.values()) {
@@ -150,7 +150,7 @@ public class DebugViewCollisionsCommand extends Command {
             return;
         }
 
-        ServerMessage message = new FurniCollisionOverlayComposer(true, collect(room)).compose();
+        ServerMessage message = new FurniCollisionOverlayComposer(true, collect(room), room).compose();
 
         for (Habbo habbo : watchers) {
             habbo.getClient().sendResponse(message);

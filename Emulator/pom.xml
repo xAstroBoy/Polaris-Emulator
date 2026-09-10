@@ -8,7 +8,7 @@
     <artifactId>Polaris</artifactId>
     <!-- Fork counter, ahead of upstream's 4.2.85. 4.2.169 and 4.2.170 are already deployed, so the
          first build after this merge has to land above them: the launcher picks the newest jar. -->
-    <version>4.2.172</version>
+    <version>4.2.173</version>
     <name>Polaris</name>
     <licenses>
         <license>

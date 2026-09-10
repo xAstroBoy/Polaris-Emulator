@@ -1,6 +1,9 @@
 package com.eu.habbo.messages.outgoing.rooms.items;
 
+import com.eu.habbo.habbohotel.rooms.Room;
+import com.eu.habbo.habbohotel.rooms.RoomLayout;
 import com.eu.habbo.habbohotel.rooms.RoomTile;
+import com.eu.habbo.habbohotel.rooms.RoomTileState;
 import com.eu.habbo.habbohotel.users.HabboItem;
 import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.messages.outgoing.MessageComposer;
@@ -21,10 +24,20 @@ public class FurniCollisionOverlayComposer extends MessageComposer {
 
     private final boolean active;
     private final Map<HabboItem, Set<RoomTile>> tiles;
+    private final Room room;
 
     public FurniCollisionOverlayComposer(boolean active, Map<HabboItem, Set<RoomTile>> tiles) {
+        this(active, tiles, null);
+    }
+
+    /**
+     * @param room the room whose floor grid travels with the furni tiles, so the client can also draw
+     *     what is walkable and how high each tile sits. Null sends the furni tiles alone.
+     */
+    public FurniCollisionOverlayComposer(boolean active, Map<HabboItem, Set<RoomTile>> tiles, Room room) {
         this.active = active;
         this.tiles = tiles;
+        this.room = room;
     }
 
     @Override
@@ -64,7 +77,50 @@ public class FurniCollisionOverlayComposer extends MessageComposer {
             }
         }
 
+        this.appendFloor();
+
         return this.response;
+    }
+
+    /**
+     * The room's own floor, tile by tile: whether a unit may stand there and how high it sits.
+     *
+     * <p>The furni tiles above answer "what does this furni block"; this answers "what does the floor
+     * itself allow", which is the other half of every collision question - a hole in the model, a
+     * tile the layout calls invalid, a step too tall to climb. Sent as a grid rather than a list so
+     * the client can index it directly, and the whole room fits in a few kilobytes.
+     */
+    private void appendFloor() {
+        RoomLayout layout = this.room == null ? null : this.room.getLayout();
+
+        if (layout == null) {
+            this.response.appendInt(0);
+            this.response.appendInt(0);
+            return;
+        }
+
+        int sizeX = layout.getMapSizeX();
+        int sizeY = layout.getMapSizeY();
+
+        this.response.appendInt(sizeX);
+        this.response.appendInt(sizeY);
+
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                RoomTile tile = layout.getTile((short) x, (short) y);
+
+                if (tile == null) {
+                    this.response.appendInt(RoomTileState.INVALID.ordinal());
+                    this.response.appendBoolean(false);
+                    this.response.appendString("0");
+                    continue;
+                }
+
+                this.response.appendInt(tile.state.ordinal());
+                this.response.appendBoolean(tile.isWalkable());
+                this.response.appendString(String.valueOf(tile.getStackHeight()));
+            }
+        }
     }
 
     /** An empty overlay, which is how the client is told to clear what it drew. */
