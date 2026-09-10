@@ -77,6 +77,8 @@ public class AcceptFriendRequestEvent extends MessageHandler {
 
             Messenger.checkFriendSizeProgress(this.client.getHabbo());
             Messenger.checkFriendSizeProgress(target);
+            com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(this.client.getHabbo(), "friends", 1); // CUSTOM: battle pass
+            com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(target, "friends", 1);
         }
     }
 }

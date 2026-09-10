@@ -1,6 +1,7 @@
 package com.eu.habbo.habbohotel.users;
 
 import com.eu.habbo.Emulator;
+import com.eu.habbo.habbohotel.users.infostand.UserLookExtras;
 import com.eu.habbo.database.SqlQueries;
 import com.eu.habbo.habbohotel.catalog.CatalogItem;
 import com.eu.habbo.habbohotel.games.Game;
@@ -51,6 +52,8 @@ public class HabboInfo implements Runnable {
     private int InfostandOverlay;
     private int InfostandCardBg;
     private int InfostandBorder;
+    /** HSmile look extras (ornament, name effect/icon/border, avatar string, profile background); loaded on first use. */
+    private UserLookExtras lookExtras;
     private int loadingRoom;
     private Room currentRoom;
     private String roomEntryMethod = "door";
@@ -436,6 +439,13 @@ public class HabboInfo implements Runnable {
 
     public void setInfostandBorder(int infostandBorder) {
         InfostandBorder = infostandBorder;
+    }
+
+    public synchronized UserLookExtras getLookExtras() {
+        if (this.lookExtras == null) {
+            this.lookExtras = UserLookExtras.load(this.id);
+        }
+        return this.lookExtras;
     }
 
     public Rank getRank() {

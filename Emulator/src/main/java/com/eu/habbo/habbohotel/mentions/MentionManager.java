@@ -170,7 +170,7 @@ public class MentionManager {
                         if (habbo == null || habbo.getHabboInfo().getId() == senderId) {
                             continue;
                         }
-                        if (!acceptsMention(habbo, false)) {
+                        if (!acceptsMention(habbo, senderId, false)) {
                             continue;
                         }
                         if (seen.add(habbo.getHabboInfo().getId())) {
@@ -207,7 +207,7 @@ public class MentionManager {
     private void collectRoomTargets(Room room, int senderId, List<Habbo> targets, Set<Integer> seen, int maxTargets, boolean isBroadcast) {
         for (Habbo habbo : room.getHabbos()) {
             if (habbo == null || habbo.getHabboInfo().getId() == senderId) continue;
-            if (!acceptsMention(habbo, isBroadcast)) continue;
+            if (!acceptsMention(habbo, senderId, isBroadcast)) continue;
             if (seen.add(habbo.getHabboInfo().getId())) targets.add(habbo);
             if (targets.size() >= maxTargets) break;
         }
@@ -222,7 +222,7 @@ public class MentionManager {
             if (buddyId == senderId) continue;
             Habbo online = habboManager.getHabbo(buddyId);
             if (online == null) continue;
-            if (!acceptsMention(online, true)) continue;
+            if (!acceptsMention(online, senderId, true)) continue;
             if (seen.add(buddyId)) targets.add(online);
             if (targets.size() >= maxTargets) break;
         }
@@ -231,16 +231,20 @@ public class MentionManager {
     private void collectEveryoneTargets(int senderId, List<Habbo> targets, Set<Integer> seen, int maxTargets) {
         for (Habbo habbo : Emulator.getGameEnvironment().getHabboManager().getOnlineHabbos().values()) {
             if (habbo == null || habbo.getHabboInfo().getId() == senderId) continue;
-            if (!acceptsMention(habbo, true)) continue;
+            if (!acceptsMention(habbo, senderId, true)) continue;
             if (seen.add(habbo.getHabboInfo().getId())) targets.add(habbo);
             if (targets.size() >= maxTargets) break;
         }
     }
 
-    private boolean acceptsMention(Habbo recipient, boolean isBroadcast) {
+    private boolean acceptsMention(Habbo recipient, int senderId, boolean isBroadcast) {
         if (recipient == null) return false;
         if (recipient.getClient() == null) return false;
         if (recipient.getHabboStats() == null) return false;
+        // CUSTOM: HSmile mention privacy (0 everyone, 1 friends only, 2 nobody)
+        int privacy = recipient.getHabboInfo() == null ? 0 : recipient.getHabboInfo().getLookExtras().getMentionPrivacy();
+        if (privacy == 2) return false;
+        if (privacy == 1 && (recipient.getMessenger() == null || !recipient.getMessenger().getFriends().containsKey(senderId))) return false;
         if (!recipient.getHabboStats().mentionsEnabled()) return false;
         if (isBroadcast && !recipient.getHabboStats().massMentionsEnabled()) return false;
         return true;

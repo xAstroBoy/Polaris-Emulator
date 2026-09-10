@@ -137,7 +137,14 @@ public class RoomTileManager {
         if (this.room.isAllowUnderpass() && result == RoomTileState.BLOCKED && tallestItem != null) {
             double walkSurface = this.getUnderpassWalkHeight(tile, items, exclude);
             if (tallestItem.getZ() - walkSurface >= RoomLayout.UNDERPASS_HEIGHT) {
-                result = RoomTileState.OPEN;
+                // The blocking furni floats a clear head height above the surface you actually stand on, so it
+                // no longer decides this tile. Forcing OPEN here also threw away whatever you were standing on:
+                // a seat under a high decoration became walkable but impossible to sit on. Keep the walkable
+                // outcome, but let a seat below the clearance still make the tile sittable.
+                RoomTileState reachable = this.stateAtOrBelow(tile, items, exclude, walkSurface);
+                result = reachable == RoomTileState.SIT || reachable == RoomTileState.LAY
+                        ? reachable
+                        : RoomTileState.OPEN;
             }
         }
 
@@ -170,6 +177,54 @@ public class RoomTileManager {
         }
 
         return walkHeight;
+    }
+
+    /**
+     * The tile state produced by the furniture you can actually reach: everything topping out at or below the
+     * underpass walk surface. Used when the underpass rule clears a floating blocker, so the seat or floor
+     * underneath still decides the tile instead of being discarded. Mirrors the tallest-wins rules of
+     * {@link #calculateTileState(RoomTile, HabboItem)}, and returns OPEN when nothing is left below.
+     */
+    private RoomTileState stateAtOrBelow(RoomTile tile, Set<HabboItem> items, HabboItem exclude, double walkSurface) {
+        RoomTileState result = RoomTileState.OPEN;
+
+        if (items == null) {
+            return result;
+        }
+
+        HabboItem tallest = null;
+        for (HabboItem item : items) {
+            if (exclude != null && item == exclude) {
+                continue;
+            }
+
+            double itemTop = item.getZ() + Item.getCurrentHeight(item);
+            if (itemTop > walkSurface) {
+                continue;
+            }
+
+            double tallestTop =
+                    tallest == null ? Double.NEGATIVE_INFINITY : tallest.getZ() + Item.getCurrentHeight(tallest);
+            if (tallest != null && tallestTop > itemTop) {
+                continue;
+            }
+
+            RoomTileState itemState = this.checkStateForItem(item, tile);
+            if (tallest != null && tallestTop == itemTop) {
+                if (itemState == RoomTileState.BLOCKED || result == RoomTileState.BLOCKED) {
+                    result = RoomTileState.BLOCKED;
+                } else if (itemState == RoomTileState.SIT || result == RoomTileState.SIT) {
+                    result = RoomTileState.SIT;
+                } else {
+                    result = itemState;
+                }
+            } else {
+                result = itemState;
+            }
+            tallest = item;
+        }
+
+        return result;
     }
 
     /**

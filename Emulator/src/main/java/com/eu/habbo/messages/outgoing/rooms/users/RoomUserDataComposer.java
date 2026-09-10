@@ -35,6 +35,7 @@ public class RoomUserDataComposer extends MessageComposer {
         this.response.appendString(customizationData.displayOrder);
         this.response.appendString(customizationData.nameColor);
         this.response.appendInt(this.habbo.getHabboInfo().getInfostandBorder());
+        customizationData.appendLookExtras(this.response);
         return this.response;
     }
 

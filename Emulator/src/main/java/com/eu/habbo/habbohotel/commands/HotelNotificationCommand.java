@@ -73,6 +73,8 @@ public class HotelNotificationCommand extends Command {
         // OpenUrl() feeds this straight into CreateLinkEvent, so no "event:" prefix here.
         parameters.put("linkUrl", "navigator/goto/" + room.getId());
         parameters.put("display", text(type, "display", "ALERT"));
+        // the client prints "- <sender>" under the text when the message itself does not name them
+        parameters.put("sender", sender.getHabboInfo().getUsername());
 
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             entry.setValue(replace(entry.getValue(), sender, room, extra));

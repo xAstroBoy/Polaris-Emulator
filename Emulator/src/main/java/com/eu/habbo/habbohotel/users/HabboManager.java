@@ -89,6 +89,8 @@ public class HabboManager {
 
     public void removeHabbo(Habbo habbo) {
         this.onlineHabbos.remove(habbo.getHabboInfo().getId());
+        com.eu.habbo.habbohotel.battlepass.BattlePassManager.forget(habbo.getHabboInfo().getId()); // CUSTOM
+        com.eu.habbo.habbohotel.calls.CallManager.onDisconnect(habbo.getHabboInfo().getId()); // CUSTOM: hang up on logout
         this.onlineHabbosByName.remove(habbo.getHabboInfo().getUsername().toLowerCase());
     }
 

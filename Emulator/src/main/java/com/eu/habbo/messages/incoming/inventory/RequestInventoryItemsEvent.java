@@ -5,52 +5,53 @@ import com.eu.habbo.messages.incoming.MessageHandler;
 import com.eu.habbo.messages.outgoing.inventory.InventoryItemsComposer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RequestInventoryItemsEvent extends MessageHandler {
+    private static final int ITEMS_PER_FRAGMENT = 1000;
+
     @Override
     public int getRatelimit() {
         return 500;
     }
 
+    /**
+     * The fragment count and the fragments themselves have to describe the same inventory. The size used to be read
+     * outside the lock, so a catalog purchase landing in between made the header promise two fragments while only one
+     * was sent - the client renders nothing until every fragment arrives, so the inventory stayed empty until the next
+     * login. Everything is now counted from one snapshot taken under the lock.
+     */
     @Override
     public void handle() throws Exception {
-        int totalItems = this.client.getHabbo().getInventory().getItemsComponent().getItems().size();
+        Int2ObjectMap<HabboItem> inventory = this.client.getHabbo().getInventory().getItemsComponent().getItems();
+        List<HabboItem> snapshot;
 
-        if (totalItems == 0) {
-            this.client.sendResponse(new InventoryItemsComposer(0, 1, new Int2ObjectOpenHashMap<>()));
+        synchronized (inventory) {
+            snapshot = new ArrayList<>(inventory.values());
+        }
+
+        if (snapshot.isEmpty()) {
+            // Fragment 1 of 1: the composer subtracts one, so the client reads fragment 0 of 1 and stops waiting.
+            this.client.sendResponse(new InventoryItemsComposer(1, 1, new Int2ObjectOpenHashMap<>()));
             return;
         }
 
-        int totalFragments = (int) Math.ceil((double) totalItems / 1000.0);
+        int totalFragments = (snapshot.size() + ITEMS_PER_FRAGMENT - 1) / ITEMS_PER_FRAGMENT;
+        int fragmentNumber = 0;
+        Int2ObjectMap<HabboItem> items = new Int2ObjectOpenHashMap<>();
 
-        if (totalFragments == 0) {
-            totalFragments = 1;
+        for (HabboItem item : snapshot) {
+            items.put(item.getId(), item);
+
+            if (items.size() == ITEMS_PER_FRAGMENT) {
+                this.client.sendResponse(new InventoryItemsComposer(++fragmentNumber, totalFragments, items));
+                items = new Int2ObjectOpenHashMap<>();
+            }
         }
 
-        synchronized (this.client.getHabbo().getInventory().getItemsComponent().getItems()) {
-            Int2ObjectMap<HabboItem> items = new Int2ObjectOpenHashMap<>();
-
-            int count = 0;
-            int fragmentNumber = 0;
-
-            for (Int2ObjectMap.Entry<HabboItem> itemEntry : this.client.getHabbo().getInventory().getItemsComponent().getItems().int2ObjectEntrySet()) {
-                if (count == 0) {
-                    fragmentNumber++;
-                }
-
-                items.put(itemEntry.getIntKey(), itemEntry.getValue());
-                count++;
-
-                if (count == 1000) {
-                    this.client.sendResponse(new InventoryItemsComposer(fragmentNumber, totalFragments, items));
-                    count = 0;
-                    items = new Int2ObjectOpenHashMap<>();
-                }
-            }
-
-            if (count > 0 && !items.isEmpty()) {
-                this.client.sendResponse(new InventoryItemsComposer(fragmentNumber, totalFragments, items));
-            }
+        if (!items.isEmpty()) {
+            this.client.sendResponse(new InventoryItemsComposer(++fragmentNumber, totalFragments, items));
         }
     }
 }

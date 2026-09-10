@@ -10,15 +10,20 @@ final class RoomFunCommandAccess {
 
     private RoomFunCommandAccess() {}
 
-    static boolean requireOwnerOrStaff(Habbo habbo, Room room) {
+    /**
+     * Room ownership no longer grants these events: they move real furniture and
+     * lock avatars in place, so only staff (rank 4+) may fire them. The room
+     * parameter stays for the call sites that already hold it.
+     */
+    static boolean requireStaff(Habbo habbo, Room room) {
         boolean staff = habbo.getHabboInfo().getRank() != null
                 && habbo.getHabboInfo().getRank().getId() >= STAFF_RANK;
-        if (staff || room.isOwner(habbo)) return true;
+        if (staff) return true;
 
         habbo.whisper(
                 Emulator.getTexts().getValue(
                         "commands.error.cmd_fun_room.permission",
-                        "Solo il proprietario della stanza o lo staff può usare questo comando."),
+                        "Solo lo staff può usare questo comando."),
                 RoomChatMessageBubbles.ALERT);
         return false;
     }

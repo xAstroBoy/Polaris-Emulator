@@ -28,7 +28,8 @@ public class RoomAlertCommand extends Command {
             Room room = gameClient.getHabbo().getHabboInfo().getCurrentRoom();
 
             if (room != null) {
-                room.sendComposer(new ModToolIssueHandledComposer(message.toString()).compose());
+                // same signature as :ha — the receivers see who sent the alert
+                room.sendComposer(new ModToolIssueHandledComposer(message.toString().trim() + "\r\n-" + gameClient.getHabbo().getHabboInfo().getUsername()).compose());
                 return true;
             }
         }

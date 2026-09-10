@@ -634,6 +634,18 @@ public class Outgoing {
     public static final int FurniCollisionOverlayComposer = 10096; // CUSTOM: :debugviewcollisions floor overlay
     public static final int ModToolCloneFinderComposer = 10100; // CUSTOM: mod tools clone finder result
     public static final int ClientRenderSettingsComposer = 10101; // CUSTOM: hotel-wide renderer settings (login + broadcast)
+    public static final int RoomChatEditedComposer = 10107; // CUSTOM: a room chat bubble was edited / deleted
+    public static final int MessengerMessageIdComposer = 10109; // CUSTOM: live id of the console message you just sent
+    public static final int MessengerChatEditedComposer = 10110; // CUSTOM: a console message was edited / deleted
+    public static final int SentFriendRequestsComposer = 10111; // CUSTOM: friend requests I sent
+    public static final int LoginRewardDataComposer = 10114; // CUSTOM: daily login reward ladder + progress
+    public static final int TutorialStatusComposer = 10120; // CUSTOM: first-login tutorial status
+    public static final int VideoCurtainStateComposer = 10122; // CUSTOM: room video curtain state
+    public static final int UserUiThemeComposer = 10128; // CUSTOM: per-user client theme
+    public static final int BattlePassDataComposer = 10130; // CUSTOM: HSmile battle pass (login, on request, on change)
+    public static final int CallIncomingComposer = 10135; // CUSTOM: HSmile friend call ringing in
+    public static final int CallStateComposer = 10136; // CUSTOM: HSmile friend call state (+ LiveKit token)
+    public static final int UserLookCatalogComposer = 10103; // CUSTOM: HSmile look library + own selection (login, on request, after a change)
     public static final int PetMorphListComposer = 10090; // CUSTOM
 
     // Custom Prefixes

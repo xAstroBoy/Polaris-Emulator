@@ -8,6 +8,7 @@ import com.eu.habbo.networking.gameserver.auth.NitroSecureApiHandler;
 import com.eu.habbo.networking.gameserver.auth.NitroSecureAssetHandler;
 import com.eu.habbo.networking.gameserver.badges.BadgeHttpHandler;
 import com.eu.habbo.networking.gameserver.chat.ChatVoiceHttpHandler;
+import com.eu.habbo.networking.gameserver.recordings.RoomRecordingHttpHandler;
 import com.eu.habbo.networking.gameserver.badges.BadgeLeaderboardHttpHandler;
 import com.eu.habbo.networking.gameserver.cms.CmsApiHandler;
 import com.eu.habbo.networking.gameserver.codec.WebSocketCodec;
@@ -112,6 +113,10 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
         ch.pipeline()
                 .addLast("blockingHttpAdmissionChatVoice", BlockingHttpExecutionGroup.admissionHandler("chatVoiceHttpHandler"));
         ch.pipeline().addLast(blockingHttp, "chatVoiceHttpHandler", new ChatVoiceHttpHandler());
+        // CUSTOM: HSmile room recordings (chunked uploads under the frame cap)
+        ch.pipeline()
+                .addLast("blockingHttpAdmissionRecordings", BlockingHttpExecutionGroup.admissionHandler("roomRecordingHttpHandler"));
+        ch.pipeline().addLast(blockingHttp, "roomRecordingHttpHandler", new RoomRecordingHttpHandler());
         ch.pipeline()
                 .addLast("blockingHttpAdmissionWired", BlockingHttpExecutionGroup.admissionHandler("wiredApiHandler"));
         ch.pipeline().addLast(blockingHttp, "wiredApiHandler", new WiredVariableApiHandler());

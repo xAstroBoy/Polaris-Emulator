@@ -46,7 +46,7 @@ public class TrashCommand extends Command {
         Habbo caller = gameClient.getHabbo();
         Room room = caller.getHabboInfo().getCurrentRoom();
         if (room == null) return true;
-        if (!RoomFunCommandAccess.requireOwnerOrStaff(caller, room)) return true;
+        if (!RoomFunCommandAccess.requireStaff(caller, room)) return true;
 
         String commandKey = params.length == 0 ? "sharknado" : params[0].replace(":", "");
         if (commandKey.equalsIgnoreCase("tornado") || commandKey.equalsIgnoreCase("trash")) {

@@ -43,6 +43,8 @@ public class RoomChatMessage implements Runnable, ISerialize, DatabaseLoggable {
     private String RoomChatColour; // Added Chatcolor
     /** -1 follows the room setting; 0 wide, 1 normal, 2 thin as the room chat settings name them. */
     private int bubbleWidthOverride = NO_BUBBLE_WIDTH_OVERRIDE;
+    // CUSTOM: live id so the speaker can edit / delete the bubble (RoomChatEditEvent)
+    private int id = RoomChatEditRegistry.nextId();
 
     public RoomChatMessage(MessageHandler message) {
         if (message.packet.getMessageId() == Incoming.RoomUserWhisperEvent) {
@@ -89,6 +91,7 @@ public class RoomChatMessage implements Runnable, ISerialize, DatabaseLoggable {
         this.roomUnitId = chatMessage.roomUnitId;
         this.emotion = (byte) chatMessage.getEmotion();
         this.bubbleWidthOverride = chatMessage.bubbleWidthOverride;
+        this.id = chatMessage.id;
     }
 
     public RoomChatMessage(String message, RoomUnit roomUnit, RoomChatMessageBubbles bubble) {
@@ -227,9 +230,19 @@ public class RoomChatMessage implements Runnable, ISerialize, DatabaseLoggable {
             message.appendString(customizationData.nameColor);
             // Optional tail: an old client stops reading before it, a new one reads -1 as "room setting".
             message.appendInt(this.bubbleWidthOverride);
+            // CUSTOM: live message id (edit / delete); old clients stop reading before it.
+            message.appendInt(this.id);
         } catch (Exception e) {
             LOGGER.error("Caught exception", e);
         }
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public int getRoomUnitId() {
+        return this.roomUnitId;
     }
 
     public int getBubbleWidthOverride() {

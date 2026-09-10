@@ -106,7 +106,7 @@ public class FunRoomCommand extends Command {
 
         Room room = gameClient.getHabbo().getHabboInfo().getCurrentRoom();
         if (room == null) return true;
-        if (!RoomFunCommandAccess.requireOwnerOrStaff(gameClient.getHabbo(), room)) return true;
+        if (!RoomFunCommandAccess.requireStaff(gameClient.getHabbo(), room)) return true;
         if (key.equals("terremoto")) return startEarthquake(gameClient, room);
         if (key.equals("cannoni")) return startCannonBarrage(gameClient, room);
 

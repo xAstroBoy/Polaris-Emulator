@@ -7,6 +7,7 @@ import com.eu.habbo.habbohotel.users.HabboGender;
 import com.eu.habbo.messages.ISerialize;
 import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.messages.outgoing.friends.FriendChatMessageComposer;
+import com.eu.habbo.messages.outgoing.friends.MessengerMessageIdComposer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,7 +201,11 @@ public class MessengerBuddy implements Runnable, ISerialize {
             return this.storeOfflineMessage(chatMessage);
         }
 
+        // CUSTOM: live id so both sides can edit / delete the message for a few minutes
+        int liveId = MessengerLiveMessages.register(from.getHabboInfo().getId(), this.id);
+        chatMessage.setLiveId(liveId);
         habbo.getClient().sendResponse(new FriendChatMessageComposer(chatMessage));
+        if (from.getClient() != null) from.getClient().sendResponse(new MessengerMessageIdComposer(this.id, liveId));
         return !this.isVisibleOnline();
     }
 

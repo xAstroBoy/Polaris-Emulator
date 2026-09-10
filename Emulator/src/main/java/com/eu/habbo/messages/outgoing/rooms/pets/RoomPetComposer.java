@@ -63,5 +63,6 @@ public class RoomPetComposer extends MessageComposer {
         this.response.appendString("unknown");
         this.response.appendInt(0);
         this.response.appendInt(0);
+        com.eu.habbo.habbohotel.users.UserCustomizationData.appendEmptyLookExtras(this.response);
     }
 }

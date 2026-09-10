@@ -44,6 +44,30 @@ import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminBulkOffer
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminGiftConfigSaveEvent;
 import com.eu.habbo.messages.incoming.rooms.ChatBubbleConfigSaveEvent;
 import com.eu.habbo.messages.incoming.rooms.ClientRenderSettingsSaveEvent;
+import com.eu.habbo.messages.incoming.users.UserLookRequestEvent;
+import com.eu.habbo.messages.incoming.users.SetUserLookEvent;
+import com.eu.habbo.messages.incoming.users.BattlePassRequestEvent;
+import com.eu.habbo.messages.incoming.users.BattlePassClaimEvent;
+import com.eu.habbo.messages.incoming.users.BattlePassBuyPremiumEvent;
+import com.eu.habbo.messages.incoming.users.BattlePassAdminSaveEvent;
+import com.eu.habbo.messages.incoming.users.LoginRewardRequestEvent;
+import com.eu.habbo.messages.incoming.users.LoginRewardClaimEvent;
+import com.eu.habbo.messages.incoming.users.LoginRewardSaveEvent;
+import com.eu.habbo.messages.incoming.users.LoginRewardDeleteEvent;
+import com.eu.habbo.messages.incoming.users.TutorialStatusRequestEvent;
+import com.eu.habbo.messages.incoming.users.TutorialCompleteEvent;
+import com.eu.habbo.messages.incoming.users.UserUiThemeSaveEvent;
+import com.eu.habbo.messages.incoming.users.UserUiThemeRequestEvent;
+import com.eu.habbo.messages.incoming.rooms.users.RoomChatEditEvent;
+import com.eu.habbo.messages.incoming.rooms.VideoCurtainSetEvent;
+import com.eu.habbo.messages.incoming.rooms.VideoCurtainPlaybackEvent;
+import com.eu.habbo.messages.incoming.rooms.VideoCurtainStateRequestEvent;
+import com.eu.habbo.messages.incoming.friends.MessengerChatEditEvent;
+import com.eu.habbo.messages.incoming.friends.SentFriendRequestsRequestEvent;
+import com.eu.habbo.messages.incoming.friends.CancelFriendRequestEvent;
+import com.eu.habbo.messages.incoming.friends.CallStartEvent;
+import com.eu.habbo.messages.incoming.friends.CallAnswerEvent;
+import com.eu.habbo.messages.incoming.friends.CallEndEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminCreateOfferEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminCreatePageEvent;
 import com.eu.habbo.messages.incoming.catalog.catalogadmin.CatalogAdminDeleteOfferEvent;
@@ -757,6 +781,30 @@ public class PacketManager {
         this.registerHandler(Incoming.CatalogAdminGiftConfigSaveEvent, CatalogAdminGiftConfigSaveEvent.class); // CUSTOM: gift wrapping settings
         this.registerHandler(Incoming.ChatBubbleConfigSaveEvent, ChatBubbleConfigSaveEvent.class); // CUSTOM: bubble picker editor
         this.registerHandler(Incoming.ClientRenderSettingsSaveEvent, ClientRenderSettingsSaveEvent.class); // CUSTOM: hotel-wide renderer settings
+        this.registerHandler(Incoming.UserLookRequestEvent, UserLookRequestEvent.class); // CUSTOM: HSmile look library
+        this.registerHandler(Incoming.SetUserLookEvent, SetUserLookEvent.class); // CUSTOM: HSmile look change
+        this.registerHandler(Incoming.BattlePassRequestEvent, BattlePassRequestEvent.class); // CUSTOM
+        this.registerHandler(Incoming.BattlePassClaimEvent, BattlePassClaimEvent.class); // CUSTOM
+        this.registerHandler(Incoming.BattlePassBuyPremiumEvent, BattlePassBuyPremiumEvent.class); // CUSTOM
+        this.registerHandler(Incoming.BattlePassAdminSaveEvent, BattlePassAdminSaveEvent.class); // CUSTOM
+        this.registerHandler(Incoming.RoomChatEditEvent, RoomChatEditEvent.class); // CUSTOM: HSmile chat edit
+        this.registerHandler(Incoming.MessengerChatEditEvent, MessengerChatEditEvent.class); // CUSTOM: HSmile console edit
+        this.registerHandler(Incoming.SentFriendRequestsRequestEvent, SentFriendRequestsRequestEvent.class); // CUSTOM
+        this.registerHandler(Incoming.CancelFriendRequestEvent, CancelFriendRequestEvent.class); // CUSTOM
+        this.registerHandler(Incoming.CallStartEvent, CallStartEvent.class); // CUSTOM: calls
+        this.registerHandler(Incoming.CallAnswerEvent, CallAnswerEvent.class); // CUSTOM: calls
+        this.registerHandler(Incoming.CallEndEvent, CallEndEvent.class); // CUSTOM: calls
+        this.registerHandler(Incoming.LoginRewardRequestEvent, LoginRewardRequestEvent.class); // CUSTOM
+        this.registerHandler(Incoming.LoginRewardClaimEvent, LoginRewardClaimEvent.class); // CUSTOM
+        this.registerHandler(Incoming.LoginRewardSaveEvent, LoginRewardSaveEvent.class); // CUSTOM
+        this.registerHandler(Incoming.LoginRewardDeleteEvent, LoginRewardDeleteEvent.class); // CUSTOM
+        this.registerHandler(Incoming.TutorialStatusRequestEvent, TutorialStatusRequestEvent.class); // CUSTOM
+        this.registerHandler(Incoming.TutorialCompleteEvent, TutorialCompleteEvent.class); // CUSTOM
+        this.registerHandler(Incoming.VideoCurtainSetEvent, VideoCurtainSetEvent.class); // CUSTOM
+        this.registerHandler(Incoming.VideoCurtainPlaybackEvent, VideoCurtainPlaybackEvent.class); // CUSTOM
+        this.registerHandler(Incoming.VideoCurtainStateRequestEvent, VideoCurtainStateRequestEvent.class); // CUSTOM
+        this.registerHandler(Incoming.UserUiThemeSaveEvent, UserUiThemeSaveEvent.class); // CUSTOM
+        this.registerHandler(Incoming.UserUiThemeRequestEvent, UserUiThemeRequestEvent.class); // CUSTOM
         this.registerHandler(Incoming.CatalogAdminDeleteOfferEvent, CatalogAdminDeleteOfferEvent.class);
         this.registerHandler(Incoming.CatalogAdminMoveOfferEvent, CatalogAdminMoveOfferEvent.class);
         this.registerHandler(Incoming.CatalogAdminMovePageEvent, CatalogAdminMovePageEvent.class);

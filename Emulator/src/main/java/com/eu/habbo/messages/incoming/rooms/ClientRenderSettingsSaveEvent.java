@@ -45,7 +45,7 @@ public class ClientRenderSettingsSaveEvent extends MessageHandler {
     private static final Set<String> KNOWN_KEYS = Set.of(
             "resolution", "scale", "round", "mask", "seatAnchor", "maxResolution", "pixelated", "sitDepth",
             "altitudeDepth", "canvasSmoothing", "antialias", "backBuffer", "mipmap", "wrap", "anisotropy",
-            "spriteRound", "offsetRound", "zoomSnap", "sitDepthByClass");
+            "spriteRound", "offsetRound", "zoomSnap", "sitDepthByClass", "drawDepthByClass");
 
     @Override
     public void handle() throws Exception {
@@ -175,6 +175,29 @@ public class ClientRenderSettingsSaveEvent extends MessageHandler {
             }
 
             if (count > 0) clean.add("sitDepthByClass", cleanOverrides);
+        }
+
+        // per-type draw order (":render" → Ordine): { "<furni class | user | bot | pet>": <1/1000 tile> }, ±5000
+        JsonElement drawElement = input.get("drawDepthByClass");
+        if (drawElement != null && drawElement.isJsonObject()) {
+            JsonObject overrides = drawElement.getAsJsonObject();
+            JsonObject cleanOverrides = new JsonObject();
+            int count = 0;
+
+            for (String key : overrides.keySet()) {
+                if (count >= MAX_SIT_DEPTH_OVERRIDES) break;
+
+                String type = key.trim();
+                if (type.isEmpty() || type.length() > 64) continue;
+
+                Double value = numberOf(overrides, key);
+                if (value == null || Math.abs(value) > 5000 || Math.round(value) == 0) continue;
+
+                cleanOverrides.addProperty(type, (int) Math.round(value));
+                count++;
+            }
+
+            if (count > 0) clean.add("drawDepthByClass", cleanOverrides);
         }
 
         forwardUnknownKeys(input, clean);

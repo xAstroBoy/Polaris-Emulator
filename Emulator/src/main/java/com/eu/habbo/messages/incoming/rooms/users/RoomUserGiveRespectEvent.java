@@ -34,6 +34,7 @@ public class RoomUserGiveRespectEvent extends MessageHandler {
             }
 
             this.client.getHabbo().respect(target);
+            com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(this.client.getHabbo(), "respect", 1); // CUSTOM: battle pass
         }
     }
 }

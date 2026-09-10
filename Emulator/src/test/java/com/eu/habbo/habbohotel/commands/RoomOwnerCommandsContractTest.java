@@ -127,7 +127,7 @@ class RoomOwnerCommandsContractTest {
         String source = read("FunRoomCommand.java");
         String trash = read("TrashCommand.java");
         String migration = Files.readString(Path.of(
-                "src/main/resources/db/migration/V20260810188000__restrict_fun_commands_to_staff.sql"));
+                "src/main/resources/db/migration/V20260910120000__fun_commands_staff_only_and_hidden.sql"));
 
         assertTrue(source.contains("super(\"cmd_trash\""));
         assertTrue(trash.contains("super(\"cmd_trash\""));
@@ -135,7 +135,26 @@ class RoomOwnerCommandsContractTest {
         assertTrue(migration.contains("`rank_3` = 0"));
         assertTrue(migration.contains("`rank_4` = 1"));
         assertTrue(migration.contains("`rank_7` = 1"));
-        assertTrue(migration.contains("`level` >= 4"));
+        assertTrue(migration.contains("`level` >= 4 THEN '1' ELSE '0'"));
+    }
+
+    /**
+     * Room ownership used to be enough for :tornado and the fun pack; the guard
+     * is staff-only again, and rank 0 on the permission row also keeps the
+     * aliases out of the :comandi listing for everyone below Support.
+     */
+    @Test
+    void funEventsRejectRoomOwnersAndStayHiddenFromTheCommandList() throws Exception {
+        String guard = read("RoomFunCommandAccess.java");
+        String funRoom = read("FunRoomCommand.java");
+        String trash = read("TrashCommand.java");
+
+        assertTrue(guard.contains("static boolean requireStaff("));
+        assertTrue(!guard.contains("room.isOwner(habbo)"));
+        assertTrue(funRoom.contains("RoomFunCommandAccess.requireStaff("));
+        assertTrue(trash.contains("RoomFunCommandAccess.requireStaff("));
+        assertTrue(!funRoom.contains("requireOwnerOrStaff"));
+        assertTrue(!trash.contains("requireOwnerOrStaff"));
     }
 
     private static String read(String file) throws Exception {

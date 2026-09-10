@@ -511,6 +511,8 @@ public class RoomChatManager {
             ServerMessage clearPrefixMessage,
             Rectangle tentRectangle) {
         ServerMessage message = new RoomUserTalkComposer(roomChatMessage).compose();
+        RoomChatEditRegistry.register(roomChatMessage.getId(), habbo.getHabboInfo().getId(), roomChatMessage.getRoomUnitId(), this.room.getId()); // CUSTOM
+        com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(habbo, "chat", 1); // CUSTOM: battle pass
         boolean noChatLimit = habbo.hasPermission(Permission.ACC_CHAT_NO_LIMIT);
         int chatDistance = this.room.getChatDistance();
 
@@ -588,6 +590,8 @@ public class RoomChatManager {
             ServerMessage clearPrefixMessage,
             Rectangle tentRectangle) {
         ServerMessage message = new RoomUserShoutComposer(roomChatMessage).compose();
+        RoomChatEditRegistry.register(roomChatMessage.getId(), habbo.getHabboInfo().getId(), roomChatMessage.getRoomUnitId(), this.room.getId()); // CUSTOM
+        com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(habbo, "chat", 1); // CUSTOM: battle pass
 
         for (Habbo h : this.room.getHabbos()) {
             if (!h.getHabboStats().userIgnored(habbo.getHabboInfo().getId())

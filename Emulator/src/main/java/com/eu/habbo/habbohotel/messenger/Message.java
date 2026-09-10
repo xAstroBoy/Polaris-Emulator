@@ -14,6 +14,7 @@ public class Message implements Runnable, DatabaseLoggable {
     private final int toId;
     private final int timestamp;
     private String message;
+    private int liveId = 0; // CUSTOM: in-memory id for edit / delete (MessengerLiveMessages)
 
     public Message(int fromId, int toId, String message) {
         this(fromId, toId, message, Emulator.getIntUnixTimestamp());
@@ -45,6 +46,14 @@ public class Message implements Runnable, DatabaseLoggable {
         statement.setString(3, this.message);
         statement.setInt(4, this.timestamp);
         statement.addBatch();
+    }
+
+    public int getLiveId() {
+        return this.liveId;
+    }
+
+    public void setLiveId(int liveId) {
+        this.liveId = liveId;
     }
 
     public int getToId() {

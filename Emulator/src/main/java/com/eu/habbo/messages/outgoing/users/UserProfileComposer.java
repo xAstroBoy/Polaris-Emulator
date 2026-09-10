@@ -127,6 +127,8 @@ public class UserProfileComposer extends MessageComposer {
         this.response.appendString(customizationData.displayOrder);
         this.response.appendString(customizationData.nameColor);
         this.response.appendInt(this.getTotalBadges());
+        customizationData.appendLookExtras(this.response);
+        this.response.appendInt(this.habboInfo.getInfostandBorder());
 
         return this.response;
     }

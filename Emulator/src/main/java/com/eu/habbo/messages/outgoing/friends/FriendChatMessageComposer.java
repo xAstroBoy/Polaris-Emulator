@@ -50,9 +50,12 @@ public class FriendChatMessageComposer extends MessageComposer {
                 }
             }
             this.response.appendString(name + "/" + look + "/" + this.fromId);
-        } else if (this.extraData != null) {
-            this.response.appendString(this.extraData);
+        } else {
+            this.response.appendString(this.extraData == null ? "" : this.extraData);
         }
+
+        // CUSTOM: live message id (0 = not editable); old clients ignore the tail.
+        this.response.appendInt(this.message.getLiveId());
 
         return this.response;
     }

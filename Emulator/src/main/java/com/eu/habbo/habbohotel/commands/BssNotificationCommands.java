@@ -51,7 +51,8 @@ final class BssNotificationCommand extends Command {
                         .replace("%description%", description)
                 + "\r\n\r\nStanza: " + room.getName()
                 + "\r\nDescrizione: " + description
-                + "\r\n\r\nClicca qui per entrare!";
+                + "\r\n\r\nClicca qui per entrare!"
+                + "\r\n-" + gameClient.getHabbo().getHabboInfo().getUsername();
         String link = "navigator/goto/" + room.getId();
         ServerMessage alert = new StaffAlertWithLinkComposer(message, link).compose();
 

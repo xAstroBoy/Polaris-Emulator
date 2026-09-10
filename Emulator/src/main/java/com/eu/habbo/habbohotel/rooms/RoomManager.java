@@ -966,6 +966,10 @@ public class RoomManager {
         habbo.getClient().sendResponse(new ConfInvisStateComposer(room).compose());
         RoomAreaHideSupport.sendState(room, habbo.getClient());
         habbo.getClient().sendResponse(new HanditemBlockStateComposer(room).compose());
+        // CUSTOM: HSmile video curtain running in this room
+        com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(habbo, "rooms", 1); // CUSTOM: battle pass
+        VideoCurtainManager.State curtain = VideoCurtainManager.get(room.getId());
+        if (curtain != null) habbo.getClient().sendResponse(new com.eu.habbo.messages.outgoing.rooms.VideoCurtainStateComposer(room.getId(), curtain).compose());
 
         if (!room.getCurrentPets().isEmpty()) {
             habbo.getClient()

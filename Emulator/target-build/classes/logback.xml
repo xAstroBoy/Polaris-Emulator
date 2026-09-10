@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook"/>
+    <conversionRule conversionWord="morningstarLevel" class="com.eu.habbo.util.logback.ConsoleLevelConverter" />
+    <conversionRule conversionWord="morningstarLogger" class="com.eu.habbo.util.logback.ConsoleLoggerConverter" />
+
+    <appender name="ConsoleDelegate" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %morningstarLevel [%-12thread] %morningstarLogger | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="Console" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>2048</queueSize>
+        <discardingThreshold>20</discardingThreshold>
+        <neverBlock>true</neverBlock>
+        <maxFlushTime>5000</maxFlushTime>
+        <appender-ref ref="ConsoleDelegate" />
+    </appender>
+
+    <appender name="FileDebugRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logging/debug.txt</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logging/debug.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FileDebug" class="ch.qos.logback.classic.AsyncAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <queueSize>4096</queueSize>
+        <discardingThreshold>20</discardingThreshold>
+        <neverBlock>true</neverBlock>
+        <maxFlushTime>5000</maxFlushTime>
+        <appender-ref ref="FileDebugRolling" />
+    </appender>
+
+    <appender name="FileErrorsRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logging/errors/runtime.txt</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logging/errors/runtime.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FileErrors" class="ch.qos.logback.classic.AsyncAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <queueSize>2048</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>false</neverBlock>
+        <maxFlushTime>5000</maxFlushTime>
+        <appender-ref ref="FileErrorsRolling" />
+    </appender>
+
+    <appender name="FileErrorsSqlRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logging/errors/sql.txt</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logging/errors/sql.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FileErrorsSql" class="ch.qos.logback.classic.AsyncAppender">
+        <filter class="com.eu.habbo.util.logback.SqlExceptionFilter" />
+        <queueSize>2048</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>false</neverBlock>
+        <maxFlushTime>5000</maxFlushTime>
+        <appender-ref ref="FileErrorsSqlRolling" />
+    </appender>
+
+    <appender name="SlowQueriesRolling" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logging/database/slow-queries.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logging/database/slow-queries.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>25MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SlowQueries" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>2048</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>false</neverBlock>
+        <maxFlushTime>5000</maxFlushTime>
+        <appender-ref ref="SlowQueriesRolling" />
+    </appender>
+
+    <logger name="io.netty" level="INFO"/>
+
+    <logger name="com.zaxxer.hikari" level="ERROR"/>
+	
+	<logger name="org.mariadb.jdbc" level="WARN"/>
+
+    <logger name="org.mariadb.jdbc.message.server.ErrorPacket" level="ERROR"/>
+
+    <logger name="database.slow_query" level="WARN" additivity="true">
+        <appender-ref ref="SlowQueries" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="Console" />
+        <appender-ref ref="FileDebug" />
+        <appender-ref ref="FileErrors" />
+        <appender-ref ref="FileErrorsSql" />
+    </root>
+</configuration>

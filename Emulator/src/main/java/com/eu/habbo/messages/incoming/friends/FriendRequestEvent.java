@@ -98,5 +98,6 @@ public class FriendRequestEvent extends MessageHandler {
         }
 
         Messenger.makeFriendRequest(this.client.getHabbo().getHabboInfo().getId(), targetId);
+        this.client.sendResponse(new com.eu.habbo.messages.outgoing.friends.SentFriendRequestsComposer(this.client.getHabbo().getHabboInfo().getId())); // CUSTOM
     }
 }

@@ -531,6 +531,30 @@ public class Incoming {
     public static final int ChatBubbleConfigSaveEvent = 10098; // CUSTOM: bubble picker edits a chat_bubbles row
     public static final int ModToolCloneFinderEvent = 10099; // CUSTOM: mod tools clone finder (accounts sharing IP / machine id)
     public static final int ClientRenderSettingsSaveEvent = 10102; // CUSTOM: staff panel saves hotel-wide renderer settings
+    public static final int UserLookRequestEvent = 10104; // CUSTOM: HSmile look library + own selection request
+    public static final int RoomChatEditEvent = 10106; // CUSTOM: HSmile edit / delete a room chat bubble
+    public static final int MessengerChatEditEvent = 10108; // CUSTOM: HSmile edit / delete a console message
+    public static final int SentFriendRequestsRequestEvent = 10112; // CUSTOM: friend requests I sent
+    public static final int CancelFriendRequestEvent = 10113; // CUSTOM: withdraw a friend request I sent
+    public static final int LoginRewardRequestEvent = 10115; // CUSTOM: daily login reward ladder
+    public static final int LoginRewardClaimEvent = 10116; // CUSTOM: claim today's login reward
+    public static final int LoginRewardSaveEvent = 10117; // CUSTOM (staff): edit one login reward day
+    public static final int LoginRewardDeleteEvent = 10118; // CUSTOM (staff): empty one login reward day
+    public static final int TutorialStatusRequestEvent = 10119; // CUSTOM: first-login tutorial status
+    public static final int TutorialCompleteEvent = 10121; // CUSTOM: tutorial finished / skipped
+    public static final int VideoCurtainSetEvent = 10123; // CUSTOM: room video curtain start / stop
+    public static final int VideoCurtainPlaybackEvent = 10124; // CUSTOM: room video curtain pause / seek
+    public static final int VideoCurtainStateRequestEvent = 10125; // CUSTOM: room video curtain state
+    public static final int UserUiThemeSaveEvent = 10126; // CUSTOM: per-user client theme save
+    public static final int UserUiThemeRequestEvent = 10127; // CUSTOM: per-user client theme request
+    public static final int BattlePassRequestEvent = 10129; // CUSTOM: HSmile battle pass
+    public static final int BattlePassClaimEvent = 10131; // CUSTOM: HSmile battle pass claim
+    public static final int BattlePassBuyPremiumEvent = 10132; // CUSTOM: HSmile battle pass premium purchase
+    public static final int BattlePassAdminSaveEvent = 10133; // CUSTOM (staff): HSmile battle pass editor
+    public static final int CallStartEvent = 10134; // CUSTOM: HSmile friend call (voice / video)
+    public static final int CallAnswerEvent = 10137; // CUSTOM: HSmile friend call answer
+    public static final int CallEndEvent = 10138; // CUSTOM: HSmile friend call hang up
+    public static final int SetUserLookEvent = 10105; // CUSTOM: HSmile look field change (banner, tile, wallpaper, border, ornament, name icon/effect/colour/border, avatar string)
 
     // Custom Prefixes
     public static final int RequestUserPrefixesEvent = 7011;

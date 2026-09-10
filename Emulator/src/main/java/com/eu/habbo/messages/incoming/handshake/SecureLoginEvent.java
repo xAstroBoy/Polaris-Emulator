@@ -45,6 +45,11 @@ import com.eu.habbo.messages.outgoing.users.UserClubComposer;
 import com.eu.habbo.messages.outgoing.users.UserHomeRoomComposer;
 import com.eu.habbo.messages.outgoing.users.UserPermissionsComposer;
 import com.eu.habbo.messages.outgoing.gamedata.ClientRenderSettingsComposer;
+import com.eu.habbo.messages.outgoing.users.UserLookCatalogComposer;
+import com.eu.habbo.messages.outgoing.users.LoginRewardDataComposer;
+import com.eu.habbo.messages.outgoing.users.TutorialStatusComposer;
+import com.eu.habbo.messages.outgoing.users.UserUiThemeComposer;
+import com.eu.habbo.messages.outgoing.users.BattlePassDataComposer;
 import com.eu.habbo.messages.incoming.rooms.ClientRenderSettingsSaveEvent;
 import com.eu.habbo.plugin.events.users.UserLoginEvent;
 import com.eu.habbo.resilience.RuntimeResilienceController;
@@ -308,6 +313,15 @@ public class SecureLoginEvent extends MessageHandler {
                 messages.add(new UserPermissionsComposer(this.client.getHabbo()).compose());
                 // CUSTOM: hotel-wide renderer settings chosen by the staff (":render" panel)
                 messages.add(new ClientRenderSettingsComposer(Emulator.getConfig().getValue(ClientRenderSettingsSaveEvent.CONFIG_KEY, "{}")).compose());
+                // CUSTOM: HSmile look library (banners, borders, ornaments, name icons...) and the user's own selection
+                messages.add(new UserLookCatalogComposer(habbo, true).compose());
+                // CUSTOM: HSmile daily login rewards, first-login tutorial flag and the saved client theme
+                messages.add(new LoginRewardDataComposer(habbo).compose());
+                messages.add(new TutorialStatusComposer(!habbo.getHabboStats().nux).compose());
+                messages.add(new UserUiThemeComposer(UserUiThemeComposer.load(habbo.getHabboInfo().getId())).compose());
+                // CUSTOM: HSmile battle pass (the login itself counts once per day)
+                messages.add(new BattlePassDataComposer(habbo).compose());
+                com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(habbo, "login", 1);
                 messages.add(new AvailableCommandsComposer(Emulator.getGameEnvironment()
                                 .getCommandHandler()
                                 .getCommandsForRank(this.client

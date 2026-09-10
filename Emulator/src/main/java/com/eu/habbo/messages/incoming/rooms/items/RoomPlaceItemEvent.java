@@ -188,6 +188,7 @@ public class RoomPlaceItemEvent extends MessageHandler {
         this.client.sendResponse(new RemoveHabboItemComposer(item.getGiftAdjustedId()));
         this.client.getHabbo().getInventory().getItemsComponent().removeHabboItem(item.getId());
         item.setFromGift(false);
+        com.eu.habbo.habbohotel.battlepass.BattlePassManager.track(this.client.getHabbo(), "furni", 1); // CUSTOM: battle pass
 
         if (BuildersClubRoomSupport.isTrackedItem(item.getId())) {
             int trackedUserId = BuildersClubRoomSupport.getTrackedUserId(item.getId());

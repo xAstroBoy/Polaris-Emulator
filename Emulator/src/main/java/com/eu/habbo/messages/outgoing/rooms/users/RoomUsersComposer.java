@@ -80,6 +80,7 @@ public class RoomUsersComposer extends MessageComposer {
             this.response.appendString(this.habbo.getHabboInfo().getRoomEntryMethod());
             this.response.appendInt(this.habbo.getHabboInfo().getRoomEntryTeleportId());
             this.response.appendInt(this.habbo.getHabboInfo().getInfostandBorder());
+            customizationData.appendLookExtras(this.response);
         } else if (this.habbos != null) {
             this.response.appendInt(this.habbos.size());
             for (Habbo habbo : this.habbos) {
@@ -124,6 +125,7 @@ public class RoomUsersComposer extends MessageComposer {
                     this.response.appendString(habbo.getHabboInfo().getRoomEntryMethod());
                     this.response.appendInt(habbo.getHabboInfo().getRoomEntryTeleportId());
                     this.response.appendInt(habbo.getHabboInfo().getInfostandBorder());
+                    customizationData.appendLookExtras(this.response);
                 }
             }
         } else if (this.bot != null) {
@@ -153,6 +155,7 @@ public class RoomUsersComposer extends MessageComposer {
             this.response.appendString("unknown");
             this.response.appendInt(0);
             this.response.appendInt(0);
+            UserCustomizationData.appendEmptyLookExtras(this.response);
         } else if (this.bots != null) {
             this.response.appendInt(this.bots.size());
             for (Bot bot : this.bots) {
@@ -181,6 +184,7 @@ public class RoomUsersComposer extends MessageComposer {
                 this.response.appendString("unknown");
                 this.response.appendInt(0);
                 this.response.appendInt(0);
+                UserCustomizationData.appendEmptyLookExtras(this.response);
             }
         }
         return this.response;
