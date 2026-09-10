@@ -23,6 +23,14 @@ public final class PacketRuntimeValidator {
                 continue;
             }
 
+            // A @Deprecated field is an alias kept so an existing plugin jar keeps linking - it
+            // points at the same id on purpose. Reporting those as duplicates buried the real ones:
+            // three of them were logged as errors at every startup, and a genuine collision added
+            // later would have read as more of the same noise.
+            if (field.isAnnotationPresent(Deprecated.class)) {
+                continue;
+            }
+
             try {
                 int packetId = field.getInt(null);
 
