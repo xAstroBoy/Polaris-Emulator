@@ -17,7 +17,6 @@ import com.eu.habbo.habbohotel.users.HabboInventory;
 import com.eu.habbo.habbohotel.users.HabboStats;
 import com.eu.habbo.habbohotel.users.inventory.ItemsComponent;
 import com.eu.habbo.messages.ClientMessage;
-import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.threading.runnables.ShutdownEmulator;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -65,7 +64,8 @@ class CatalogBuyItemEventTest {
             ShutdownEmulator.timestamp = previousShutdownTimestamp;
         }
 
-        verify(client).sendResponse(any(ServerMessage.class));
+        // The purchase service answers with a composer, not a pre-composed ServerMessage.
+        verify(client).sendResponse(any(com.eu.habbo.messages.outgoing.MessageComposer.class));
     }
 
     private static ClientMessage packet(int pageId, int itemId, String extraData, int count) {

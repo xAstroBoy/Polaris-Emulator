@@ -71,7 +71,12 @@ class CatalogStudioPacketContractTest {
         assertEquals("Summer catalog", readString(payload));
         assertEquals("2026-08-02T10:00:00Z", readString(payload));
         assertEquals(CatalogStudioSessionComposer.SNAPSHOT_ENCODING, readString(payload));
+        // COUNTS_V2: the page and offer counts travel before the chunks, so a truncated snapshot
+        // cannot pass itself off as an empty catalog.
         assertEquals(0, payload.readInt());
+        assertEquals(0, payload.readInt());
+        int chunkCount = payload.readInt();
+        for (int index = 0; index < chunkCount; index++) readString(payload);
         assertFalse(payload.isReadable());
     }
 
@@ -105,6 +110,9 @@ class CatalogStudioPacketContractTest {
         assertHeader(payload, Outgoing.CatalogStudioSessionComposer);
         skipSessionMetadata(payload);
         assertEquals(CatalogStudioSessionComposer.SNAPSHOT_ENCODING, readString(payload));
+        // COUNTS_V2 puts the page and offer counts ahead of the chunks.
+        assertTrue(payload.readInt() >= 0);
+        assertTrue(payload.readInt() >= 0);
         int chunkCount = payload.readInt();
         assertTrue(chunkCount > 1);
 
@@ -120,7 +128,10 @@ class CatalogStudioPacketContractTest {
         try (GZIPInputStream input = new GZIPInputStream(new ByteArrayInputStream(compressed))) {
             json = new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
-        CatalogPageSnapshot[] decoded = new Gson().fromJson(json, CatalogPageSnapshot[].class);
+        // The chunks carry a {pages, offers} document, not a bare page array.
+        com.google.gson.JsonObject snapshot = com.google.gson.JsonParser.parseString(json).getAsJsonObject();
+        CatalogPageSnapshot[] decoded =
+                new Gson().fromJson(snapshot.getAsJsonArray("pages"), CatalogPageSnapshot[].class);
         assertEquals(700, decoded.length);
         assertEquals(lastText, decoded[699].pageTextDetails());
         assertFalse(payload.isReadable());

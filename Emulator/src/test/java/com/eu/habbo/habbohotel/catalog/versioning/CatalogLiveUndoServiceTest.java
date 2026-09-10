@@ -27,6 +27,9 @@ class CatalogLiveUndoServiceTest {
         CatalogLiveMutationHook hook = mock(CatalogLiveMutationHook.class);
         when(dataSource.getConnection()).thenReturn(connection);
         when(versions.lockRuntimeState(connection)).thenReturn(new CatalogRuntimeState(10, 11, Instant.EPOCH));
+        CatalogPageSnapshot livePage = new CatalogPageSnapshot(
+                17, -1, "page_17", "Page 17", "root", 0, 0, 1, 0, true, true, false, "NORMAL", false, "", "", "", "",
+                "", "", "", 0, "");
         when(versions.loadSnapshot(connection, 10))
                 .thenReturn(new CatalogVersionSnapshot(
                         new CatalogVersion(
@@ -39,8 +42,11 @@ class CatalogLiveUndoServiceTest {
                                 Instant.EPOCH,
                                 1,
                                 Instant.EPOCH),
-                        List.of(),
+                        List.of(livePage),
                         List.of()));
+        // Undo now compares the live snapshot against the state the entry recorded, so the page has
+        // to be in the snapshot exactly as the entry left it - otherwise it reads as "someone edited
+        // this after you" and refuses.
         CatalogChangeEntry original = new CatalogChangeEntry(
                 1,
                 CatalogEntityType.PAGE,
@@ -48,7 +54,7 @@ class CatalogLiveUndoServiceTest {
                 17,
                 CatalogChangeOperation.UPDATE,
                 "before",
-                "after");
+                new com.google.gson.Gson().toJson(livePage));
         when(journal.load(connection, 21))
                 .thenReturn(new CatalogChangeGroup(
                         21, 10, 4, 7, "Edit", CatalogChangeSource.UI, Instant.EPOCH, List.of(original)));
@@ -67,7 +73,7 @@ class CatalogLiveUndoServiceTest {
                 .apply(
                         eq(connection),
                         org.mockito.ArgumentMatchers.argThat(
-                                change -> change.beforeJson().equals("after")
+                                change -> change.beforeJson().equals(original.afterJson())
                                         && change.afterJson().equals("before")));
         verify(journal).append(eq(connection), eq(10L), eq(5L), eq(7), any(), eq(CatalogChangeSource.UNDO), any());
         verify(operations).insert(eq(connection), any(CatalogOperationRecord.class));
