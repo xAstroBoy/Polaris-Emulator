@@ -43,6 +43,27 @@ public class DebugViewCollisionsCommand extends Command {
                         .split(";"));
     }
 
+    /** Support rank; staff can look at any room's collisions the way they can enter any room. */
+    private static final int STAFF_RANK = 4;
+
+    /**
+     * The overlay reveals how a room is built - where the real collision sits under a furni that
+     * looks like something else - so it stays with the people who are entitled to build there: the
+     * owner, anyone the owner gave rights to, and staff.
+     *
+     * <p>It draws only for the one viewer and writes nothing to the room, so there is no reason to
+     * hold it any tighter than that.
+     */
+    static boolean canView(Habbo habbo, Room room) {
+        if (habbo == null || room == null) return false;
+
+        if (habbo.getHabboInfo().getRank() != null && habbo.getHabboInfo().getRank().getId() >= STAFF_RANK) {
+            return true;
+        }
+
+        return room.isOwner(habbo) || room.hasRights(habbo);
+    }
+
     public static boolean isWatching(int habboId) {
         return WATCHING.contains(habboId);
     }
@@ -57,6 +78,16 @@ public class DebugViewCollisionsCommand extends Command {
         Room room = habbo.getHabboInfo().getCurrentRoom();
 
         if (room == null) {
+            return true;
+        }
+
+        if (!canView(habbo, room)) {
+            habbo.whisper(
+                    Emulator.getTexts()
+                            .getValue(
+                                    "commands.error.collisions.permission",
+                                    "Puoi vedere le collisioni solo in una stanza tua o in cui hai i diritti."),
+                    RoomChatMessageBubbles.ALERT);
             return true;
         }
 

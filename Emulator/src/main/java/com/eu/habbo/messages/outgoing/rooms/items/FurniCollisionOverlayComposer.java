@@ -44,6 +44,10 @@ public class FurniCollisionOverlayComposer extends MessageComposer {
             String name = item.getBaseItem() != null ? item.getBaseItem().getName() : "";
             int width = item.getBaseItem() != null ? item.getBaseItem().getWidth() : 1;
             int length = item.getBaseItem() != null ? item.getBaseItem().getLength() : 1;
+            // Only a seat gets a direction arrow drawn for it: on a seat the rotation decides which way
+            // the avatar ends up facing, which is the thing worth checking. On a wall or a floor tile it
+            // is one more mark over an already busy floor.
+            boolean seat = item.getBaseItem() != null && item.getBaseItem().allowSit();
 
             for (RoomTile tile : entry.getValue()) {
                 this.response.appendInt(item.getId());
@@ -56,6 +60,7 @@ public class FurniCollisionOverlayComposer extends MessageComposer {
                 this.response.appendInt(item.getRotation());
                 this.response.appendInt(width);
                 this.response.appendInt(length);
+                this.response.appendBoolean(seat);
             }
         }
 

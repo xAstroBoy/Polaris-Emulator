@@ -223,7 +223,7 @@ U|com/eu/habbo/habbohotel/commands/CreditsCommand.java|CALL|getGameEnvironment|1
 U|com/eu/habbo/habbohotel/commands/CreditsCommand.java|CALL|getGameServer|1
 U|com/eu/habbo/habbohotel/commands/CreditsCommand.java|CALL|getTexts|9
 U|com/eu/habbo/habbohotel/commands/DanceCommand.java|CALL|getTexts|4
-U|com/eu/habbo/habbohotel/commands/DebugViewCollisionsCommand.java|CALL|getTexts|3
+U|com/eu/habbo/habbohotel/commands/DebugViewCollisionsCommand.java|CALL|getTexts|4
 U|com/eu/habbo/habbohotel/commands/DiagonalCommand.java|CALL|getTexts|3
 U|com/eu/habbo/habbohotel/commands/DisconnectCommand.java|CALL|getGameEnvironment|1
 U|com/eu/habbo/habbohotel/commands/DisconnectCommand.java|CALL|getTexts|6

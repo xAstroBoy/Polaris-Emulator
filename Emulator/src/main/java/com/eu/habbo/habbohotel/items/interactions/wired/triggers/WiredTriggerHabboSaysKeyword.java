@@ -20,7 +20,20 @@ public class WiredTriggerHabboSaysKeyword extends InteractionWiredTrigger {
     private static final int MATCH_EXACT = 1;
     private static final int MATCH_ALL_WORDS = 2;
 
-    private boolean hideMessage = false;
+    /**
+     * A fresh box hides the message that set it off.
+     *
+     * <p>Almost every use of this trigger is a command word - ":premio", "start", a password on a
+     * door - and leaving it in the chat both spoils it for whoever is watching and invites everyone
+     * else to repeat it. Builders were ticking the box every single time; the ones who want the word
+     * to stay visible can untick it.
+     *
+     * <p>A row saved before the option existed keeps showing the message: those rooms work the way
+     * their owner set them up, and a placed furni must not change behaviour on its own.
+     */
+    private static final boolean HIDE_MESSAGE_BY_DEFAULT = true;
+
+    private boolean hideMessage = HIDE_MESSAGE_BY_DEFAULT;
     private boolean ownerOnly = false;
     private String key = "";
     private int matchMode = MATCH_CONTAINS;
@@ -104,7 +117,7 @@ public class WiredTriggerHabboSaysKeyword extends InteractionWiredTrigger {
 
     @Override
     public void onPickUp() {
-        this.hideMessage = false;
+        this.hideMessage = HIDE_MESSAGE_BY_DEFAULT;
         this.ownerOnly = false;
         this.key = "";
         this.matchMode = MATCH_CONTAINS;

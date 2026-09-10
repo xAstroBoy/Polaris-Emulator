@@ -64,10 +64,32 @@ class WiredTriggerHabboSaysKeywordLoadTest {
         return trigger;
     }
 
+    /**
+     * A box nobody has configured hides the message that sets it off: the keyword is nearly always a
+     * command word, and leaving it in the chat both spoils it and invites everyone to repeat it.
+     */
+    @Test
+    void aFreshBoxHidesTheMessage() {
+        assertTrue(configured().isHideMessage());
+    }
+
+    /**
+     * A row written before the option existed keeps showing the message. Those rooms work the way
+     * their owner set them up, and a furni already placed must not change behaviour on its own.
+     */
+    @Test
+    void aRowSavedWithoutTheOptionKeepsShowingTheMessage() throws Exception {
+        WiredTriggerHabboSaysKeyword trigger = configured();
+
+        trigger.loadWiredData(row("{\"key\":\"start\",\"matchMode\":0}"), null);
+
+        assertFalse(trigger.isHideMessage());
+    }
+
     private static void assertDefaults(WiredTriggerHabboSaysKeyword trigger) {
         assertEquals("", trigger.getKey());
         assertFalse(trigger.isOwnerOnly());
-        assertFalse(trigger.isHideMessage());
+        assertTrue(trigger.isHideMessage());
         assertEquals(0, trigger.getMatchMode());
     }
 }
